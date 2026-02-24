@@ -50,6 +50,37 @@ namespace TPU_Assembly.Class
             server = null;
         }
 
+        public void Send(string message)
+        {
+            try
+            {
+                if (client != null && client.Connected)
+                {
+                    byte[] data = Encoding.UTF8.GetBytes(message);
+                    stream.Write(data, 0, data.Length);
+                    MSystem.InsertAndSaveLogs($"Sent to Robot: {message}", Color.Blue);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi gửi: {ex.Message}");
+            }
+        }
+
+        public bool IsConnected()
+        {
+            return client != null && client.Connected;
+        }
+
+        public string GetClientIP()
+        {
+            if (client != null && client.Connected)
+            {
+                return ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString();
+            }
+            return "Không có client";
+        }
+
         private void ListenForClients()
         {
             while (isRunning)

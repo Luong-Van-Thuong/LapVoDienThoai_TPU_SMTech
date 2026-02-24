@@ -1,5 +1,4 @@
-﻿using Basler.Pylon;
-using PaddleOCRSharp;
+﻿using PaddleOCRSharp;
 using System.Diagnostics;
 using System.Drawing.Drawing2D;
 using System.IO.Compression;
@@ -43,6 +42,7 @@ namespace TPU_Assembly_Inspection_Paddle
         public PictureBox _currentSelectedThumb;
 
         private PerformanceCounter cpuCounter;
+
         private System.Windows.Forms.Timer timerPerformance;
 
         public string _name_file;
@@ -84,10 +84,9 @@ namespace TPU_Assembly_Inspection_Paddle
 
             CreateFolderFileDefault.CreateSaveFolders();
 
-            UpdateStatusCameraAndRobot();
+            UpdateStatusCamera();
 
             InitializePerformanceMonitor();
-
 
             zoomable.InitializePictureBoxEvents();
         }
@@ -112,7 +111,6 @@ namespace TPU_Assembly_Inspection_Paddle
 
             zoomable.LoadOcrZones();
             Start_Server();
-            InitializeServer();
         }
 
         #region Open Server TCP/IP
@@ -175,9 +173,13 @@ namespace TPU_Assembly_Inspection_Paddle
                 this.BeginInvoke(new Action(() => OnDataReceived(cmd)));
                 return;
             }
+
             MSystem.InsertAndSaveLogs(cmd, Color.Blue);
             if (string.IsNullOrEmpty(cmd)) return;
+
             string data = cmd.ToUpper().Trim();
+
+            // xử lý data nhận được
             if (data.Contains("TRIGGER"))
             {
                 Run_Once();
@@ -191,32 +193,41 @@ namespace TPU_Assembly_Inspection_Paddle
             var taskCam2 = Task.Run(() => ProcessCameraAI("CAMERA2"));
             var taskCam3 = Task.Run(() => ProcessCameraAI("CAMERA3"));
             await Task.WhenAll(taskCam1, taskCam2, taskCam3);
-            if (taskCam1.Result == false || taskCam2.Result == false || taskCam3.Result == false)
+
+            string[] results = { taskCam1.Result, taskCam2.Result, taskCam3.Result };
+
+            if (results.Any(r => r != "OK"))
             {
-                MSystem.InsertAndSaveLogs("CAMERA1 PROCESSING FAILED", Color.Red);
+                string errorToSend = results.FirstOrDefault(r => r != "OK");
+                _tcpServer.Send(errorToSend);
+                MSystem.InsertAndSaveLogs("CAMERA PROCESSING FAILED", Color.Red);
                 btnResult.BackColor = Color.Red;
                 btnResult.Text = "NG";
                 return;
             }
+
             await Task.Run(() => Run_All_PictureBox_Click(null, null));
             stopWatch.Stop();
             BT_Time.Text = stopWatch.ElapsedMilliseconds.ToString();   
         }
 
-        private bool ProcessCameraAI(string camName)
+        private string ProcessCameraAI(string camName)
         {
             PictureBox targetPB = null;
             switch (camName)
             {
-                case "CAMERA1": pictureBox1.Image?.Dispose();targetPB = pictureBox1;break;
-                case "CAMERA2": pictureBox2.Image?.Dispose();targetPB = pictureBox2;break;
-                case "CAMERA3":pictureBox3.Image?.Dispose();targetPB = pictureBox3;break;
+                case "CAMERA1": targetPB = pictureBox1;break;
+                case "CAMERA2": targetPB = pictureBox2;break;
+                case "CAMERA3":targetPB = pictureBox3;break;
             }
             try
             {
                 using (Bitmap img = CameraBasler.GrabImage(false, camName))
                 {
-                    if (img == null) { return false; }
+                    if (img == null) 
+                    {
+                        return "GRAB_ERROR";
+                    }
 
                     Bitmap cloned = (Bitmap)img.Clone();
 
@@ -227,13 +238,13 @@ namespace TPU_Assembly_Inspection_Paddle
                         }
                         UpdateCameraImage((camName == "CAMERA1") ? 1 : (camName == "CAMERA2") ? 2 : 3, cloned);
                     }));
-                    return true;
+                    return "OK";
                 }
             }
             catch (Exception ex) 
             {
                 MSystem.InsertAndSaveLogs($"Error {camName}: {ex.Message}", Color.Red);
-                return false;
+                return "UNKNOWN_ERROR"; // Lỗi ngoại lệ
             }
         }
 
@@ -608,7 +619,7 @@ namespace TPU_Assembly_Inspection_Paddle
 
         #region 5. Check Connection Camera
 
-        private void UpdateStatusCameraAndRobot()
+        private void UpdateStatusCamera()
         {
             btnCamera1.BackColor = (CameraBasler.CheckConnectCam("CAMERA1")) ? Color.Lime : Color.Red;
             btnCamera2.BackColor = (CameraBasler.CheckConnectCam("CAMERA2")) ? Color.Lime : Color.Red;
@@ -647,7 +658,7 @@ namespace TPU_Assembly_Inspection_Paddle
 
         private string ShowSelectionDialog()
         {
-            Form prompt = new Form()
+            Form prompt = new()
             {
                 Width = 300,
                 Height = 150,
@@ -658,12 +669,12 @@ namespace TPU_Assembly_Inspection_Paddle
                 MinimizeBox = false
             };
 
-            FlowLayoutPanel panel = new FlowLayoutPanel() { Dock = DockStyle.Fill, Padding = new Padding(10) };
+            FlowLayoutPanel panel = new() { Dock = DockStyle.Fill, Padding = new Padding(10) };
             string selected = "All";
 
             for (int i = 1; i <= 3; i++)
             {
-                Button btn = new Button() { Text = i.ToString(), Width = 50, Height = 50 };
+                Button btn = new() { Text = i.ToString(), Width = 50, Height = 50 };
                 int index = i;
                 btn.Click += (s, e) => { selected = "PB" + index; prompt.Close(); };
                 panel.Controls.Add(btn);
@@ -681,10 +692,6 @@ namespace TPU_Assembly_Inspection_Paddle
             if (currentImportpictureBox == "All")
             {
                 currentImportpictureBox = "PB1";
-
-                pictureBox1.Image?.Dispose();
-                pictureBox2.Image?.Dispose();
-                pictureBox3.Image?.Dispose();
 
                 using (OpenFileDialog ofd = new OpenFileDialog())
                 {
@@ -754,7 +761,6 @@ namespace TPU_Assembly_Inspection_Paddle
 
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
-                    targetPB.Image?.Dispose();
 
                     Bitmap bmp = LoadBitmapWithoutLocking(ofd.FileName);
 
@@ -938,7 +944,7 @@ namespace TPU_Assembly_Inspection_Paddle
 
         #region 11. Save Result Image
 
-        private void SaveResultToDisk(Bitmap image, string baseFileName, string type)
+        private static void SaveResultToDisk(Bitmap image, string baseFileName, string type)
         {
             try
             {
@@ -948,8 +954,7 @@ namespace TPU_Assembly_Inspection_Paddle
 
                 if (!isAllowed) return;
 
-                string dateString = DateTime.Now.ToString("yyyy-MM-dd");
-                EnsureImageDirectories(dateString, out string pathOrigin, out string pathOK, out string pathNG);
+                EnsureImageDirectories(out string pathOrigin, out string pathOK, out string pathNG);
 
                 string destFolder = "";
                 switch (type)
@@ -1294,8 +1299,9 @@ namespace TPU_Assembly_Inspection_Paddle
             zoomable.FitImageToPictureBox(pictureBox1);
         }
 
-        private void EnsureImageDirectories(string dateString, out string originalPath, out string okPath, out string ngPath)
+        private static void EnsureImageDirectories(out string originalPath, out string okPath, out string ngPath)
         {
+            string dateString = DateTime.Now.ToString("ddMMyyyy");
             string baseImagesPath = @"C:\FA\TPU_Assembly_Inspection_Paddle\Images";
             string dateFolderPath = Path.Combine(baseImagesPath, dateString);
 

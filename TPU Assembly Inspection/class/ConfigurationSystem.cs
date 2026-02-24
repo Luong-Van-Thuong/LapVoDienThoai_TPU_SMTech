@@ -1,7 +1,5 @@
-﻿using System;
-using System.Windows.Forms;
+﻿using System.Configuration;
 using TPU_Assembly_Inspection_Paddle;
-using System.Configuration;
 namespace TPU_Assembly.Class
 {
     public class ConfigurationSystem

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Drawing;
-using System.IO;
-using System.Windows.Forms;
-
-namespace TPU_Assembly.Class
+﻿namespace TPU_Assembly.Class
 {
     public class MSystem
     {
