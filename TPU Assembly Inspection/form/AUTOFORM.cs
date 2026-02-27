@@ -1326,6 +1326,23 @@ namespace TPU_Assembly_Inspection_Paddle
                 Color backColor = isAllOK ? Color.Lime : Color.Red;
                 Color foreColor = isAllOK ? Color.Black : Color.White;
 
+                if (isAllOK)
+                {
+                    _tcpServer.Send("OK");
+                }
+                else if (!isOCROK && errorCams.Count >= 2)
+                {
+                    _tcpServer.Send("NG_ALL");
+                }
+                else if (!isOCROK && errorCams.Count < 2) 
+                {
+                    _tcpServer.Send("NG_OCR");
+                }
+                else if (isOCROK && errorCams.Count > 0)
+                {
+                    _tcpServer.Send("NG_TPU");
+                }
+
                 string logCamName = isAllOK ? "All Camera" : string.Join(" + ", errorCams);
 
                 this.Invoke(new Action(() =>
@@ -1338,7 +1355,6 @@ namespace TPU_Assembly_Inspection_Paddle
                 MSystem.InsertAndSaveLogs($"Result: {resultText}", isAllOK ? Color.Green : Color.Red);
                 TotalCount++; // tăng số lượng sản phẩm
                 UpdateResult(logCamName, isAllOK, ocrResult, "Complete");
-
 
                 if (SaveImageOK || SaveImageNG)
                 {
