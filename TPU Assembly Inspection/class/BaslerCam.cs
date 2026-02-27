@@ -28,12 +28,7 @@ namespace TPU_Assembly.Class
 
         private readonly AutoResetEvent _waitForImageEvent = new(false);
 
-        public override bool isContinuous()
-        {
-            if (isContinue == true)
-                return true;
-            return false;
-        }
+        public override bool isContinuous() => isContinue;
 
         public override void SetPictureBox(PictureBox control)
         {
@@ -46,51 +41,50 @@ namespace TPU_Assembly.Class
 
         public BaslerCam(string userDefinedName)
         {
+            
+            List<ICameraInfo> allCameras = CameraFinder.Enumerate();
+            try
             {
-                List<ICameraInfo> allCameras = CameraFinder.Enumerate();
-                try
+                foreach (ICameraInfo cameraInfo in allCameras)
                 {
-                    foreach (ICameraInfo cameraInfo in allCameras)
+
+                    if (cameraInfo[CameraInfoKey.UserDefinedName] == userDefinedName)
                     {
+                        string cameraSerial = cameraInfo[CameraInfoKey.SerialNumber];
+                        camera = new Camera(cameraSerial);
+                        cameraName = userDefinedName;
+                        deviceType = cameraInfo[CameraInfoKey.DeviceType];
 
-                        if (cameraInfo[CameraInfoKey.UserDefinedName] == userDefinedName)
-                        {
-                            string cameraSerial = cameraInfo[CameraInfoKey.SerialNumber];
-                            camera = new Camera(cameraSerial);
-                            cameraName = userDefinedName;
-                            deviceType = cameraInfo[CameraInfoKey.DeviceType];
+                        camera.CameraOpened += Configuration.AcquireContinuous;
+                        camera.ConnectionLost += OnConnectionLost;
+                        camera.CameraOpened += OnCameraOpened;
+                        camera.CameraClosed += OnCameraClosed;
+                        camera.StreamGrabber.GrabStarted += OnGrabStarted;
+                        camera.StreamGrabber.ImageGrabbed += OnImageGrabbed;
+                        camera.StreamGrabber.GrabStopped += OnGrabStopped;
 
-                            camera.CameraOpened += Configuration.AcquireContinuous;
-                            camera.ConnectionLost += OnConnectionLost;
-                            camera.CameraOpened += OnCameraOpened;
-                            camera.CameraClosed += OnCameraClosed;
-                            camera.StreamGrabber.GrabStarted += OnGrabStarted;
-                            camera.StreamGrabber.ImageGrabbed += OnImageGrabbed;
-                            camera.StreamGrabber.GrabStopped += OnGrabStopped;
-
-                            camera.Open();
-
-                            isOpened = true;
-
-                            camera.Parameters[PLCamera.UserSetLoad].Execute();
-                        }
-                    }
-                }
-                catch
-                {
-                    Thread.Sleep(300);
-                    try
-                    {
-                        // Retry to open camera
                         camera.Open();
+
                         isOpened = true;
 
                         camera.Parameters[PLCamera.UserSetLoad].Execute();
                     }
-                    catch (Exception)
-                    {
-                        MSystem.InsertAndSaveLogs($"Failed to open camera: {userDefinedName}", Color.Red);
-                    }
+                }
+            }
+            catch
+            {
+                Thread.Sleep(300);
+                try
+                {
+                    // Retry to open camera
+                    camera.Open();
+                    isOpened = true;
+
+                    camera.Parameters[PLCamera.UserSetLoad].Execute();
+                }
+                catch (Exception)
+                {
+                    MSystem.InsertAndSaveLogs($"Failed to open camera: {userDefinedName}", Color.Red);
                 }
             }
         }

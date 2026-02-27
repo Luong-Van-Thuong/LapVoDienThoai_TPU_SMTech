@@ -2,46 +2,42 @@
 
 namespace TPU_Assembly.Class
 {
-    public class CameraBasler()
+    public static class CameraBasler
     {
-       
-        public static bool CheckConnectCam(string IndexCamera)
+        public static bool CheckConnectCam(string indexCamera)
         {
-            return MAINFORM._cameraDict.ContainsKey(IndexCamera)
-           && MAINFORM._cameraDict[IndexCamera].CameraInterface.IsOpened();
+            return MAINFORM._cameraDict.TryGetValue(indexCamera, out var config)
+                   && config.CameraInterface.IsOpened();
         }
-
 
         public static Bitmap GrabImage(string indexCamera)
         {
-            ICameraInterface Camera;
-            switch (indexCamera)
+            if (!MAINFORM._cameraDict.TryGetValue(indexCamera, out var config))
             {
-                case "CAMERA1": Camera = BaslerCam.CAMERA1; break;
-                case "CAMERA2": Camera = BaslerCam.CAMERA2; break;
-                case "CAMERA3": Camera = BaslerCam.CAMERA3; break;
-                default: return null;
+                MSystem.InsertAndSaveLogs($"Camera {indexCamera} Not Found in Dict", Color.Red);
+                return null;
             }
 
-            if (!CheckConnectCam(indexCamera))
+            if (!config.CameraInterface.IsOpened())
             {
                 MSystem.InsertAndSaveLogs($"Camera {indexCamera} Is Not Open", Color.Red);
                 return null;
             }
+
             try
             {
-                using (Bitmap bitmap_grapIMG = Camera.OneShot_())
+                using Bitmap bitmap_grapIMG = config.CameraInterface.OneShot_();
+
+                if (bitmap_grapIMG == null) return null;
+
+                Bitmap returnImg = (Bitmap)bitmap_grapIMG.Clone();
+
+                if (MAINFORM.SaveImageOrigin)
                 {
-                    if (bitmap_grapIMG == null) return null;
-
-                    Bitmap returnImg = (Bitmap)bitmap_grapIMG.Clone();
-
-                    if (MAINFORM.SaveImageOrigin)
-                    {
-                        CreateFolderFileDefault.SaveOriginalBitmap(returnImg);
-                    }
-                    return returnImg;
+                    CreateFolderFileDefault.SaveOriginalBitmap(returnImg);
                 }
+
+                return returnImg;
             }
             catch (Exception ex)
             {
@@ -49,7 +45,5 @@ namespace TPU_Assembly.Class
                 return null;
             }
         }
-
-
     }
 }
