@@ -26,8 +26,6 @@ namespace TPU_Assembly.Class
 
         private readonly PixelDataConverter converter = new();
 
-        public readonly object _LockImage = new();
-
         private readonly AutoResetEvent _waitForImageEvent = new(false);
 
         public override bool isContinuous()
@@ -238,7 +236,8 @@ namespace TPU_Assembly.Class
                 MSystem.InsertAndSaveLogs($"Camera connection lost: {cameraName}", Color.Red);
             }
             finally 
-            {                 
+            {
+                isOpened = false;
                 ReOpenCamera();
             }
         }
@@ -299,14 +298,8 @@ namespace TPU_Assembly.Class
                 if (i > 0) ReOpenCamera();
                 _waitForImageEvent.Reset();
 
-                lock (_LockImage) 
-                {
-                    Image_BASLER?.Dispose();
-                    Image_BASLER = null;
-                }
                 if (!OneShot())
                 {
-                    Thread.Sleep(100);
                     continue;
                 }
 
@@ -342,7 +335,7 @@ namespace TPU_Assembly.Class
                         try
                         {
                             stopWatch.Restart();
-                            Bitmap bitmap = new Bitmap(grabResult.Width, grabResult.Height, PixelFormat.Format8bppIndexed);
+                            Bitmap bitmap = new (grabResult.Width, grabResult.Height, PixelFormat.Format8bppIndexed);
                             ColorPalette palette = bitmap.Palette;
                             for (int i = 0; i < 256; i++)
                                 palette.Entries[i] = Color.FromArgb(i, i, i);

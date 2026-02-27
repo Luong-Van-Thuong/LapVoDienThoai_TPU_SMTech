@@ -107,6 +107,9 @@
             LabelNG = new Label();
             label1 = new Label();
             btnClearCounter = new FontAwesome.Sharp.IconButton();
+            btnLightingOn = new FontAwesome.Sharp.IconButton();
+            btnLightingOff = new FontAwesome.Sharp.IconButton();
+            groupBox2 = new GroupBox();
             Panel_Menu.SuspendLayout();
             Panel_Home.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
@@ -123,6 +126,7 @@
             groupboxConnection.SuspendLayout();
             Panel_Settings.SuspendLayout();
             groupBox1.SuspendLayout();
+            groupBox2.SuspendLayout();
             SuspendLayout();
             // 
             // Panel_Menu
@@ -152,7 +156,7 @@
             btnHome.Location = new Point(0, 75);
             btnHome.Margin = new Padding(4, 3, 4, 3);
             btnHome.Name = "btnHome";
-            btnHome.Size = new Size(257, 100);
+            btnHome.Size = new Size(200, 100);
             btnHome.TabIndex = 0;
             btnHome.Text = "Home";
             btnHome.TextImageRelation = TextImageRelation.ImageBeforeText;
@@ -172,7 +176,7 @@
             btnSettings.Location = new Point(0, 276);
             btnSettings.Margin = new Padding(4, 3, 4, 3);
             btnSettings.Name = "btnSettings";
-            btnSettings.Size = new Size(257, 100);
+            btnSettings.Size = new Size(200, 100);
             btnSettings.TabIndex = 2;
             btnSettings.Text = "Settings";
             btnSettings.TextImageRelation = TextImageRelation.ImageBeforeText;
@@ -192,7 +196,7 @@
             btnTeaching.Location = new Point(0, 175);
             btnTeaching.Margin = new Padding(4, 3, 4, 3);
             btnTeaching.Name = "btnTeaching";
-            btnTeaching.Size = new Size(257, 100);
+            btnTeaching.Size = new Size(200, 100);
             btnTeaching.TabIndex = 1;
             btnTeaching.Text = "Teaching";
             btnTeaching.TextImageRelation = TextImageRelation.ImageBeforeText;
@@ -362,7 +366,7 @@
             pictureBox3.Location = new Point(102, 429);
             pictureBox3.Margin = new Padding(4, 3, 4, 3);
             pictureBox3.Name = "pictureBox3";
-            pictureBox3.Size = new Size(538, 402);
+            pictureBox3.Size = new Size(556, 402);
             pictureBox3.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox3.TabIndex = 3;
             pictureBox3.TabStop = false;
@@ -396,10 +400,10 @@
             pictureBox2.BackColor = Color.DarkBlue;
             pictureBox2.BorderStyle = BorderStyle.FixedSingle;
             pictureBox2.ContextMenuStrip = MenuStripPic2;
-            pictureBox2.Location = new Point(674, 429);
+            pictureBox2.Location = new Point(666, 429);
             pictureBox2.Margin = new Padding(4, 3, 4, 3);
             pictureBox2.Name = "pictureBox2";
-            pictureBox2.Size = new Size(538, 402);
+            pictureBox2.Size = new Size(546, 402);
             pictureBox2.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox2.TabIndex = 1;
             pictureBox2.TabStop = false;
@@ -435,7 +439,8 @@
             pictureBox1.Location = new Point(102, 21);
             pictureBox1.Margin = new Padding(4, 3, 4, 3);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(1110, 382);
+            pictureBox1.Size = new Size(1110, 394);
+            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
             pictureBox1.DoubleClick += pictureBox1_DoubleClick;
@@ -1008,6 +1013,7 @@
             // Panel_Settings
             // 
             Panel_Settings.BackColor = Color.White;
+            Panel_Settings.Controls.Add(groupBox2);
             Panel_Settings.Controls.Add(groupBox1);
             Panel_Settings.Controls.Add(propertyGridSettings);
             Panel_Settings.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
@@ -1173,6 +1179,50 @@
             btnClearCounter.UseVisualStyleBackColor = false;
             btnClearCounter.Click += btnClearCounter_Click;
             // 
+            // btnLightingOn
+            // 
+            btnLightingOn.FlatStyle = FlatStyle.Flat;
+            btnLightingOn.IconChar = FontAwesome.Sharp.IconChar.None;
+            btnLightingOn.IconColor = Color.Black;
+            btnLightingOn.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            btnLightingOn.Location = new Point(38, 39);
+            btnLightingOn.Margin = new Padding(4, 3, 4, 3);
+            btnLightingOn.Name = "btnLightingOn";
+            btnLightingOn.Size = new Size(177, 75);
+            btnLightingOn.TabIndex = 1241;
+            btnLightingOn.Text = "Light On";
+            btnLightingOn.UseVisualStyleBackColor = true;
+            btnLightingOn.Click += btnLightingOn_Click;
+            // 
+            // btnLightingOff
+            // 
+            btnLightingOff.FlatStyle = FlatStyle.Flat;
+            btnLightingOff.IconChar = FontAwesome.Sharp.IconChar.None;
+            btnLightingOff.IconColor = Color.Black;
+            btnLightingOff.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            btnLightingOff.Location = new Point(38, 139);
+            btnLightingOff.Margin = new Padding(4, 3, 4, 3);
+            btnLightingOff.Name = "btnLightingOff";
+            btnLightingOff.Size = new Size(177, 72);
+            btnLightingOff.TabIndex = 1242;
+            btnLightingOff.Text = "Light Off";
+            btnLightingOff.UseVisualStyleBackColor = true;
+            btnLightingOff.Click += btnLightingOff_Click;
+            // 
+            // groupBox2
+            // 
+            groupBox2.Controls.Add(btnLightingOn);
+            groupBox2.Controls.Add(btnLightingOff);
+            groupBox2.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            groupBox2.Location = new Point(518, 319);
+            groupBox2.Margin = new Padding(4, 3, 4, 3);
+            groupBox2.Name = "groupBox2";
+            groupBox2.Padding = new Padding(4, 3, 4, 3);
+            groupBox2.Size = new Size(253, 249);
+            groupBox2.TabIndex = 1245;
+            groupBox2.TabStop = false;
+            groupBox2.Text = "Models";
+            // 
             // MAINFORM
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -1197,10 +1247,10 @@
             Controls.Add(BT_cylcetime);
             Controls.Add(Panel_Menu);
             Controls.Add(btnLabelOCR);
-            Controls.Add(Panel_Home);
-            Controls.Add(Panel_Teaching);
             Controls.Add(Panel_Settings);
             Controls.Add(panel1);
+            Controls.Add(Panel_Home);
+            Controls.Add(Panel_Teaching);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(4, 3, 4, 3);
             Name = "MAINFORM";
@@ -1224,6 +1274,7 @@
             groupboxConnection.ResumeLayout(false);
             Panel_Settings.ResumeLayout(false);
             groupBox1.ResumeLayout(false);
+            groupBox2.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
 
@@ -1308,6 +1359,9 @@
         private FontAwesome.Sharp.IconButton Import_Image2;
         private FontAwesome.Sharp.IconButton BT_GrapImage2;
         private FontAwesome.Sharp.IconButton Run_Vision_CAMERA2;
+        private FontAwesome.Sharp.IconButton btnLightingOff;
+        private FontAwesome.Sharp.IconButton btnLightingOn;
+        private GroupBox groupBox2;
     }
 }
 

@@ -5,8 +5,8 @@ using System.IO.Compression;
 using System.Runtime;
 using System.Runtime.InteropServices;
 using TPU_Assembly.Class;
-using TPU_Assembly.JobSelection;
-
+using TPU_Assembly.JobSelection;   
+using Lighting_ALT;         
 
 namespace TPU_Assembly_Inspection_Paddle
 {
@@ -63,10 +63,14 @@ namespace TPU_Assembly_Inspection_Paddle
 
         private TCP_Server _tcpServer;
 
-        private readonly Font font = new ("Arial", 150, FontStyle.Bold);
-        private readonly Pen penBox = new (Color.Lime, 15);                   
-        private readonly SolidBrush brushText = new (Color.White);  
-        private readonly SolidBrush brushBg = new (Color.Lime);
+        private readonly Font font = new("Arial", 150, FontStyle.Bold);
+        private readonly Pen penBox = new(Color.Lime, 15);
+        private readonly SolidBrush brushText = new(Color.White);
+        private readonly SolidBrush brushBg = new(Color.Lime);
+
+        public static Dictionary<string, CameraConfig> _cameraDict;
+
+        private LightingSerialALT myLighting;
 
         public MAINFORM()
         {
@@ -74,13 +78,40 @@ namespace TPU_Assembly_Inspection_Paddle
 
             SplashScreenManager.ShowSplash();
 
+            MSystem.SetRichTextLogs(this.richTextLog);
+
+            _cameraDict = new Dictionary<string, CameraConfig>
+        {
+            {
+                "CAMERA1", new CameraConfig {
+                    Name = "CAMERA1",
+                    CameraInterface = BaslerCam.CAMERA1,
+                    TargetPictureBox = pictureBox1
+                }
+            },
+            {
+                "CAMERA2", new CameraConfig {
+                    Name = "CAMERA2",
+                    CameraInterface = BaslerCam.CAMERA2,
+                    TargetPictureBox = pictureBox2
+                }
+            },
+            {
+                "CAMERA3", new CameraConfig {
+                    Name = "CAMERA3",
+                    CameraInterface = BaslerCam.CAMERA3,
+                    TargetPictureBox = pictureBox3
+                }
+            }
+        };
+
             LoadSystemSettings();
 
             zoomable = new Zoomable(this);
 
             thumbnails = new Thumbnails(this);
 
-            MSystem.SetRichTextLogs(this.richTextLog);
+            InitializeLighting();
 
             CreateFolderFileDefault.CreateSaveFolders();
 
@@ -182,33 +213,56 @@ namespace TPU_Assembly_Inspection_Paddle
             // xử lý data nhận được
             if (data.Contains("TRIGGER"))
             {
+                if (!myLighting.LightON(myLighting.Channel, myLighting.Brightness))
+                {
+                    MSystem.InsertAndSaveLogs("ERROR ON LIGHT", Color.Red);
+                    _tcpServer.Send("GRAB_ERROR");
+                    return;
+                }
+                Thread.Sleep(50);
                 Run_Once();
             }
         }
 
         private async void Run_Once()
         {
-            stopWatch.Restart();
-            var taskCam1 = Task.Run(() => ProcessCameraAI("CAMERA1"));
-            var taskCam2 = Task.Run(() => ProcessCameraAI("CAMERA2"));
-            var taskCam3 = Task.Run(() => ProcessCameraAI("CAMERA3"));
-            await Task.WhenAll(taskCam1, taskCam2, taskCam3);
-
-            string[] results = { taskCam1.Result, taskCam2.Result, taskCam3.Result };
-
-            if (results.Any(r => r != "OK"))
+            try
             {
-                string errorToSend = results.FirstOrDefault(r => r != "OK");
-                _tcpServer.Send(errorToSend);
-                MSystem.InsertAndSaveLogs("CAMERA PROCESSING FAILED", Color.Red);
-                btnResult.BackColor = Color.Red;
-                btnResult.Text = "NG";
-                return;
-            }
+                stopWatch.Restart();
+                var taskCam1 = Task.Run(() => ProcessCameraAI("CAMERA1"));
+                var taskCam2 = Task.Run(() => ProcessCameraAI("CAMERA2"));
+                var taskCam3 = Task.Run(() => ProcessCameraAI("CAMERA3"));
+                await Task.WhenAll(taskCam1, taskCam2, taskCam3);
 
-            await Task.Run(() => Run_All_PictureBox_Click(null, null));
-            stopWatch.Stop();
-            BT_Time.Text = stopWatch.ElapsedMilliseconds.ToString();   
+                string[] results = { taskCam1.Result, taskCam2.Result, taskCam3.Result };
+
+                if (results.Any(r => r != "OK"))
+                {
+                    string errorToSend = results.FirstOrDefault(r => r != "OK");
+                    _tcpServer.Send(errorToSend);
+                    MSystem.InsertAndSaveLogs("CAMERA PROCESSING FAILED", Color.Red);
+                    btnResult.BackColor = Color.Red;
+                    btnResult.Text = "NG";
+                    return;
+                }
+                await Task.Run(() => Run_All_PictureBox_Click(null, null));
+                stopWatch.Stop();
+                BT_Time.Text = stopWatch.ElapsedMilliseconds.ToString();
+            }
+            catch (Exception ex)
+            {
+                MSystem.InsertAndSaveLogs($"Lỗi hệ thống trong Run_Once: {ex.Message}", Color.Red);
+                _tcpServer.Send("GRAB_ERROR");
+                btnResult.BackColor = Color.Red;
+                btnResult.Text = "GRAB_ERROR";
+            }
+            finally
+            {
+                if (!myLighting.LightOFF(myLighting.Channel))
+                {
+                    MSystem.InsertAndSaveLogs("ERROR OFF LIGHT", Color.Red);
+                }
+            }
         }
 
         private string ProcessCameraAI(string camName)
@@ -216,35 +270,60 @@ namespace TPU_Assembly_Inspection_Paddle
             PictureBox targetPB = null;
             switch (camName)
             {
-                case "CAMERA1": targetPB = pictureBox1;break;
-                case "CAMERA2": targetPB = pictureBox2;break;
-                case "CAMERA3":targetPB = pictureBox3;break;
+                case "CAMERA1": targetPB = pictureBox1; break;
+                case "CAMERA2": targetPB = pictureBox2; break;
+                case "CAMERA3": targetPB = pictureBox3; break;
             }
             try
             {
-                using (Bitmap img = CameraBasler.GrabImage(false, camName))
+                Bitmap img = CameraBasler.GrabImage(camName);
+                if (img == null) return "GRAB_ERROR";
+
+                targetPB.Invoke(new Action(() =>
                 {
-                    if (img == null) 
-                    {
-                        return "GRAB_ERROR";
-                    }
+                    var oldImage = targetPB.Image;
 
-                    Bitmap cloned = (Bitmap)img.Clone();
+                    int camId = (camName == "CAMERA1") ? 1 : (camName == "CAMERA2") ? 2 : 3;
+                    UpdateCameraImage(camId, img);
+                    oldImage?.Dispose();
+                }));
 
-                    targetPB.Invoke(new Action(() => {
-                        if (targetPB.Image != null && targetPB.Image != targetPB.Tag)
-                        {
-                            targetPB.Image.Dispose(); 
-                        }
-                        UpdateCameraImage((camName == "CAMERA1") ? 1 : (camName == "CAMERA2") ? 2 : 3, cloned);
-                    }));
-                    return "OK";
-                }
+                return "OK";
+
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 MSystem.InsertAndSaveLogs($"Error {camName}: {ex.Message}", Color.Red);
-                return "UNKNOWN_ERROR"; // Lỗi ngoại lệ
+                return "UNKNOWN_ERROR";
+            }
+        }
+
+        #endregion
+
+        #region Lighting
+        private void InitializeLighting()
+        {
+            myLighting = new LightingSerialALT();
+
+            if (myLighting.IsConnected())
+            {
+                MSystem.InsertAndSaveLogs($"[Lighting] Đã kết nối thành công", Color.Green);
+            }
+        }
+
+        private void btnLightingOn_Click(object sender, EventArgs e)
+        {
+            if (myLighting.IsConnected())
+            {
+                if(!myLighting.LightON(myLighting.Channel, myLighting.Brightness)) MSystem.InsertAndSaveLogs("ERROR ON Light", Color.Red);
+            }
+        }
+
+        private void btnLightingOff_Click(object sender, EventArgs e)
+        {
+            if (myLighting.IsConnected())
+            {
+                if (!myLighting.LightOFF(myLighting.Channel)) MSystem.InsertAndSaveLogs("ERROR OFF Light", Color.Red);
             }
         }
 
@@ -464,6 +543,7 @@ namespace TPU_Assembly_Inspection_Paddle
                 if (result == DialogResult.Yes)
                 {
                     CleanupResources();
+
                     this.Close();
                 }
             }
@@ -480,7 +560,7 @@ namespace TPU_Assembly_Inspection_Paddle
             {
                 cam.DestroyCamera();
             }
-            catch {}
+            catch { }
             finally
             {
                 cam = null;
@@ -516,6 +596,8 @@ namespace TPU_Assembly_Inspection_Paddle
             pictureBox3.Image?.Dispose();
             pictureBox3.Image = null;
             _tcpServer?.Stop();
+
+            myLighting?.Dispose();
         }
 
         #endregion
@@ -631,27 +713,46 @@ namespace TPU_Assembly_Inspection_Paddle
         #region 6. Teaching Camera
         private void Universal_GrabImage_Click(object sender, EventArgs e)
         {
-            if (sender is not Button btn) return;
-            string cameraName = "";
-            PictureBox targetPB = null;
-            switch (btn.Name)
+            try
             {
-                case "BT_GrapImage1": cameraName = "CAMERA1"; targetPB = pictureBox1; break;
-                case "BT_GrapImage2": cameraName = "CAMERA2"; targetPB = pictureBox2; break;
-                case "BT_GrapImage3": cameraName = "CAMERA3"; targetPB = pictureBox3; break;
-            }
-
-            if (targetPB != null)
-            {
-                using (Bitmap newImage = CameraBasler.GrabImage(true, cameraName))
+                if (sender is not Button btn) return;
+                string cameraName = "";
+                PictureBox targetPB = null;
+                switch (btn.Name)
                 {
-                    if (newImage == null) return;
+                    case "BT_GrapImage1": cameraName = "CAMERA1"; targetPB = pictureBox1; break;
+                    case "BT_GrapImage2": cameraName = "CAMERA2"; targetPB = pictureBox2; break;
+                    case "BT_GrapImage3": cameraName = "CAMERA3"; targetPB = pictureBox3; break;
+                }
 
-                    targetPB.Image?.Dispose();
-                    UpdateCameraImage(
-                        (cameraName == "CAMERA1") ? 1 :
-                        (cameraName == "CAMERA2") ? 2 : 3,
-                        newImage);
+                if (targetPB != null)
+                {
+                    if (!myLighting.LightON(myLighting.Channel, myLighting.Brightness))
+                    {
+                        MSystem.InsertAndSaveLogs("ERROR ON LIGHT", Color.Red);
+                        return;
+                    }
+                    Thread.Sleep(100);
+                    stopWatch.Restart();
+                    Bitmap newImage = CameraBasler.GrabImage(cameraName);
+                    stopWatch.Stop();
+                    BT_Time.Text = stopWatch.ElapsedMilliseconds.ToString() + " ms";
+                    {
+                        if (newImage == null) return;
+
+                        targetPB.Image?.Dispose();
+                        UpdateCameraImage(
+                            (cameraName == "CAMERA1") ? 1 :
+                            (cameraName == "CAMERA2") ? 2 : 3,
+                            newImage);
+                    }
+                }
+            }
+            finally
+            {
+                if (!myLighting.LightOFF(myLighting.Channel))
+                {
+                    MSystem.InsertAndSaveLogs("ERROR OFF LIGHT", Color.Red);
                 }
             }
         }
@@ -713,7 +814,7 @@ namespace TPU_Assembly_Inspection_Paddle
                 return;
             }
             thumbnails.SetupThumbnailUI();
-            using (OpenFileDialog ofd = new OpenFileDialog())
+            using (OpenFileDialog ofd = new())
             {
                 ofd.Filter = "Image Files|*.bmp;*.jpg;*.jpeg;*.png;*.tif;*.tiff";
                 ofd.Multiselect = true;
@@ -1072,24 +1173,26 @@ namespace TPU_Assembly_Inspection_Paddle
         public void UpdateCameraImage(int camId, Bitmap rawImage)
         {
             PictureBox pb = GetPictureBox(camId);
-            if (pb == null) return;
+            if (pb == null || rawImage == null) return;
 
-            if (this.InvokeRequired)
+            if (pb.InvokeRequired)
             {
-                using (Bitmap cloned = (Bitmap)rawImage.Clone())
-                {
-                    this.Invoke(new Action(() => UpdateCameraImage(camId, cloned)));
-                }
+                pb.Invoke(new Action(() => UpdateCameraImage(camId, rawImage)));
                 return;
             }
 
-            if (pb.Tag is Bitmap oldTag)
-                oldTag.Dispose();
-
             pb.Image?.Dispose();
-            Bitmap newImage = (Bitmap)rawImage.Clone();
-            pb.Tag = newImage;
-            pb.Image = newImage;
+            pb.Image = null;
+
+            if (pb.Tag is Bitmap oldTag)
+            {
+                oldTag.Dispose();
+                pb.Tag = null;
+            }
+
+            pb.Image = rawImage;
+            pb.Tag = rawImage;
+            zoomable.FitImageToPictureBox(pb);
         }
 
         public void UpdatePictureBoxSafe(PictureBox pb, Bitmap source, List<YoloInferenceEngine.Detection> detections)
@@ -1155,6 +1258,7 @@ namespace TPU_Assembly_Inspection_Paddle
                 UpdatePictureBoxSafe(pictureBox2, bm2, det2);
                 UpdatePictureBoxSafe(pictureBox3, bm3, det3);
 
+                string status = "NG";
                 if (det2.Count >= 3 && det3.Count >= 3 && !string.IsNullOrEmpty(ocrResult))
                 {
                     this.Invoke(new Action(() =>
@@ -1164,6 +1268,7 @@ namespace TPU_Assembly_Inspection_Paddle
                         btnResult.BackColor = Color.Lime;
                     }));
                     MSystem.InsertAndSaveLogs("Result: OK", Color.Green);
+                    status = "OK";
                 }
                 else
                 {
@@ -1174,6 +1279,19 @@ namespace TPU_Assembly_Inspection_Paddle
                         btnResult.BackColor = Color.Red;
                     }));
                     MSystem.InsertAndSaveLogs("Result: NG", Color.Red);
+                }
+
+
+                string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                string baseName_OCR = $"OCR_{timestamp}";
+                string baseName_Picture2 = $"Picture2_{timestamp}";
+                string baseName_Picture3 = $"Picture3_{timestamp}";
+
+                if (SaveImageOK || SaveImageNG)
+                {
+                    SaveResultToDisk((Bitmap)pictureBox1.Image, baseName_OCR, status);      // lưu 3 ảnh
+                    SaveResultToDisk((Bitmap)pictureBox2.Image, baseName_Picture2, status); // lưu 3 ảnh
+                    SaveResultToDisk((Bitmap)pictureBox3.Image, baseName_Picture3, status); // lưu 3 ảnh
                 }
 
             }
@@ -1299,7 +1417,7 @@ namespace TPU_Assembly_Inspection_Paddle
             zoomable.FitImageToPictureBox(pictureBox1);
         }
 
-        private static void EnsureImageDirectories(out string originalPath, out string okPath, out string ngPath)
+        private static void EnsureImageDirectories(out string originPath, out string okPath, out string ngPath)
         {
             string dateString = DateTime.Now.ToString("ddMMyyyy");
             string baseImagesPath = @"C:\FA\TPU_Assembly_Inspection_Paddle\Images";
@@ -1312,11 +1430,11 @@ namespace TPU_Assembly_Inspection_Paddle
             }
 
             // Thư mục con
-            originalPath = Path.Combine(dateFolderPath, "Original");
+            originPath = Path.Combine(dateFolderPath, "Origin");
             okPath = Path.Combine(dateFolderPath, "OK");
             ngPath = Path.Combine(dateFolderPath, "NG");
 
-            if (!Directory.Exists(originalPath)) Directory.CreateDirectory(originalPath);
+            if (!Directory.Exists(originPath)) Directory.CreateDirectory(originPath);
             if (!Directory.Exists(okPath)) Directory.CreateDirectory(okPath);
             if (!Directory.Exists(ngPath)) Directory.CreateDirectory(ngPath);
         }
@@ -1351,6 +1469,13 @@ namespace TPU_Assembly_Inspection_Paddle
             Environment.SetEnvironmentVariable("PATH", paddleLibPath + ";" + pathEnv);
             SetDllDirectory(paddleLibPath);
         }
+    }
+
+    public class CameraConfig
+    {
+        public string Name { get; set; }
+        public ICameraInterface CameraInterface { get; set; }
+        public PictureBox TargetPictureBox { get; set; }
     }
     #endregion
 

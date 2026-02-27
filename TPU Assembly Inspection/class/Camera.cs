@@ -7,18 +7,12 @@ namespace TPU_Assembly.Class
        
         public static bool CheckConnectCam(string IndexCamera)
         {
-            if (IndexCamera == "CAMERA1")
-                return BaslerCam.CAMERA1.IsOpened();
-            else if (IndexCamera == "CAMERA2")
-                return BaslerCam.CAMERA2.IsOpened();
-            else if (IndexCamera == "CAMERA3")
-                return BaslerCam.CAMERA3.IsOpened();
-            else
-                return false;
+            return MAINFORM._cameraDict.ContainsKey(IndexCamera)
+           && MAINFORM._cameraDict[IndexCamera].CameraInterface.IsOpened();
         }
 
 
-        public static Bitmap GrabImage(bool ManualGrab, string indexCamera)
+        public static Bitmap GrabImage(string indexCamera)
         {
             ICameraInterface Camera;
             switch (indexCamera)
@@ -36,22 +30,18 @@ namespace TPU_Assembly.Class
             }
             try
             {
-                Bitmap bitmap_grapIMG = Camera.OneShot_();
-
-                if (bitmap_grapIMG == null)
+                using (Bitmap bitmap_grapIMG = Camera.OneShot_())
                 {
-                    MSystem.InsertAndSaveLogs("Grab Image Failed", Color.Red);
-                    return null;
+                    if (bitmap_grapIMG == null) return null;
+
+                    Bitmap returnImg = (Bitmap)bitmap_grapIMG.Clone();
+
+                    if (MAINFORM.SaveImageOrigin)
+                    {
+                        CreateFolderFileDefault.SaveOriginalBitmap(returnImg);
+                    }
+                    return returnImg;
                 }
-
-                Bitmap returnImage = (Bitmap)bitmap_grapIMG.Clone();
-
-                if (MAINFORM.SaveImageOrigin || ManualGrab)
-                {
-                    CreateFolderFileDefault.SaveOriginalBitmap(returnImage);
-                }
-                return returnImage;
-
             }
             catch (Exception ex)
             {
