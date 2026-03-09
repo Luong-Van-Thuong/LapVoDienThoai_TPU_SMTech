@@ -57,6 +57,8 @@
             Fit_Image = new ToolStripMenuItem();
             Clear_Image = new ToolStripMenuItem();
             selectROIstrip = new ToolStripMenuItem();
+            listROIstrip = new ToolStripMenuItem();
+            showROIstrip = new ToolStripMenuItem();
             BT_GrapImage1 = new FontAwesome.Sharp.IconButton();
             Run_Vision_CAMERA1 = new FontAwesome.Sharp.IconButton();
             MenuStripPic4 = new ContextMenuStrip(components);
@@ -95,6 +97,9 @@
             BT_Hide = new FontAwesome.Sharp.IconButton();
             Panel_Teaching = new Panel();
             Panel_Settings = new Panel();
+            groupBox2 = new GroupBox();
+            btnLightingOn = new FontAwesome.Sharp.IconButton();
+            btnLightingOff = new FontAwesome.Sharp.IconButton();
             groupBox1 = new GroupBox();
             progressBar1 = new ProgressBar();
             btnAddtoArchive = new FontAwesome.Sharp.IconButton();
@@ -107,9 +112,7 @@
             LabelNG = new Label();
             label1 = new Label();
             btnClearCounter = new FontAwesome.Sharp.IconButton();
-            btnLightingOn = new FontAwesome.Sharp.IconButton();
-            btnLightingOff = new FontAwesome.Sharp.IconButton();
-            groupBox2 = new GroupBox();
+            pictureBox4 = new PictureBox();
             Panel_Menu.SuspendLayout();
             Panel_Home.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
@@ -125,8 +128,9 @@
             panel1.SuspendLayout();
             groupboxConnection.SuspendLayout();
             Panel_Settings.SuspendLayout();
-            groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
+            groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox4).BeginInit();
             SuspendLayout();
             // 
             // Panel_Menu
@@ -230,6 +234,7 @@
             // Panel_Home
             // 
             Panel_Home.BackColor = Color.White;
+            Panel_Home.Controls.Add(pictureBox4);
             Panel_Home.Controls.Add(Import_Image2);
             Panel_Home.Controls.Add(BT_GrapImage2);
             Panel_Home.Controls.Add(Run_Vision_CAMERA2);
@@ -439,20 +444,19 @@
             pictureBox1.Location = new Point(102, 21);
             pictureBox1.Margin = new Padding(4, 3, 4, 3);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(1110, 394);
+            pictureBox1.Size = new Size(556, 394);
             pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
-            pictureBox1.DoubleClick += pictureBox1_DoubleClick;
             // 
             // MenuStripPic1
             // 
             MenuStripPic1.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             MenuStripPic1.ImageScalingSize = new Size(20, 20);
-            MenuStripPic1.Items.AddRange(new ToolStripItem[] { Fit_Image, Clear_Image, selectROIstrip });
+            MenuStripPic1.Items.AddRange(new ToolStripItem[] { Fit_Image, Clear_Image, selectROIstrip, listROIstrip, showROIstrip });
             MenuStripPic1.Name = "contextMenuStrip_Home";
             MenuStripPic1.RenderMode = ToolStripRenderMode.Professional;
-            MenuStripPic1.Size = new Size(164, 82);
+            MenuStripPic1.Size = new Size(164, 134);
             // 
             // Fit_Image
             // 
@@ -474,6 +478,20 @@
             selectROIstrip.Size = new Size(163, 26);
             selectROIstrip.Text = "Select ROI";
             selectROIstrip.Click += btnSelcectROI_Click;
+            // 
+            // listROIstrip
+            // 
+            listROIstrip.Name = "listROIstrip";
+            listROIstrip.Size = new Size(163, 26);
+            listROIstrip.Text = "List ROI";
+            listROIstrip.Click += listROIstrip_Click;
+            // 
+            // showROIstrip
+            // 
+            showROIstrip.Name = "showROIstrip";
+            showROIstrip.Size = new Size(163, 26);
+            showROIstrip.Text = "Show ROI";
+            showROIstrip.Click += showROIstrip_Click;
             // 
             // BT_GrapImage1
             // 
@@ -1023,6 +1041,50 @@
             Panel_Settings.Size = new Size(1310, 841);
             Panel_Settings.TabIndex = 1236;
             // 
+            // groupBox2
+            // 
+            groupBox2.Controls.Add(btnLightingOn);
+            groupBox2.Controls.Add(btnLightingOff);
+            groupBox2.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            groupBox2.Location = new Point(518, 319);
+            groupBox2.Margin = new Padding(4, 3, 4, 3);
+            groupBox2.Name = "groupBox2";
+            groupBox2.Padding = new Padding(4, 3, 4, 3);
+            groupBox2.Size = new Size(253, 249);
+            groupBox2.TabIndex = 1245;
+            groupBox2.TabStop = false;
+            groupBox2.Text = "Models";
+            // 
+            // btnLightingOn
+            // 
+            btnLightingOn.FlatStyle = FlatStyle.Flat;
+            btnLightingOn.IconChar = FontAwesome.Sharp.IconChar.None;
+            btnLightingOn.IconColor = Color.Black;
+            btnLightingOn.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            btnLightingOn.Location = new Point(38, 39);
+            btnLightingOn.Margin = new Padding(4, 3, 4, 3);
+            btnLightingOn.Name = "btnLightingOn";
+            btnLightingOn.Size = new Size(177, 75);
+            btnLightingOn.TabIndex = 1241;
+            btnLightingOn.Text = "Light On";
+            btnLightingOn.UseVisualStyleBackColor = true;
+            btnLightingOn.Click += btnLightingOn_Click;
+            // 
+            // btnLightingOff
+            // 
+            btnLightingOff.FlatStyle = FlatStyle.Flat;
+            btnLightingOff.IconChar = FontAwesome.Sharp.IconChar.None;
+            btnLightingOff.IconColor = Color.Black;
+            btnLightingOff.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            btnLightingOff.Location = new Point(38, 139);
+            btnLightingOff.Margin = new Padding(4, 3, 4, 3);
+            btnLightingOff.Name = "btnLightingOff";
+            btnLightingOff.Size = new Size(177, 72);
+            btnLightingOff.TabIndex = 1242;
+            btnLightingOff.Text = "Light Off";
+            btnLightingOff.UseVisualStyleBackColor = true;
+            btnLightingOff.Click += btnLightingOff_Click;
+            // 
             // groupBox1
             // 
             groupBox1.Controls.Add(progressBar1);
@@ -1179,49 +1241,17 @@
             btnClearCounter.UseVisualStyleBackColor = false;
             btnClearCounter.Click += btnClearCounter_Click;
             // 
-            // btnLightingOn
+            // pictureBox4
             // 
-            btnLightingOn.FlatStyle = FlatStyle.Flat;
-            btnLightingOn.IconChar = FontAwesome.Sharp.IconChar.None;
-            btnLightingOn.IconColor = Color.Black;
-            btnLightingOn.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            btnLightingOn.Location = new Point(38, 39);
-            btnLightingOn.Margin = new Padding(4, 3, 4, 3);
-            btnLightingOn.Name = "btnLightingOn";
-            btnLightingOn.Size = new Size(177, 75);
-            btnLightingOn.TabIndex = 1241;
-            btnLightingOn.Text = "Light On";
-            btnLightingOn.UseVisualStyleBackColor = true;
-            btnLightingOn.Click += btnLightingOn_Click;
-            // 
-            // btnLightingOff
-            // 
-            btnLightingOff.FlatStyle = FlatStyle.Flat;
-            btnLightingOff.IconChar = FontAwesome.Sharp.IconChar.None;
-            btnLightingOff.IconColor = Color.Black;
-            btnLightingOff.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            btnLightingOff.Location = new Point(38, 139);
-            btnLightingOff.Margin = new Padding(4, 3, 4, 3);
-            btnLightingOff.Name = "btnLightingOff";
-            btnLightingOff.Size = new Size(177, 72);
-            btnLightingOff.TabIndex = 1242;
-            btnLightingOff.Text = "Light Off";
-            btnLightingOff.UseVisualStyleBackColor = true;
-            btnLightingOff.Click += btnLightingOff_Click;
-            // 
-            // groupBox2
-            // 
-            groupBox2.Controls.Add(btnLightingOn);
-            groupBox2.Controls.Add(btnLightingOff);
-            groupBox2.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            groupBox2.Location = new Point(518, 319);
-            groupBox2.Margin = new Padding(4, 3, 4, 3);
-            groupBox2.Name = "groupBox2";
-            groupBox2.Padding = new Padding(4, 3, 4, 3);
-            groupBox2.Size = new Size(253, 249);
-            groupBox2.TabIndex = 1245;
-            groupBox2.TabStop = false;
-            groupBox2.Text = "Models";
+            pictureBox4.BackColor = Color.DarkBlue;
+            pictureBox4.BorderStyle = BorderStyle.FixedSingle;
+            pictureBox4.Location = new Point(666, 21);
+            pictureBox4.Margin = new Padding(4, 3, 4, 3);
+            pictureBox4.Name = "pictureBox4";
+            pictureBox4.Size = new Size(546, 394);
+            pictureBox4.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox4.TabIndex = 1255;
+            pictureBox4.TabStop = false;
             // 
             // MAINFORM
             // 
@@ -1247,10 +1277,10 @@
             Controls.Add(BT_cylcetime);
             Controls.Add(Panel_Menu);
             Controls.Add(btnLabelOCR);
-            Controls.Add(Panel_Settings);
             Controls.Add(panel1);
             Controls.Add(Panel_Home);
             Controls.Add(Panel_Teaching);
+            Controls.Add(Panel_Settings);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(4, 3, 4, 3);
             Name = "MAINFORM";
@@ -1273,8 +1303,9 @@
             panel1.ResumeLayout(false);
             groupboxConnection.ResumeLayout(false);
             Panel_Settings.ResumeLayout(false);
-            groupBox1.ResumeLayout(false);
             groupBox2.ResumeLayout(false);
+            groupBox1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)pictureBox4).EndInit();
             ResumeLayout(false);
             PerformLayout();
 
@@ -1362,6 +1393,9 @@
         private FontAwesome.Sharp.IconButton btnLightingOff;
         private FontAwesome.Sharp.IconButton btnLightingOn;
         private GroupBox groupBox2;
+        private ToolStripMenuItem listROIstrip;
+        private ToolStripMenuItem showROIstrip;
+        public PictureBox pictureBox4;
     }
 }
 

@@ -132,17 +132,21 @@ namespace TPU_Assembly.Class
                     float currentZoom = state.ZoomScale;
 
                     // Vẽ các vùng đã lưu
-                    foreach (var zone in MainForm._inspectionZones)
+
+                    if (MainForm.showROI)
                     {
-                        using (Pen pen = new Pen(Color.Lime, 2 / currentZoom))
+                        foreach (var zone in MainForm._inspectionZones)
                         {
-                            e.Graphics.DrawRectangle(pen, zone.Rect);
-                        }
-                        // Điều chỉnh font size theo zoom để chữ không bị quá to/nhỏ
-                        using (Brush brush = new SolidBrush(Color.Yellow))
-                        using (Font font = new Font("Arial", 14 / currentZoom, FontStyle.Bold))
-                        {
-                            e.Graphics.DrawString(zone.Name, font, brush, zone.Rect.X, zone.Rect.Y - (20 / currentZoom));
+                            using (Pen pen = new Pen(Color.Lime, 2 / currentZoom))
+                            {
+                                e.Graphics.DrawRectangle(pen, zone.Rect);
+                            }
+                            // Điều chỉnh font size theo zoom để chữ không bị quá to/nhỏ
+                            using (Brush brush = new SolidBrush(Color.Yellow))
+                            using (Font font = new Font("Arial", 14 / currentZoom, FontStyle.Bold))
+                            {
+                                e.Graphics.DrawString(zone.Name, font, brush, zone.Rect.X, zone.Rect.Y - (20 / currentZoom));
+                            }
                         }
                     }
 
@@ -279,18 +283,43 @@ namespace TPU_Assembly.Class
             Form prompt = new Form()
             {
                 Width = 350,
-                Height = 180,
+                Height = 220,
                 FormBorderStyle = FormBorderStyle.FixedDialog,
                 Text = caption,
                 StartPosition = FormStartPosition.CenterScreen
             };
+
             Label textLabel = new Label() { Left = 20, Top = 20, Text = text, Width = 300 };
             TextBox textBox = new TextBox() { Left = 20, Top = 50, Width = 280 };
-            Button confirmation = new Button() { Text = "Save", Left = 220, Width = 80, Top = 90, DialogResult = DialogResult.OK };
+
+            Button btnOCR = new Button() { Text = "OCR", Left = 20, Top = 85, Width = 80, Cursor = Cursors.Hand };
+            Button btnClassify = new Button() { Text = "Classify", Left = 110, Top = 85, Width = 80, Cursor = Cursors.Hand };
+            Button btnBarcode = new Button() { Text = "Barcode", Left = 200, Top = 85, Width = 80, Cursor = Cursors.Hand };
+
+            Button confirmation = new Button() { Text = "Save", Left = 200, Width = 80, Top = 135, DialogResult = DialogResult.OK };
+
+            EventHandler quickSelectAction = (sender, e) =>
+            {
+                Button btn = sender as Button;
+                if (btn != null)
+                {
+                    textBox.Text = btn.Text;
+                    prompt.DialogResult = DialogResult.OK;
+                    prompt.Close(); 
+                }
+            };
+
+            btnOCR.Click += quickSelectAction;
+            btnClassify.Click += quickSelectAction;
+            btnBarcode.Click += quickSelectAction;
 
             prompt.Controls.Add(textLabel);
             prompt.Controls.Add(textBox);
+            prompt.Controls.Add(btnOCR);
+            prompt.Controls.Add(btnClassify);
+            prompt.Controls.Add(btnBarcode);
             prompt.Controls.Add(confirmation);
+
             prompt.AcceptButton = confirmation;
 
             return prompt.ShowDialog() == DialogResult.OK ? textBox.Text : "";
@@ -332,5 +361,139 @@ namespace TPU_Assembly.Class
         }
 
         #endregion
+
+        public void ShowROIManagerDialog()
+        {
+            // 1. Khởi tạo Form Dialog
+            Form roiForm = new Form()
+            {
+                Text = "Quản Lý Danh Sách ROI",
+                Width = 600,
+                Height = 450,
+                StartPosition = FormStartPosition.CenterScreen,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                MaximizeBox = false,
+                MinimizeBox = false,
+                Font = new Font("Segoe UI", 11)
+            };
+
+            // 2. Tiêu đề
+            Label lblTitle = new Label()
+            {
+                Text = "DANH SÁCH CÁC VÙNG QUAN TÂM (ROI)",
+                Dock = DockStyle.Top,
+                Height = 50,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Font = new Font("Segoe UI", 14, FontStyle.Bold),
+                ForeColor = Color.DarkBlue
+            };
+
+            // 3. Bảng hiển thị (DataGridView)
+            DataGridView dgv = new DataGridView()
+            {
+                Dock = DockStyle.Fill,
+                AllowUserToAddRows = false,
+                AllowUserToDeleteRows = false,
+                ReadOnly = true, // Chỉ cho phép xem
+                SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                RowTemplate = { Height = 45 }, // Chiều cao dòng lớn -> dễ bấm
+                BackgroundColor = Color.White,
+                BorderStyle = BorderStyle.None,
+                ColumnHeadersHeight = 45,
+                AllowUserToResizeRows = false,
+                Cursor = Cursors.Hand
+            };
+
+            // Thêm các cột
+            dgv.Columns.Add("colName", "Tên Vùng (Name)");
+            dgv.Columns.Add("colRect", "Tọa Độ (X, Y, W, H)");
+
+            // Cột Nút Xóa
+            DataGridViewButtonColumn btnDelete = new DataGridViewButtonColumn()
+            {
+                Name = "colDelete",
+                HeaderText = "Thao tác",
+                Text = "❌ Xóa",
+                UseColumnTextForButtonValue = true,
+                FlatStyle = FlatStyle.Flat,
+                Width = 100,
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.None
+            };
+            dgv.Columns.Add(btnDelete);
+
+            // 4. Hàm tải dữ liệu vào bảng
+            Action loadData = () =>
+            {
+                dgv.Rows.Clear();
+                if (MainForm._inspectionZones != null)
+                {
+                    foreach (var zone in MainForm._inspectionZones)
+                    {
+                        dgv.Rows.Add(zone.Name, $"[{zone.Rect.X}, {zone.Rect.Y}] - {zone.Rect.Width}x{zone.Rect.Height}");
+                    }
+                }
+                dgv.ClearSelection();
+            };
+
+            // 5. Bắt sự kiện Click vào nút Xóa
+            dgv.CellContentClick += (s, ev) =>
+            {
+                // Kiểm tra nếu click đúng vào cột "Xóa" và không phải header
+                if (ev.RowIndex >= 0 && dgv.Columns[ev.ColumnIndex].Name == "colDelete")
+                {
+                    string roiName = dgv.Rows[ev.RowIndex].Cells["colName"].Value?.ToString();
+
+                    DialogResult result = MessageBox.Show(
+                        $"Bạn có chắc chắn muốn xóa vùng '{roiName}' không?",
+                        "Xác nhận xóa",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning);
+
+                    if (result == DialogResult.Yes)
+                    {
+                        // Xóa khỏi List
+                        MainForm._inspectionZones.RemoveAll(z => z.Name == roiName);
+
+                        // Gọi hàm lưu đè vào file JSON
+                        SaveOcrZones();
+
+                        // Cập nhật lại giao diện PictureBox
+                        MainForm.pictureBox1.Invalidate();
+
+                        // Tải lại bảng hiển thị
+                        loadData();
+                    }
+                }
+            };
+
+            // 6. Panel chứa nút Đóng ở dưới cùng
+            Panel bottomPanel = new Panel() { Dock = DockStyle.Bottom, Height = 60 };
+            Button btnClose = new Button()
+            {
+                Text = "Đóng",
+                Width = 120,
+                Height = 40,
+                Cursor = Cursors.Hand,
+                BackColor = Color.WhiteSmoke,
+                Font = new Font("Segoe UI", 12, FontStyle.Bold)
+            };
+            btnClose.Click += (s, ev) => roiForm.Close();
+            bottomPanel.Controls.Add(btnClose);
+
+            // Căn giữa nút Đóng
+            roiForm.Load += (s, ev) => { btnClose.Left = (bottomPanel.Width - btnClose.Width) / 2; btnClose.Top = 10; };
+            roiForm.Resize += (s, ev) => { btnClose.Left = (bottomPanel.Width - btnClose.Width) / 2; };
+
+            // 7. Thêm control vào Form và Hiển thị
+            roiForm.Controls.Add(dgv);
+            roiForm.Controls.Add(lblTitle);
+            roiForm.Controls.Add(bottomPanel);
+
+            // Tải dữ liệu lần đầu
+            loadData();
+
+            roiForm.ShowDialog();
+        }
     }
 }

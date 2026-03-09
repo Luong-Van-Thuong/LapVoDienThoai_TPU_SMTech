@@ -1,13 +1,8 @@
 ﻿using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+using TPU_Assembly_Inspection_Paddle;
 
 namespace TPU_Assembly.Class
 {
@@ -18,12 +13,8 @@ namespace TPU_Assembly.Class
         private readonly int _inputHeight;
         private readonly int _inputWidth;
 
-        // Metadata output
         private int _numClasses;
-        private int _numPredictions; // Ví dụ 8400
-
-        // Cấu hình
-        public float ConfidenceThreshold { get; set; } = 0.50f;
+        private int _numPredictions;
         public float NmsThreshold { get; set; } = 0.45f;
 
         public YoloInferenceEngine(string modelPath)
@@ -34,18 +25,18 @@ namespace TPU_Assembly.Class
 
             var inputMeta = _session.InputMetadata.First();
             _inputName = inputMeta.Key;
-            _inputHeight = inputMeta.Value.Dimensions[2]; // [1, 3, 640, 640]
+            _inputHeight = inputMeta.Value.Dimensions[2];
             _inputWidth = inputMeta.Value.Dimensions[3];
 
             var outputMeta = _session.OutputMetadata.First();
-            var shape = outputMeta.Value.Dimensions; // [1, 84, 8400] hoặc [1, 8400, 84]
+            var shape = outputMeta.Value.Dimensions;
 
             if (shape[2] > shape[1])
             {
 
                 _numPredictions = shape[2];
                 int channels = shape[1];
-                _numClasses = channels - 4; // Trừ 4 toạ độ box
+                _numClasses = channels - 4;
             }
             else
             {
@@ -59,7 +50,6 @@ namespace TPU_Assembly.Class
         {
             Tensor<float> inputTensor = PreprocessImage(image);
 
-            // 2. Inference
             var inputs = new List<NamedOnnxValue> { NamedOnnxValue.CreateFromTensor(_inputName, inputTensor) };
 
             using (var results = _session.Run(inputs))
@@ -68,6 +58,15 @@ namespace TPU_Assembly.Class
 
                 return ParseOutputOptimized(outputTensor, image.Width, image.Height);
             }
+        }
+        public Dictionary<string, float> GetTotalAreaPerClass(List<Detection> detections)
+        {
+            return detections
+                .GroupBy(d => d.ClassName)
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.Sum(d => d.Area)
+                );
         }
 
         private Tensor<float> PreprocessImage(Bitmap image)
@@ -130,7 +129,7 @@ namespace TPU_Assembly.Class
                     }
                 }
 
-                if (maxConf >= ConfidenceThreshold)
+                if (maxConf >= MAINFORM.ConfidenceThreshold)
                 {
                     float x = outputData[0 * _numPredictions + i];
                     float y = outputData[1 * _numPredictions + i];
@@ -203,7 +202,7 @@ namespace TPU_Assembly.Class
             float areaA = a.Width * a.Height;
             float areaB = b.Width * b.Height;
 
-            return inter / (areaA + areaB - inter + 1e-6f); // +1e-6f để tránh chia 0
+            return inter / (areaA + areaB - inter + 1e-6f);
         }
 
         public void Dispose()
@@ -221,11 +220,13 @@ namespace TPU_Assembly.Class
             public float Width { get; set; }
             public float Height { get; set; }
 
-            public RectangleF Rect => new RectangleF(X, Y, Width, Height);
+            public float Area => Width * Height;
+
+            public RectangleF Rect => new (X, Y, Width, Height);
 
             public override string ToString()
             {
-                return $"Class: {ClassName} | Conf: {Confidence:0.00}";
+                return $"Class: {ClassName} | Conf: {Confidence:0.00} | Area: {Area:0.00}";
             }
         }
     }

@@ -26,18 +26,20 @@ namespace TPU_Assembly.Class
 
             try
             {
-                using Bitmap bitmap_grapIMG = config.CameraInterface.OneShot_();
-
-                if (bitmap_grapIMG == null) return null;
-
-                Bitmap returnImg = (Bitmap)bitmap_grapIMG.Clone();
-
-                if (MAINFORM.SaveImageOrigin)
+                using (Bitmap bitmap_grapIMG = config.CameraInterface.OneShot_())
                 {
-                    CreateFolderFileDefault.SaveOriginalBitmap(returnImg);
-                }
 
-                return returnImg;
+                    if (bitmap_grapIMG == null) return null;
+
+                    Bitmap returnImg = (Bitmap)bitmap_grapIMG.Clone();
+
+                    if (MAINFORM.SaveImageOrigin)
+                    {
+                        CreateFolderFileDefault.SaveOriginalBitmap(returnImg);
+                    }
+
+                    return returnImg;
+                }
             }
             catch (Exception ex)
             {

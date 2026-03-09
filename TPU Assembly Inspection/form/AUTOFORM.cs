@@ -1,16 +1,17 @@
-﻿using PaddleOCRSharp;
+﻿using Lighting_ALT;         
+using PaddleOCRSharp;
 using System.Diagnostics;
 using System.Drawing.Drawing2D;
+using System.Globalization;
 using System.IO.Compression;
 using System.Runtime;
 using System.Runtime.InteropServices;
 using TPU_Assembly.Class;
-using TPU_Assembly.JobSelection;   
-using Lighting_ALT;         
+using TPU_Assembly.JobSelection;
+using TPU_Assembly_Inspection.Properties;
 
 namespace TPU_Assembly_Inspection_Paddle
 {
-
     public partial class MAINFORM : Form
     {
         public volatile bool IsRunning = false;
@@ -59,6 +60,8 @@ namespace TPU_Assembly_Inspection_Paddle
 
         public readonly Dictionary<PictureBox, ViewState> _viewStates = [];
 
+        public bool showROI = true;
+
         public string currentImportpictureBox = "";
 
         private TCP_Server _tcpServer;
@@ -76,6 +79,7 @@ namespace TPU_Assembly_Inspection_Paddle
         public int TotalCount = 0;
         public int OKCount = 0;
         public int NGCount = 0;
+
 
         public MAINFORM()
         {
@@ -147,6 +151,8 @@ namespace TPU_Assembly_Inspection_Paddle
 
             zoomable.LoadOcrZones();
             Start_Server();
+            AutoDeleteOldLogs();
+            Menu_Strip();
         }
 
         #region Open Server TCP/IP
@@ -287,9 +293,7 @@ namespace TPU_Assembly_Inspection_Paddle
 
                 targetPB.Invoke(new Action(() =>
                 {
-                    var oldImage = targetPB.Image;
                     UpdateCameraImage(camName, img);
-                    oldImage?.Dispose();
                 }));
 
                 return "OK";
@@ -318,7 +322,7 @@ namespace TPU_Assembly_Inspection_Paddle
         {
             if (myLighting.IsConnected())
             {
-                if(!myLighting.LightON(myLighting.Channel, myLighting.Brightness)) MSystem.InsertAndSaveLogs("ERROR ON Light", Color.Red);
+                if (!myLighting.LightON(myLighting.Channel, myLighting.Brightness)) MSystem.InsertAndSaveLogs("ERROR ON Light", Color.Red);
             }
         }
 
@@ -628,12 +632,14 @@ namespace TPU_Assembly_Inspection_Paddle
 
                             inferenceEngine?.Dispose();
                             inferenceEngine = new YoloInferenceEngine(selectedJob);
-                            inferenceEngine.ConfidenceThreshold = ConfidenceThreshold;
 
                             try
                             {
-                                InspectionZones.SetupPaddlePaths();
-                                _ocrEngine = new PaddleOCREngine(null, new OCRParameter());
+                                if (_ocrEngine == null)
+                                {
+                                    InspectionZones.SetupPaddlePaths();
+                                    _ocrEngine = new PaddleOCREngine(null, new OCRParameter());
+                                }
                             }
                             catch { MSystem.InsertAndSaveLogs("PaddleOCR Engine Init Failed!", Color.Red); }
                             this.Cursor = Cursors.Default;
@@ -743,7 +749,7 @@ namespace TPU_Assembly_Inspection_Paddle
                 Bitmap newImage = CameraBasler.GrabImage(cameraName);
                 stopWatch.Stop();
                 BT_Time.Text = stopWatch.ElapsedMilliseconds.ToString() + " ms";
-                
+
                 if (newImage == null) return;
 
                 UpdateCameraImage(cameraName, newImage);
@@ -803,10 +809,14 @@ namespace TPU_Assembly_Inspection_Paddle
 
                     if (ofd.ShowDialog() == DialogResult.OK)
                     {
-                        Bitmap bmp = LoadBitmapWithoutLocking(ofd.FileName);
-                        UpdateCameraImage("CAMERA1", bmp);
-                        UpdateCameraImage("CAMERA2", bmp);
-                        UpdateCameraImage("CAMERA3", bmp);
+                        Bitmap originalBmp = LoadBitmapWithoutLocking(ofd.FileName);
+
+                        UpdateCameraImage("CAMERA1", new Bitmap(originalBmp));
+                        UpdateCameraImage("CAMERA2", new Bitmap(originalBmp));
+                        UpdateCameraImage("CAMERA3", new Bitmap(originalBmp));
+
+                        originalBmp.Dispose();
+
                         zoomable.FitImageToPictureBox(pictureBox1);
                         zoomable.FitImageToPictureBox(pictureBox2);
                         zoomable.FitImageToPictureBox(pictureBox3);
@@ -866,10 +876,7 @@ namespace TPU_Assembly_Inspection_Paddle
                 {
 
                     Bitmap bmp = LoadBitmapWithoutLocking(ofd.FileName);
-
                     UpdateCameraImage(camName, bmp);
-
-                    targetPB.Image = bmp;
                     zoomable.FitImageToPictureBox(targetPB);
                 }
             }
@@ -968,6 +975,24 @@ namespace TPU_Assembly_Inspection_Paddle
             {
                 GC.Collect();
             }
+        }
+
+
+        private void listROIstrip_Click(object sender, EventArgs e)
+        {
+            zoomable?.ShowROIManagerDialog();
+        }
+
+        private void showROIstrip_Click(object sender, EventArgs e)
+        {
+            showROI = !showROI;
+            zoomable.FitImageToPictureBox(pictureBox1);
+            Menu_Strip();
+        }
+
+        private void Menu_Strip()
+        {
+            showROIstrip.Image = showROI ? Resources.Tick : null;
         }
 
         #endregion
@@ -1075,12 +1100,52 @@ namespace TPU_Assembly_Inspection_Paddle
                 string savePath = Path.Combine(destFolder, baseFileName + ".jpg");
                 image?.Save(savePath, System.Drawing.Imaging.ImageFormat.Jpeg);
 
-                //MSystem.InsertAndSaveLogs($"Saved {type}: {baseFileName}.jpg", Color.Black);
+                
             }
             catch (Exception ex)
             {
                 MSystem.InsertAndSaveLogs($"Save Error ({type}): {ex.Message}", Color.Red);
             }
+        }
+
+        private void AutoDeleteOldLogs()
+        {
+            Task.Run(() =>
+            {
+                try
+                {
+                    string baseImagesPath = @"C:\FA\TPU_Assembly_Inspection_Paddle\Images";
+                    if (!Directory.Exists(baseImagesPath)) return;
+
+                    string[] directories = Directory.GetDirectories(baseImagesPath);
+                    DateTime thresholdDate = DateTime.Now.AddDays(-SaveLogDays);
+
+                    foreach (string dirPath in directories)
+                    {
+                        string folderName = Path.GetFileName(dirPath);
+
+                        if (DateTime.TryParseExact(folderName, "ddMMyyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime folderDate))
+                        {
+                            if (folderDate < thresholdDate)
+                            {
+                                try
+                                {
+                                    Directory.Delete(dirPath, true);
+                                    Debug.WriteLine($"Đã xóa thư mục cũ: {folderName}");
+                                }
+                                catch (Exception ex)
+                                {
+                                    Debug.WriteLine($"Không thể xóa {folderName}: {ex.Message}");
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("Lỗi thực hiện dọn dẹp tự động: " + ex.Message);
+                }
+            });
         }
 
         private void SaveProductionLog(string cameraName, bool isOK, string OCR, string note = "")
@@ -1199,7 +1264,7 @@ namespace TPU_Assembly_Inspection_Paddle
                 {
                     g.DrawRectangle(penBox, item.X, item.Y, item.Width, item.Height);
 
-                    string label = $"{item.ClassName} ({item.Confidence:0.00})";
+                    string label = $"{item.ClassName} ({item.Confidence:0.00}) ({item.Area})";
                     SizeF textSize = g.MeasureString(label, font);
 
                     float textX = item.X;
@@ -1224,6 +1289,7 @@ namespace TPU_Assembly_Inspection_Paddle
                 _ => null,
             };
         }
+
         public void UpdateCameraImage(string camName, Bitmap rawImage)
         {
             PictureBox pb = GetPictureBox(camName);
@@ -1244,7 +1310,7 @@ namespace TPU_Assembly_Inspection_Paddle
                 pb.Tag = null;
             }
 
-            pb.Image = rawImage;
+            pb.Image = new Bitmap(rawImage);
             pb.Tag = rawImage;
             zoomable.FitImageToPictureBox(pb);
         }
@@ -1326,6 +1392,8 @@ namespace TPU_Assembly_Inspection_Paddle
                 Color backColor = isAllOK ? Color.Lime : Color.Red;
                 Color foreColor = isAllOK ? Color.Black : Color.White;
 
+                float tongDienTichLoi = det2.Where(d => d.ClassName == "2").Sum(d => d.Area);
+
                 if (isAllOK)
                 {
                     _tcpServer.Send("OK");
@@ -1334,11 +1402,11 @@ namespace TPU_Assembly_Inspection_Paddle
                 {
                     _tcpServer.Send("NG_ALL");
                 }
-                else if (!isOCROK && errorCams.Count < 2) 
+                else if (!isOCROK && errorCams.Count < 2)
                 {
                     _tcpServer.Send("NG_OCR");
                 }
-                else if (isOCROK && errorCams.Count > 0)
+                else if ((isOCROK && errorCams.Count > 0) || tongDienTichLoi < 200000)
                 {
                     _tcpServer.Send("NG_TPU");
                 }
@@ -1366,6 +1434,7 @@ namespace TPU_Assembly_Inspection_Paddle
                     SaveResultToDisk((Bitmap)pictureBox2.Image, baseName_Picture2, resultText); // lưu 3 ảnh
                     SaveResultToDisk((Bitmap)pictureBox3.Image, baseName_Picture3, resultText); // lưu 3 ảnh
                 }
+                AutoDeleteOldLogs();
             }
             catch (Exception ex)
             {
@@ -1479,14 +1548,54 @@ namespace TPU_Assembly_Inspection_Paddle
             }
         }
 
-        private void Run_Vision_CAMERA3_Click(object sender, EventArgs e)
+        private async void Run_Vision_CAMERA3_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Chức năng này đang phát triển!", "Thông báo");
-        }
+            if (pictureBox3.Image == null) return;
 
-        private void pictureBox1_DoubleClick(object sender, EventArgs e)
-        {
-            zoomable.FitImageToPictureBox(pictureBox1);
+            Bitmap workingImage = new Bitmap(pictureBox3.Image);
+
+            try
+            {
+                ButtonIsEnableLoadJob(false);
+                string fileName = !string.IsNullOrEmpty(_name_file) ? Path.GetFileNameWithoutExtension(_name_file) : "LiveImage";
+                string baseName = $"{DateTime.Now:yyyyMMdd_HHmmss}_{fileName}";
+
+                stopWatch.Restart();
+
+                var resultData = await Task.Run(() =>
+                {
+                    var detections = inferenceEngine.RunInference(workingImage);
+
+                    Bitmap drawnImage = DrawBoundingBoxes(workingImage, detections);
+
+                    return new { Detections = detections, ResultImage = drawnImage };
+                });
+
+                stopWatch.Stop();
+                BT_Time.Text = stopWatch.ElapsedMilliseconds.ToString() + " ms";
+
+                var oldImage = pictureBox3.Image;
+
+                pictureBox3.Image = resultData.ResultImage;
+
+                oldImage?.Dispose();
+
+                workingImage.Dispose();
+
+                string status = (resultData.Detections.Count >= 3) ? "OK" : "NG";
+
+                SaveResultToDisk((Bitmap)pictureBox3.Image, baseName, status);
+
+            }
+            catch (Exception ex)
+            {
+                MSystem.InsertAndSaveLogs($"Error Process Cam2: {ex.Message}", Color.Red);
+                workingImage?.Dispose();
+            }
+            finally
+            {
+                ButtonIsEnableLoadJob(true);
+            }
         }
 
         private static void EnsureImageDirectories(out string originPath, out string okPath, out string ngPath)
@@ -1519,6 +1628,7 @@ namespace TPU_Assembly_Inspection_Paddle
         }
 
         #endregion
+
     }
 
     #region Inspection Zones Class
