@@ -21,6 +21,16 @@ namespace TPU_Assembly.Class
         {
             var options = new SessionOptions();
 
+            try
+            {
+                options.AppendExecutionProvider_OpenVINO("CPU");
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("OpenVINO not supported, using default CPU: " + ex.Message);
+            }
+
             _session = new InferenceSession(modelPath, options);
 
             var inputMeta = _session.InputMetadata.First();
