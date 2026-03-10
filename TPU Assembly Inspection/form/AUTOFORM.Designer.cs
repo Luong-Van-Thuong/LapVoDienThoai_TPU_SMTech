@@ -37,6 +37,7 @@
             percentNG = new Label();
             percentOK = new Label();
             Panel_Home = new Panel();
+            pictureBox4 = new PictureBox();
             Import_Image2 = new FontAwesome.Sharp.IconButton();
             BT_GrapImage2 = new FontAwesome.Sharp.IconButton();
             Run_Vision_CAMERA2 = new FontAwesome.Sharp.IconButton();
@@ -112,9 +113,9 @@
             LabelNG = new Label();
             label1 = new Label();
             btnClearCounter = new FontAwesome.Sharp.IconButton();
-            pictureBox4 = new PictureBox();
             Panel_Menu.SuspendLayout();
             Panel_Home.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox4).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
             MenuStripPic3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
@@ -130,7 +131,6 @@
             Panel_Settings.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox4).BeginInit();
             SuspendLayout();
             // 
             // Panel_Menu
@@ -253,6 +253,18 @@
             Panel_Home.Name = "Panel_Home";
             Panel_Home.Size = new Size(1310, 841);
             Panel_Home.TabIndex = 1;
+            // 
+            // pictureBox4
+            // 
+            pictureBox4.BackColor = Color.DarkBlue;
+            pictureBox4.BorderStyle = BorderStyle.FixedSingle;
+            pictureBox4.Location = new Point(666, 21);
+            pictureBox4.Margin = new Padding(4, 3, 4, 3);
+            pictureBox4.Name = "pictureBox4";
+            pictureBox4.Size = new Size(546, 394);
+            pictureBox4.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox4.TabIndex = 1255;
+            pictureBox4.TabStop = false;
             // 
             // Import_Image2
             // 
@@ -1241,18 +1253,6 @@
             btnClearCounter.UseVisualStyleBackColor = false;
             btnClearCounter.Click += btnClearCounter_Click;
             // 
-            // pictureBox4
-            // 
-            pictureBox4.BackColor = Color.DarkBlue;
-            pictureBox4.BorderStyle = BorderStyle.FixedSingle;
-            pictureBox4.Location = new Point(666, 21);
-            pictureBox4.Margin = new Padding(4, 3, 4, 3);
-            pictureBox4.Name = "pictureBox4";
-            pictureBox4.Size = new Size(546, 394);
-            pictureBox4.SizeMode = PictureBoxSizeMode.Zoom;
-            pictureBox4.TabIndex = 1255;
-            pictureBox4.TabStop = false;
-            // 
             // MAINFORM
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -1288,6 +1288,7 @@
             Load += MAINFORM_Load;
             Panel_Menu.ResumeLayout(false);
             Panel_Home.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)pictureBox4).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).EndInit();
             MenuStripPic3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
@@ -1305,7 +1306,6 @@
             Panel_Settings.ResumeLayout(false);
             groupBox2.ResumeLayout(false);
             groupBox1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)pictureBox4).EndInit();
             ResumeLayout(false);
             PerformLayout();
 

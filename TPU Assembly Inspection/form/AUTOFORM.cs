@@ -51,6 +51,7 @@ namespace TPU_Assembly_Inspection_Paddle
         private PaddleOCREngine _ocrEngine;
 
         private readonly Stopwatch stopWatch = new();
+        private readonly Stopwatch stopWatch_Run = new();
 
         public List<InspectionZones> _inspectionZones = [];
 
@@ -237,35 +238,105 @@ namespace TPU_Assembly_Inspection_Paddle
 
         private async void Run_Once()
         {
+            CameraProcessResult res1 = null;
+            CameraProcessResult res2 = null;
+            CameraProcessResult res3 = null;
             try
             {
-                stopWatch.Restart();
-                var taskCam1 = Task.Run(() => ProcessCameraAI("CAMERA1"));
-                var taskCam2 = Task.Run(() => ProcessCameraAI("CAMERA2"));
-                var taskCam3 = Task.Run(() => ProcessCameraAI("CAMERA3"));
-                await Task.WhenAll(taskCam1, taskCam2, taskCam3);
+                stopWatch_Run.Restart();
 
-                string[] results = { taskCam1.Result, taskCam2.Result, taskCam3.Result };
-
-                if (results.Any(r => r != "OK"))
+                if (inferenceEngine == null)
                 {
-                    string errorToSend = results.FirstOrDefault(r => r != "OK");
-                    _tcpServer.Send(errorToSend);
-                    MSystem.InsertAndSaveLogs("CAMERA PROCESSING FAILED", Color.Red);
-                    btnResult.BackColor = Color.Red;
-                    btnResult.Text = "NG";
+                    MessageBox.Show("Inference Engine chưa được khởi tạo!");
                     return;
                 }
-                await Task.Run(() => Run_All_PictureBox_Click(null, null));
-                stopWatch.Stop();
-                BT_Time.Text = stopWatch.ElapsedMilliseconds.ToString();
+
+                var taskCam1 = ProcessCameraAndAIAsync("CAMERA1");
+                var taskCam2 = ProcessCameraAndAIAsync("CAMERA2");
+                var taskCam3 = ProcessCameraAndAIAsync("CAMERA3");
+
+                await Task.WhenAll(taskCam1, taskCam2, taskCam3);
+
+                res1 = taskCam1.Result;
+                res2 = taskCam2.Result;
+                res3 = taskCam3.Result;
+
+                if (res1.Status != "OK" || res2.Status != "OK" || res3.Status != "OK")
+                {
+                    string errorToSend = new[] { res1.Status, res2.Status, res3.Status }.FirstOrDefault(r => r != "OK");
+                    _tcpServer.Send(errorToSend ?? "GRAB_ERROR");
+                    MSystem.InsertAndSaveLogs("CAMERA PROCESSING FAILED", Color.Red);
+
+                    this.Invoke(new Action(() => {
+                        btnResult.BackColor = Color.Red;
+                        btnResult.Text = "NG";
+                    }));
+                    return;
+                }
+
+                bool isCam2OK = res2.Detections.Count >= 3;
+                bool isCam3OK = res3.Detections.Count >= 3;
+                bool isOCROK = !string.IsNullOrEmpty(res1.OcrText);
+
+                List<string> errorCams = [];
+                if (!isCam2OK) errorCams.Add("Camera 2");
+                if (!isCam3OK) errorCams.Add("Camera 3");
+                if (!isOCROK) errorCams.Add("Camera OCR");
+
+                bool isAllOK = errorCams.Count == 0;
+                string resultText = isAllOK ? "OK" : "NG";
+                Color backColor = isAllOK ? Color.Lime : Color.Red;
+                Color foreColor = isAllOK ? Color.Black : Color.White;
+
+                float tongDienTichLoi = res2.Detections.Where(d => d.ClassName == "2").Sum(d => d.Area);
+
+                if (isAllOK) _tcpServer.Send("OK");
+                else if (!isOCROK && errorCams.Count >= 2) _tcpServer.Send("NG_ALL");
+                else if (!isOCROK && errorCams.Count < 2) _tcpServer.Send("NG_OCR");
+                else if ((isOCROK && errorCams.Count > 0) || tongDienTichLoi < 200000) _tcpServer.Send("NG_TPU");
+
+
+                stopWatch_Run.Stop();
+                this.Invoke(new Action(() => {
+                    BT_Time.Text = stopWatch_Run.ElapsedMilliseconds.ToString() + " ms";
+                }));
+
+                string logCamName = isAllOK ? "All Camera" : string.Join(" + ", errorCams);
+
+                this.Invoke(new Action(() =>
+                {
+                    btnResult.Text = resultText;
+                    btnResult.ForeColor = foreColor;
+                    btnResult.BackColor = backColor;
+                    btnOCR.Text = isOCROK ? res1.OcrText : "N/A";
+
+                    UpdatePictureBoxWithClone(pictureBox1, res1.RawImage);
+                    UpdatePictureBoxSafe(pictureBox2, res2.RawImage, res2.Detections);
+                    UpdatePictureBoxSafe(pictureBox3, res3.RawImage, res3.Detections);
+
+                    if (SaveImageOK || SaveImageNG)
+                    {
+                        string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                        SaveResultToDisk((Bitmap)pictureBox1.Image, $"OCR_{timestamp}", resultText);
+                        SaveResultToDisk((Bitmap)pictureBox2.Image, $"Picture2_{timestamp}", resultText);
+                        SaveResultToDisk((Bitmap)pictureBox3.Image, $"Picture3_{timestamp}", resultText);
+                    }
+                }));
+
+                MSystem.InsertAndSaveLogs($"Result: {resultText}", isAllOK ? Color.Green : Color.Red);
+                TotalCount++;
+                UpdateResult(logCamName, isAllOK, res1.OcrText, "Complete");
+                AutoDeleteOldLogs();
+
             }
             catch (Exception ex)
             {
                 MSystem.InsertAndSaveLogs($"Lỗi hệ thống trong Run Once: {ex.Message}", Color.Red);
                 _tcpServer.Send("GRAB_ERROR");
-                btnResult.BackColor = Color.Red;
-                btnResult.Text = "GRAB_ERROR";
+                this.Invoke(new Action(() => {
+                    btnResult.BackColor = Color.Red;
+                    btnResult.Text = "GRAB_ERROR";
+                }));
             }
             finally
             {
@@ -273,35 +344,158 @@ namespace TPU_Assembly_Inspection_Paddle
                 {
                     MSystem.InsertAndSaveLogs("ERROR OFF LIGHT", Color.Red);
                 }
+                res1?.RawImage?.Dispose();
+                res2?.RawImage?.Dispose();
+                res3?.RawImage?.Dispose();
+
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
             }
         }
-
-        private string ProcessCameraAI(string camName)
+        private async Task<CameraProcessResult> ProcessCameraAndAIAsync(string camName)
         {
-            if (!_cameraDict.TryGetValue(camName, out var cameraConfig))
+            return await Task.Run(() =>
             {
-                MSystem.InsertAndSaveLogs($"Error: {camName} not in dictionary", Color.Red);
-                return "UNKNOWN_ERROR";
+                var result = new CameraProcessResult();
+
+                if (!_cameraDict.TryGetValue(camName, out var cameraConfig))
+                {
+                    MSystem.InsertAndSaveLogs($"Error: {camName} not in dictionary", Color.Red);
+                    return result;
+                }
+                try
+                {
+                    Bitmap grabbedImg = CameraBasler.GrabImage(camName);
+                    if (grabbedImg == null)
+                    {
+                        result.Status = "GRAB_ERROR";
+                        return result;
+                    }
+
+                    result.RawImage = grabbedImg;
+
+                    if (camName == "CAMERA1")
+                    {
+                        result.OcrText = GetResultFromZone(grabbedImg, "OCR");
+                    }
+                    else
+                    {
+                        result.Detections = inferenceEngine.RunInference(grabbedImg);
+                    }
+
+                    result.Status = "OK";
+                }
+                catch (Exception ex)
+                {
+                    MSystem.InsertAndSaveLogs($"Error {camName}: {ex.Message}", Color.Red);
+                    result.RawImage?.Dispose();
+                }
+                return result;
+            });
+        }
+
+        private void UpdatePictureBoxWithClone(PictureBox pb, Bitmap newImage)
+        {
+            if (pb == null || newImage == null) return;
+
+            Image oldImg = pb.Image;
+            pb.Image = (Bitmap)newImage.Clone();
+
+            oldImg?.Dispose();
+
+            zoomable.FitImageToPictureBox(pb);
+        }
+
+        public void UpdatePictureBoxSafe(PictureBox pb, Bitmap source, List<YoloInferenceEngine.Detection> detections)
+        {
+            if (detections == null) return;
+            Bitmap newDrawnImage = DrawBoundingBoxes(source, detections);
+            Image oldImage = pb.Image;
+            pb.Image = newDrawnImage;
+            if (oldImage != null && oldImage != pb.Tag)
+            {
+                oldImage.Dispose();
+            }
+            zoomable.FitImageToPictureBox(pb);
+        }
+        public Bitmap DrawBoundingBoxes(Bitmap originalImage, List<YoloInferenceEngine.Detection> detections)
+        {
+            Bitmap drawnImage = new Bitmap(originalImage.Width, originalImage.Height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+
+            using (Graphics g = Graphics.FromImage(drawnImage))
+            {
+                g.DrawImage(originalImage, 0, 0, originalImage.Width, originalImage.Height);
+                g.SmoothingMode = SmoothingMode.AntiAlias;
+                g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+
+                foreach (var item in detections)
+                {
+                    g.DrawRectangle(penBox, item.X, item.Y, item.Width, item.Height);
+
+                    string label = $"{item.ClassName} ({item.Confidence:0.00}) ({item.Area})";
+                    SizeF textSize = g.MeasureString(label, font);
+
+                    float textX = item.X;
+                    float textY = item.Y - textSize.Height;
+                    if (textY < 0) textY = item.Y;
+
+                    g.FillRectangle(brushBg, textX, textY, textSize.Width, textSize.Height);
+
+                    g.DrawString(label, font, brushText, textX, textY);
+                }
             }
 
-            PictureBox targetPB = cameraConfig.TargetPictureBox;
+            return drawnImage;
+        }
+
+        public string GetResultFromZone(Bitmap fullImage, string zoneName)
+        {
+            var zone = _inspectionZones.Find(z => z.Name == zoneName);
+            if (zone == null) return "N/A";
 
             try
             {
-                Bitmap img = CameraBasler.GrabImage(camName);
-                if (img == null) return "GRAB_ERROR";
+                Rectangle cropRect = zone.Rect;
+                cropRect.Intersect(new Rectangle(0, 0, fullImage.Width, fullImage.Height));
 
-                targetPB.Invoke(new Action(() =>
+                if (cropRect.Width == 0 || cropRect.Height == 0) return "Error_Size";
+
+                string resultText = "";
+                Color boxColor = Color.Lime;
+
+                using (Bitmap roi = fullImage.Clone(cropRect, fullImage.PixelFormat))
                 {
-                    UpdateCameraImage(camName, img);
-                }));
+                    if (zoneName.ToUpper().Contains("OCR") || zoneName.ToUpper().Contains("TEXT"))
+                    {
+                        var ocrResult = _ocrEngine.DetectText(roi);
+                        resultText = ocrResult != null ? ocrResult.Text.Trim() : "";
+                    }
+                }
 
-                return "OK";
+                using (Graphics g = Graphics.FromImage(fullImage))
+                {
+                    g.SmoothingMode = SmoothingMode.AntiAlias;
+                    g.DrawRectangle(penBox, cropRect);
+
+                    if (!string.IsNullOrEmpty(resultText))
+                    {
+                        string label = $"{zoneName}: {resultText}";
+
+                        SizeF textSize = g.MeasureString(label, font);
+                        float labelY = cropRect.Y - textSize.Height;
+                        if (labelY < 0) labelY = cropRect.Y;
+
+                        g.FillRectangle(brushBg, cropRect.X, labelY, textSize.Width, textSize.Height);
+                        g.DrawString(label, font, brushText, cropRect.X, labelY);
+                    }
+                }
+
+                return resultText;
             }
             catch (Exception ex)
             {
-                MSystem.InsertAndSaveLogs($"Error {camName}: {ex.Message}", Color.Red);
-                return "UNKNOWN_ERROR";
+                MSystem.InsertAndSaveLogs("Lỗi xử lý OCR: " + ex.Message, Color.Red);
+                return "Error: " + ex.Message;
             }
         }
 
@@ -740,15 +934,14 @@ namespace TPU_Assembly_Inspection_Paddle
                 if (!myLighting.LightON(myLighting.Channel, myLighting.Brightness))
                 {
                     MSystem.InsertAndSaveLogs("ERROR ON LIGHT", Color.Red);
-                    return;
+                    //return;
                 }
 
                 Thread.Sleep(50);
                 stopWatch.Restart();
-
-                Bitmap newImage = CameraBasler.GrabImage(cameraName);
+                Bitmap newImage = CameraBasler.GrabImage(cameraName); // chụp manual
                 stopWatch.Stop();
-                BT_Time.Text = stopWatch.ElapsedMilliseconds.ToString() + " ms";
+                BT_Time.Text = stopWatch.ElapsedMilliseconds.ToString() + " ms"; // đoạn này trả về 200ms
 
                 if (newImage == null) return;
 
@@ -1199,86 +1392,6 @@ namespace TPU_Assembly_Inspection_Paddle
 
         #region 12. Run
 
-        public string GetResultFromZone(Bitmap fullImage, string zoneName)
-        {
-            var zone = _inspectionZones.Find(z => z.Name == zoneName);
-            if (zone == null) return "N/A";
-
-            try
-            {
-                Rectangle cropRect = zone.Rect;
-                cropRect.Intersect(new Rectangle(0, 0, fullImage.Width, fullImage.Height));
-
-                if (cropRect.Width == 0 || cropRect.Height == 0) return "Error_Size";
-
-                string resultText = "";
-                Color boxColor = Color.Lime;
-
-                using (Bitmap roi = fullImage.Clone(cropRect, fullImage.PixelFormat))
-                {
-                    if (zoneName.ToUpper().Contains("OCR") || zoneName.ToUpper().Contains("TEXT"))
-                    {
-                        var ocrResult = _ocrEngine.DetectText(roi);
-                        resultText = ocrResult != null ? ocrResult.Text.Trim() : "";
-                    }
-                }
-
-                using (Graphics g = Graphics.FromImage(fullImage))
-                {
-                    g.SmoothingMode = SmoothingMode.AntiAlias;
-                    g.DrawRectangle(penBox, cropRect);
-
-                    if (!string.IsNullOrEmpty(resultText))
-                    {
-                        string label = $"{zoneName}: {resultText}";
-
-                        SizeF textSize = g.MeasureString(label, font);
-                        float labelY = cropRect.Y - textSize.Height;
-                        if (labelY < 0) labelY = cropRect.Y;
-
-                        g.FillRectangle(brushBg, cropRect.X, labelY, textSize.Width, textSize.Height);
-                        g.DrawString(label, font, brushText, cropRect.X, labelY);
-                    }
-                }
-
-                return resultText;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Lỗi xử lý OCR: " + ex.Message);
-                return "Error: " + ex.Message;
-            }
-        }
-
-        public Bitmap DrawBoundingBoxes(Bitmap originalImage, List<YoloInferenceEngine.Detection> detections)
-        {
-            Bitmap drawnImage = new Bitmap(originalImage.Width, originalImage.Height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-
-            using (Graphics g = Graphics.FromImage(drawnImage))
-            {
-                g.DrawImage(originalImage, 0, 0, originalImage.Width, originalImage.Height);
-                g.SmoothingMode = SmoothingMode.AntiAlias;
-                g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
-
-                foreach (var item in detections)
-                {
-                    g.DrawRectangle(penBox, item.X, item.Y, item.Width, item.Height);
-
-                    string label = $"{item.ClassName} ({item.Confidence:0.00}) ({item.Area})";
-                    SizeF textSize = g.MeasureString(label, font);
-
-                    float textX = item.X;
-                    float textY = item.Y - textSize.Height;
-                    if (textY < 0) textY = item.Y;
-
-                    g.FillRectangle(brushBg, textX, textY, textSize.Width, textSize.Height);
-
-                    g.DrawString(label, font, brushText, textX, textY);
-                }
-            }
-
-            return drawnImage;
-        }
         private PictureBox GetPictureBox(string camName)
         {
             return camName switch
@@ -1315,17 +1428,7 @@ namespace TPU_Assembly_Inspection_Paddle
             zoomable.FitImageToPictureBox(pb);
         }
 
-        public void UpdatePictureBoxSafe(PictureBox pb, Bitmap source, List<YoloInferenceEngine.Detection> detections)
-        {
-            if (detections == null) return;
-            Bitmap newDrawnImage = DrawBoundingBoxes(source, detections);
-            Image oldImage = pb.Image;
-            pb.Image = newDrawnImage;
-            if (oldImage != null && oldImage != pb.Tag)
-            {
-                oldImage.Dispose();
-            }
-        }
+
         private async void Run_All_PictureBox_Click(object sender, EventArgs e)
         {
             if (pictureBox1.Image == null || pictureBox2.Image == null ||
@@ -1658,5 +1761,13 @@ namespace TPU_Assembly_Inspection_Paddle
         public PictureBox TargetPictureBox { get; set; }
     }
     #endregion
+
+    public class CameraProcessResult
+    {
+        public Bitmap RawImage { get; set; }
+        public string Status { get; set; } = "UNKNOWN_ERROR";
+        public string OcrText { get; set; } = "";
+        public List<YoloInferenceEngine.Detection> Detections { get; set; } = new();
+    }
 
 }

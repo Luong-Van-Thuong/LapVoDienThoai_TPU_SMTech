@@ -31,7 +31,7 @@ namespace TPU_Assembly.Class
 
                     if (bitmap_grapIMG == null) return null;
 
-                    Bitmap returnImg = (Bitmap)bitmap_grapIMG.Clone();
+                    Bitmap returnImg = new(bitmap_grapIMG);
 
                     if (MAINFORM.SaveImageOrigin)
                     {
