@@ -35,7 +35,7 @@ namespace TPU_Assembly.Class
 
                     if (MAINFORM.SaveImageOrigin)
                     {
-                        CreateFolderFileDefault.SaveOriginalBitmap(returnImg);
+                        CreateFolderFileDefault.SaveOriginalBitmap(bitmap_grapIMG);
                     }
 
                     return returnImg;

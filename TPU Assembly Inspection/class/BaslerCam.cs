@@ -1,6 +1,7 @@
 ﻿using Basler.Pylon;
 using System.Diagnostics;
 using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 
 namespace TPU_Assembly.Class
 {
@@ -41,7 +42,7 @@ namespace TPU_Assembly.Class
 
         public BaslerCam(string userDefinedName)
         {
-            
+
             List<ICameraInfo> allCameras = CameraFinder.Enumerate();
             try
             {
@@ -166,45 +167,20 @@ namespace TPU_Assembly.Class
                 }
             }
 
-            public string CameraName { get; set; }
-            public long Exposure { get; set; }
-            public long SizeW { get; set; }
-            public long SizeH { get; set; }
-            public long OffsetX { get; set; }
-            public long OffsetY { get; set; }
 
             public string CAM1 = "CAMERA1";
             public string CAM2 = "CAMERA2";
             public string CAM3 = "CAMERA3";
 
             public List<AoiParam> AoiParams = new List<AoiParam>();
-            public long NumberOfCamera = 4;
 
-        }
-        public override void Init()
-        {
-            for (int i = 0; i < AoiParam.Instance.NumberOfCamera; i++)
-            {
-                if (AoiParam.Instance.AoiParams[i].CameraName == cameraName)
-                {
-                    CameraParams readJsonParam = new CameraParams
-                    {
-                        ExposureValue = AoiParam.Instance.AoiParams[i].Exposure,
-                        Width = AoiParam.Instance.AoiParams[i].SizeW,
-                        Height = AoiParam.Instance.AoiParams[i].SizeH,
-                        Xoffset = AoiParam.Instance.AoiParams[i].OffsetX,
-                        Yoffset = AoiParam.Instance.AoiParams[i].OffsetY
-                    };
 
-                    SetParameter(readJsonParam);
-                }
-            }
         }
         public override bool IsOpened()
         {
             return isOpened;
         }
-        
+
         private void OnConnectionLost(Object sender, EventArgs e)
         {
             if (isContinue)
@@ -229,29 +205,25 @@ namespace TPU_Assembly.Class
                 isOpened = false;
                 MSystem.InsertAndSaveLogs($"Camera connection lost: {cameraName}", Color.Red);
             }
-            finally 
+            finally
             {
                 isOpened = false;
                 ReOpenCamera();
             }
         }
 
-        // Occurs when the connection to a camera device is opened.
         private void OnCameraOpened(Object sender, EventArgs e)
         {
             if (isContinue)
             {
-
                 if (thisControl.InvokeRequired)
                 {
-                    // If called from a different thread, we must use the Invoke method to marshal the call to the proper thread.
                     thisControl.BeginInvoke(new EventHandler<EventArgs>(OnCameraOpened), sender, e);
                     return;
                 }
             }
         }
 
-        // Occurs when the connection to a camera device is closed.
         private void OnCameraClosed(Object sender, EventArgs e)
         {
             if (isContinue)
@@ -265,14 +237,13 @@ namespace TPU_Assembly.Class
             isOpened = false;
         }
 
-        // Occurs when a camera starts grabbing.
         private void OnGrabStarted(Object sender, EventArgs e)
         {
             if (isContinue)
             {
                 if (thisControl.InvokeRequired)
                 {
-                    
+
                     thisControl.BeginInvoke(new EventHandler<EventArgs>(OnGrabStarted), sender, e);
                     return;
                 }
@@ -308,64 +279,45 @@ namespace TPU_Assembly.Class
             }
             return null;
         }
-        private void OnImageGrabbed(Object sender, ImageGrabbedEventArgs e)
+        private void OnImageGrabbed(object sender, ImageGrabbedEventArgs e)
         {
-            if (isContinue)
-            {
-                if (thisControl.InvokeRequired)
-                {
-                    thisControl.BeginInvoke(new EventHandler<ImageGrabbedEventArgs>(OnImageGrabbed), sender, e.Clone());
-                    return;
-                }
-            }
             try
             {
                 IGrabResult grabResult = e.GrabResult;
 
                 if (grabResult.IsValid)
                 {
-                    if (!stopWatch.IsRunning || stopWatch.ElapsedMilliseconds > 120 || stopWatch.ElapsedMilliseconds > 33)
+                    try
                     {
-                        try
-                        {
-                            stopWatch.Restart();
-                            Bitmap bitmap = new (grabResult.Width, grabResult.Height, PixelFormat.Format8bppIndexed);
-                            ColorPalette palette = bitmap.Palette;
-                            for (int i = 0; i < 256; i++)
-                                palette.Entries[i] = Color.FromArgb(i, i, i);
-                            bitmap.Palette = palette;
+                        stopWatch.Restart();
 
-                            BitmapData bmpData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadWrite, bitmap.PixelFormat);
+                        Bitmap bitmap = new(grabResult.Width, grabResult.Height, PixelFormat.Format8bppIndexed);
+                        //Bitmap bitmap = new(grabResult.Width, grabResult.Height, PixelFormat.Format32bppRgb);
 
-                            converter.OutputPixelFormat = PixelType.Mono8;
+                        ColorPalette palette = bitmap.Palette;
+                        for (int i = 0; i < 256; i++)
+                            palette.Entries[i] = Color.FromArgb(i, i, i);
+                        bitmap.Palette = palette;
 
-                            IntPtr ptrBmp = bmpData.Scan0;
-                            converter.Convert(ptrBmp, bmpData.Stride * bitmap.Height, grabResult);
-                            bitmap.UnlockBits(bmpData);
-                            
+                        BitmapData bmpData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadWrite, bitmap.PixelFormat);
+                        //converter.OutputPixelFormat = PixelType.BGRA8packed;
+                        converter.OutputPixelFormat = PixelType.Mono8;
 
-                            if (isContinue)
-                            {
-                                Bitmap bitmapOld = ((PictureBox)thisControl).Image as Bitmap;
-                                ((PictureBox)thisControl).Image = bitmap;
-                                bitmapOld?.Dispose();
-                            }
-                            else
-                            {
-                                if (bitmap != null)
-                                {
-                                    Image_BASLER?.Dispose();
-                                    Image_BASLER = bitmap;
-                                    _waitForImageEvent.Set();
-                                    isgrabed = true;
-                                }
-                            }
-                        }
-                        catch(Exception ex) 
-                        {
-                            MSystem.InsertAndSaveLogs($"OnImageGrabbed error: {ex.Message}", Color.Red);
-                            Thread.Sleep(100);
-                        }
+                        IntPtr ptrBmp = bmpData.Scan0;
+                        converter.Convert(ptrBmp, bmpData.Stride * bitmap.Height, grabResult);
+
+                        bitmap.UnlockBits(bmpData);
+
+                        Image_BASLER?.Dispose();
+                        Image_BASLER = bitmap;
+                        _waitForImageEvent.Set();
+                        isgrabed = true;
+
+                    }
+                    catch (Exception ex)
+                    {
+                        MSystem.InsertAndSaveLogs($"OnImageGrabbed error: {ex.Message}", Color.Red);
+                        Thread.Sleep(100);
                     }
                 }
             }
@@ -381,17 +333,7 @@ namespace TPU_Assembly.Class
 
         private void OnGrabStopped(Object sender, GrabStopEventArgs e)
         {
-            if (isContinue)
-            {
-                if (thisControl.InvokeRequired)
-                {
-                    thisControl.BeginInvoke(new EventHandler<GrabStopEventArgs>(OnGrabStopped), sender, e);
-                    return;
-                }
-            }
-
             stopWatch.Reset();
-
             if (e.Reason != GrabStopReason.UserRequest)
             {
                 MessageBox.Show("A grab error occured:\n" + e.ErrorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -439,41 +381,14 @@ namespace TPU_Assembly.Class
         {
             try
             {
-                if (camera != null)
-                {
-                    if (!camera.IsOpen)
-                    {
-                        camera.Open();
-                        Thread.Sleep(500);
-                    }
+                if (camera == null || !camera.IsOpen) { return false; }
 
-                    Image_BASLER?.Dispose();
-                    Image_BASLER = null;
-                    isgrabed = false;
-
-                    camera.Parameters[PLCamera.AcquisitionMode].SetValue(PLCamera.AcquisitionMode.SingleFrame); // SingleFrame
-                    camera.StreamGrabber.Start(1, GrabStrategy.OneByOne, GrabLoop.ProvidedByStreamGrabber);
-                    GC.Collect();
-                    return true;
-                }
-                else
-                {
-                    if (!camera.IsOpen)
-                    {
-                        camera.Close();
-                        Thread.Sleep(1000);
-                        camera.Open();
-                    }
-                   
-                    isgrabed = false;
-                    Image_BASLER?.Dispose();
-                    Image_BASLER = null;
-
-                    camera.Parameters[PLCamera.AcquisitionMode].SetValue(PLCamera.AcquisitionMode.SingleFrame); // SingleFrame
-                    camera.StreamGrabber.Start(1, GrabStrategy.OneByOne, GrabLoop.ProvidedByStreamGrabber);
-                    GC.Collect();
-                    return true;
-                }
+                Image_BASLER?.Dispose();
+                Image_BASLER = null;
+                isgrabed = false;
+                camera.Parameters[PLCamera.AcquisitionMode].SetValue(PLCamera.AcquisitionMode.SingleFrame);
+                camera.StreamGrabber.Start(1, GrabStrategy.OneByOne, GrabLoop.ProvidedByStreamGrabber);
+                return true;
             }
             catch (Exception)
             {
@@ -483,115 +398,5 @@ namespace TPU_Assembly.Class
             }
         }
 
-        public void ContinuousShot()
-        {
-            try
-            {
-                camera.Parameters[PLCamera.AcquisitionMode].SetValue(PLCamera.AcquisitionMode.Continuous);
-                camera.StreamGrabber.Start(GrabStrategy.OneByOne, GrabLoop.ProvidedByStreamGrabber);
-                isgrabed = false;
-                Image_BASLER = null;
-            }
-            catch (Exception)
-            {
-            }
-        }
-
-        public override CameraParams GetParameter()
-        {
-            cameraParams.ExposureValue = (int)camera.Parameters[PLCamera.ExposureTimeRaw].GetValue();
-            cameraParams.MinExposure = (int)camera.Parameters[PLCamera.ExposureTimeRaw].GetMinimum();
-            cameraParams.MaxExposure = (int)camera.Parameters[PLCamera.ExposureTimeRaw].GetMaximum();
-            cameraParams.Width = (int)camera.Parameters[PLCamera.Width].GetValue();
-            cameraParams.MinWidth = (int)camera.Parameters[PLCamera.Width].GetMinimum();
-            cameraParams.MaxWidth = (int)camera.Parameters[PLCamera.Width].GetMaximum();
-            cameraParams.Height = (int)camera.Parameters[PLCamera.Height].GetValue();
-            cameraParams.MinHeight = (int)camera.Parameters[PLCamera.Height].GetMinimum();
-            cameraParams.MaxHeight = (int)camera.Parameters[PLCamera.Height].GetMaximum();
-            cameraParams.Xoffset = (int)camera.Parameters[PLCamera.OffsetX].GetValue();
-            cameraParams.Yoffset = (int)camera.Parameters[PLCamera.OffsetY].GetValue();
-            return cameraParams;
-        }
-
-        public override bool GetGammaStatus()
-        {
-            return camera.Parameters[PLCamera.GammaEnable].GetValue();
-        }
-        public override void SetGammaValue(double value)
-        {
-            camera?.Parameters[PLCamera.Gamma].SetValue(value);
-        }
-        public override void SetGammaMode()
-        {
-            camera?.Parameters[PLCamera.GammaEnable].SetValue(true);
-        }
-        public override void StartAutoExposure()
-        {
-            camera?.Parameters[PLCamera.ExposureAuto].SetValue("Once");
-        }
-
-        public override void StopAutoExposure()
-        {
-            return;
-        }
-
-        public override int GetExposure()
-        {
-            return (int)camera.Parameters[PLCamera.ExposureTimeRaw].GetValue();
-        }
-        public override void SetLivePlay(bool isLiveMode)
-        {
-            if (isLiveMode)
-                isContinue = true;
-            else
-                isContinue = false;
-        }
-
-        public override bool GetLivePlay()
-        {
-            return isContinue;
-        }
-
-        public override bool SetParameter(CameraParams cameraParams)
-        {
-            try
-            {
-                camera.Parameters[PLCamera.Width].SetValue(cameraParams.Width, IntegerValueCorrection.Nearest);
-                Thread.Sleep(50);
-                camera.Parameters[PLCamera.Height].SetValue(cameraParams.Height, IntegerValueCorrection.Nearest);
-                Thread.Sleep(50);
-                camera.Parameters[PLCamera.OffsetX].SetValue(cameraParams.Xoffset, IntegerValueCorrection.Nearest);
-                Thread.Sleep(50);
-                camera.Parameters[PLCamera.OffsetY].SetValue(cameraParams.Yoffset, IntegerValueCorrection.Nearest);
-                Thread.Sleep(50);
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-        public override bool SetExposure(int exposure)
-        {
-            return camera.Parameters[PLCamera.ExposureTimeRaw].TrySetValue(exposure, IntegerValueCorrection.Nearest);
-        }
-
-        public override bool SetTriggerMode(IntPtr _hDisplayWnd, IntPtr _Handle)
-        {
-            return true;
-        }
-
-        public override bool SetPreviewMode(IntPtr _hDisplayWnd, IntPtr _Handle)
-        {
-            SetLivePlay(true);
-            ContinuousShot();
-            return true;
-        }
-
-        public override void DisablePreviewMode(IntPtr _hDisplayWnd, IntPtr _Handle)
-        {
-            SetLivePlay(false);
-            Stop();
-        }
     }
 }

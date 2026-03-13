@@ -1,17 +1,5 @@
 ﻿namespace TPU_Assembly.Class
 {
-    public class CaputreCompleteEventArgs : EventArgs
-    {
-        public string CameraName { get; set; }
-        public Bitmap Image { get; set; }
-
-        public CaputreCompleteEventArgs(string cameraName, Bitmap image)
-        {
-            CameraName = cameraName;
-            Image = image;
-        }
-    }
-
     public abstract class ICameraInterface
     {
         public delegate void CaptureCompleteEventArgs(object sender, CaptureCompleteEventArgs args);
@@ -19,28 +7,12 @@
         public CameraParams cameraParams = new CameraParams();
 
         public abstract Bitmap OneShot_();
-        public abstract void Init();
         public abstract bool IsOpened();
         public abstract void Stop();
         public abstract bool ReOpenCamera();
         public abstract void DestroyCamera();
-        public abstract void SetLivePlay(bool bLiveMode);
-        public abstract CameraParams GetParameter();
-        public abstract bool SetParameter(CameraParams cameraParams);
-        public abstract int GetExposure();
-        public abstract bool SetExposure(int exposure);
         public abstract void SetPictureBox(PictureBox contorl);
         public abstract bool isContinuous();
-        public abstract bool GetGammaStatus();
-        public abstract void SetGammaMode();
-        public abstract void SetGammaValue(double value);
-        public abstract bool SetTriggerMode(IntPtr _hDisplayWnd, IntPtr _Handle);
-        public abstract bool SetPreviewMode(IntPtr _hDisplayWnd, IntPtr _Handle);
-        public abstract void DisablePreviewMode(IntPtr _hDisplayWnd, IntPtr _Handle);
-        public abstract void StartAutoExposure();
-        public abstract void StopAutoExposure();
-
-        public abstract bool GetLivePlay();
     }
 
     public class CameraParams

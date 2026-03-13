@@ -81,7 +81,9 @@ namespace TPU_Assembly_Inspection_Paddle
         public int OKCount = 0;
         public int NGCount = 0;
 
+        
 
+        
         public MAINFORM()
         {
             InitializeComponent();
