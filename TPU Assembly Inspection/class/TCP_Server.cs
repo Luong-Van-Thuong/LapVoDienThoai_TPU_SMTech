@@ -54,9 +54,10 @@ namespace TPU_Assembly.Class
         {
             try
             {
+                string messageToSend = $"\x02{message}\x03";
                 if (client != null && client.Connected)
                 {
-                    byte[] data = Encoding.UTF8.GetBytes(message);
+                    byte[] data = Encoding.UTF8.GetBytes(messageToSend);
                     stream.Write(data, 0, data.Length);
                     MSystem.InsertAndSaveLogs($"Sent to Robot: {message}", Color.Blue);
                 }

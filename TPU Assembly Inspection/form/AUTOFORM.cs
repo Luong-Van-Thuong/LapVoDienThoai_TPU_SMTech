@@ -81,9 +81,7 @@ namespace TPU_Assembly_Inspection_Paddle
         public int OKCount = 0;
         public int NGCount = 0;
 
-        
 
-        
         public MAINFORM()
         {
             InitializeComponent();
@@ -156,6 +154,7 @@ namespace TPU_Assembly_Inspection_Paddle
             Start_Server();
             AutoDeleteOldLogs();
             Menu_Strip();
+            AutoLoadModel();
         }
 
         #region Open Server TCP/IP
@@ -210,6 +209,7 @@ namespace TPU_Assembly_Inspection_Paddle
             btnRobot.BackColor = Color.Red;
             MSystem.InsertAndSaveLogs($"Client is Disconncted", Color.Red);
         }
+        private static Random _rand = new Random();
 
         private void OnDataReceived(string cmd)
         {
@@ -222,9 +222,9 @@ namespace TPU_Assembly_Inspection_Paddle
             MSystem.InsertAndSaveLogs(cmd, Color.Blue);
             if (string.IsNullOrEmpty(cmd)) return;
 
-            string data = cmd.ToUpper().Trim();
+            string data = cmd.Trim();
 
-            // xử lý data nhận được
+            //// xử lý data nhận được
             if (data.Contains("TRIGGER"))
             {
                 if (!myLighting.LightON(myLighting.Channel, myLighting.Brightness))
@@ -236,6 +236,24 @@ namespace TPU_Assembly_Inspection_Paddle
                 Thread.Sleep(50);
                 Run_Once();
             }
+
+            //if (data.Contains("TRIGGER"))
+            //{
+            //    int r = _rand.Next(0, 6);
+
+            //    string response = r switch
+            //    {
+            //        0 => "OK",
+            //        1 => "NG_OCR",
+            //        2 => "NG_TPU",
+            //        3 => "NG_ALL",
+            //        4 => "GRAB_ERROR",
+            //        5 => "UNKNOWN_ERROR",
+            //        _ => "UNKNOWN_ERROR"
+            //    };
+
+            //    _tcpServer.Send(response);
+            //}
         }
 
         private async void Run_Once()
@@ -269,7 +287,8 @@ namespace TPU_Assembly_Inspection_Paddle
                     _tcpServer.Send(errorToSend ?? "GRAB_ERROR");
                     MSystem.InsertAndSaveLogs("CAMERA PROCESSING FAILED", Color.Red);
 
-                    this.Invoke(new Action(() => {
+                    this.Invoke(new Action(() =>
+                    {
                         btnResult.BackColor = Color.Red;
                         btnResult.Text = "NG";
                     }));
@@ -299,7 +318,8 @@ namespace TPU_Assembly_Inspection_Paddle
 
 
                 stopWatch_Run.Stop();
-                this.Invoke(new Action(() => {
+                this.Invoke(new Action(() =>
+                {
                     BT_Time.Text = stopWatch_Run.ElapsedMilliseconds.ToString() + " ms";
                 }));
 
@@ -335,7 +355,8 @@ namespace TPU_Assembly_Inspection_Paddle
             {
                 MSystem.InsertAndSaveLogs($"Lỗi hệ thống trong Run Once: {ex.Message}", Color.Red);
                 _tcpServer.Send("GRAB_ERROR");
-                this.Invoke(new Action(() => {
+                this.Invoke(new Action(() =>
+                {
                     btnResult.BackColor = Color.Red;
                     btnResult.Text = "GRAB_ERROR";
                 }));
@@ -853,10 +874,70 @@ namespace TPU_Assembly_Inspection_Paddle
             }
             finally
             {
+                if (inferenceEngine != null)
+                {
+                    btnStart_Click(null, null);
+                }
                 ButtonIsEnableLoadJob(true);
                 this.Cursor = Cursors.Default;
             }
 
+        }
+
+        private async void AutoLoadModel()
+        {
+            try
+            {
+                ButtonIsEnableLoadJob(false);
+                this.Cursor = Cursors.WaitCursor;
+
+                string modelFolderPath = Path.Combine(Application.StartupPath, "models");
+                string modelFilePath = Path.Combine(modelFolderPath, "best.onnx");
+
+                if (!File.Exists(modelFilePath))
+                {
+                    MSystem.InsertAndSaveLogs($"Không tìm thấy file model tại: {modelFilePath}", Color.Red);
+                    return;
+                }
+                await Task.Run(() =>
+                {
+                    inferenceEngine?.Dispose();
+                    inferenceEngine = new YoloInferenceEngine(modelFilePath);
+
+                    try
+                    {
+                        if (_ocrEngine == null)
+                        {
+                            InspectionZones.SetupPaddlePaths();
+                            _ocrEngine = new PaddleOCREngine(null, new OCRParameter());
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        this.Invoke(new Action(() =>
+                        {
+                            MSystem.InsertAndSaveLogs($"PaddleOCR Engine Init Failed! {ex.Message}", Color.Red);
+                        }));
+                    }
+                });
+
+                btnLoadModel.BackColor = Color.Lime;
+                MSystem.InsertAndSaveLogs("Auto Load Models Successfully!", Color.Green);
+            }
+            catch (Exception ex)
+            {
+                btnLoadModel.BackColor = Color.Red;
+                MSystem.InsertAndSaveLogs($"Auto Load Models Fail: {ex.Message}", Color.Red);
+            }
+            finally
+            {
+                if (inferenceEngine != null)
+                {
+                    btnStart_Click(null, null);
+                }
+                ButtonIsEnableLoadJob(true);
+                this.Cursor = Cursors.Default;
+            }
         }
 
         internal void ButtonIsEnableLoadJob(bool isTrue)
@@ -1295,7 +1376,7 @@ namespace TPU_Assembly_Inspection_Paddle
                 string savePath = Path.Combine(destFolder, baseFileName + ".jpg");
                 image?.Save(savePath, System.Drawing.Imaging.ImageFormat.Jpeg);
 
-                
+
             }
             catch (Exception ex)
             {
@@ -1725,15 +1806,30 @@ namespace TPU_Assembly_Inspection_Paddle
 
         #endregion
 
-        #region Start Engine
+        #region 13. Start Engine
         private void btnStart_Click(object sender, EventArgs e)
         {
-
+            if (inferenceEngine == null) { 
+                MSystem.InsertAndSaveLogs("Inference Engine chưa được khởi tạo!", Color.Red);
+                return;
+            }
+            IsRunning = true;
+            btnStart.Enabled = false;
+            btnStop.Enabled = true;
+            btnStart.BackColor = Color.Lime;
+            btnStop.BackColor = Color.White;
 
         }
 
+        private void btnStop_Click(object sender, EventArgs e)
+        {
+            IsRunning = false;
+            btnStop.Enabled = false;
+            btnStart.Enabled = true;
+            btnStop.BackColor = Color.Red;
+            btnStart.BackColor = Color.White;
+        }
         #endregion
-
     }
 
     #region Inspection Zones Class
@@ -1762,7 +1858,6 @@ namespace TPU_Assembly_Inspection_Paddle
         public ICameraInterface CameraInterface { get; set; }
         public PictureBox TargetPictureBox { get; set; }
     }
-    #endregion
 
     public class CameraProcessResult
     {
@@ -1771,5 +1866,6 @@ namespace TPU_Assembly_Inspection_Paddle
         public string OcrText { get; set; } = "";
         public List<YoloInferenceEngine.Detection> Detections { get; set; } = new();
     }
+    #endregion
 
 }

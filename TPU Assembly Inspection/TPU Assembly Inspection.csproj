@@ -10,7 +10,8 @@
     <Platforms>x64</Platforms>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ApplicationIcon>Resource\Picture1.ico</ApplicationIcon>
-    <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+    <AssemblyName>TPUAssemblyInspection</AssemblyName>
+    <AssemblyTitle>TPUAssemblyInspection</AssemblyTitle>
   </PropertyGroup>
 
   <ItemGroup>

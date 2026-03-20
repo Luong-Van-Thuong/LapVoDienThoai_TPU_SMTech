@@ -976,6 +976,7 @@
             btnStop.TabIndex = 1176;
             btnStop.Text = "STOP";
             btnStop.UseVisualStyleBackColor = true;
+            btnStop.Click += btnStop_Click;
             // 
             // btnStart
             // 

@@ -1,7 +1,6 @@
 ﻿using Basler.Pylon;
 using System.Diagnostics;
 using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
 
 namespace TPU_Assembly.Class
 {
@@ -159,10 +158,7 @@ namespace TPU_Assembly.Class
             {
                 get
                 {
-                    if (instance == null)
-                    {
-                        instance = new AoiParam();
-                    }
+                    instance ??= new AoiParam();
                     return instance;
                 }
             }
@@ -172,7 +168,7 @@ namespace TPU_Assembly.Class
             public string CAM2 = "CAMERA2";
             public string CAM3 = "CAMERA3";
 
-            public List<AoiParam> AoiParams = new List<AoiParam>();
+            public List<AoiParam> AoiParams = [];
 
 
         }
