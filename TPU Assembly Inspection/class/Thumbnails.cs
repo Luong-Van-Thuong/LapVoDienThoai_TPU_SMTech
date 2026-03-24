@@ -106,8 +106,8 @@ namespace TPU_Assembly.Class
                 switch (MainForm.currentImportpictureBox)
                 {
                     case "PB1": PictureBoxTarget = MainForm.pictureBox1; break;
-                    case "PB2": PictureBoxTarget = MainForm.pictureBox2; break;
-                    case "PB3": PictureBoxTarget = MainForm.pictureBox3; break;
+                    case "PB2": PictureBoxTarget = MainForm.pictureBox3; break;
+                    case "PB3": PictureBoxTarget = MainForm.pictureBox2; break;
                     case "": break;
                     default: break;
                 }

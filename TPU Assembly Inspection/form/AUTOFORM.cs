@@ -8,6 +8,7 @@ using System.Runtime;
 using System.Runtime.InteropServices;
 using TPU_Assembly.Class;
 using TPU_Assembly.JobSelection;
+using TPU_Assembly_Inspection;
 using TPU_Assembly_Inspection.Properties;
 
 namespace TPU_Assembly_Inspection_Paddle
@@ -20,13 +21,11 @@ namespace TPU_Assembly_Inspection_Paddle
 
         public static bool SaveImageOrigin, SaveImageOK, SaveImageNG;
 
-        public static int SaveLogDays;
+        public static int SaveLogDays, Port;
 
         public static float ConfidenceThreshold;
 
         public static string IPAddress;
-
-        public static int Port;
 
         public bool isLiveOn = false;
 
@@ -209,7 +208,7 @@ namespace TPU_Assembly_Inspection_Paddle
             btnRobot.BackColor = Color.Red;
             MSystem.InsertAndSaveLogs($"Client is Disconncted", Color.Red);
         }
-        private static Random _rand = new Random();
+        private static Random _rand = new();
 
         private void OnDataReceived(string cmd)
         {
@@ -243,10 +242,10 @@ namespace TPU_Assembly_Inspection_Paddle
 
             //    string response = r switch
             //    {
-            //        0 => "OK",
-            //        1 => "NG_OCR",
-            //        2 => "NG_TPU",
-            //        3 => "NG_ALL",
+            //        0 => "OK:A37GF12#6HT",
+            //        1 => "NG_OCR:A26GF12#6HT",
+            //        2 => "NG_TPU:A37GF12#6HT",
+            //        3 => "NG_ALL:A26GF12#6HT",
             //        4 => "GRAB_ERROR",
             //        5 => "UNKNOWN_ERROR",
             //        _ => "UNKNOWN_ERROR"
@@ -258,6 +257,7 @@ namespace TPU_Assembly_Inspection_Paddle
 
         private async void Run_Once()
         {
+            string OcrText = "";
             CameraProcessResult res1 = null;
             CameraProcessResult res2 = null;
             CameraProcessResult res3 = null;
@@ -296,8 +296,10 @@ namespace TPU_Assembly_Inspection_Paddle
                 }
 
                 bool isCam2OK = res2.Detections.Count >= 3;
-                bool isCam3OK = res3.Detections.Count >= 3;
+                bool isCam3OK = res3.Detections.Count >= 5;
                 bool isOCROK = !string.IsNullOrEmpty(res1.OcrText);
+
+                OcrText = res1.OcrText;
 
                 List<string> errorCams = [];
                 if (!isCam2OK) errorCams.Add("Camera 2");
@@ -311,10 +313,10 @@ namespace TPU_Assembly_Inspection_Paddle
 
                 float tongDienTichLoi = res2.Detections.Where(d => d.ClassName == "2").Sum(d => d.Area);
 
-                if (isAllOK) _tcpServer.Send("OK");
-                else if (!isOCROK && errorCams.Count >= 2) _tcpServer.Send("NG_ALL");
-                else if (!isOCROK && errorCams.Count < 2) _tcpServer.Send("NG_OCR");
-                else if ((isOCROK && errorCams.Count > 0) || tongDienTichLoi < 200000) _tcpServer.Send("NG_TPU");
+                if (isAllOK) _tcpServer.Send("OK:"+ OcrText);
+                else if (!isOCROK && errorCams.Count >= 2) _tcpServer.Send("NG_ALL:"+ OcrText);
+                else if (!isOCROK && errorCams.Count < 2) _tcpServer.Send("NG_OCR:"+ OcrText);
+                else if ((isOCROK && errorCams.Count > 0) || tongDienTichLoi < 200000) _tcpServer.Send("NG_TPU:"+ OcrText);
 
 
                 stopWatch_Run.Stop();
@@ -704,28 +706,28 @@ namespace TPU_Assembly_Inspection_Paddle
         }
         private void btnTeaching_Click(object sender, EventArgs e)
         {
-            //using (FullTouchKeyboard kboard = new FullTouchKeyboard("PASSWORD", true, "1"))
-            //{
-            //    if (kboard.ShowDialog() == DialogResult.OK)
-            //    {
-            ShowPanel(Panel_Teaching);
-            SetActiveMenuButton(btnTeaching);
-            //    }
-            //}
+            using (FullTouchKeyboard kboard = new FullTouchKeyboard("PASSWORD", true, "1"))
+            {
+                if (kboard.ShowDialog() == DialogResult.OK)
+                {
+                    ShowPanel(Panel_Teaching);
+                    SetActiveMenuButton(btnTeaching);
+                }
+            }
 
         }
 
         private void btnSettings_Click(object sender, EventArgs e)
         {
-            //using (FullTouchKeyboard kboard = new FullTouchKeyboard("PASSWORD", true, "1"))
-            //{
-            //    if (kboard.ShowDialog() == DialogResult.OK)
-            //    {
-            ShowPanel(Panel_Settings);
-            SetActiveMenuButton(btnSettings);
-            //    }
+            using (FullTouchKeyboard kboard = new FullTouchKeyboard("PASSWORD", true, "1"))
+            {
+                if (kboard.ShowDialog() == DialogResult.OK)
+                {
+                    ShowPanel(Panel_Settings);
+                    SetActiveMenuButton(btnSettings);
+                }
 
-            //}
+            }
         }
 
 
@@ -815,10 +817,10 @@ namespace TPU_Assembly_Inspection_Paddle
 
             pictureBox1.Image?.Dispose();
             pictureBox1.Image = null;
-            pictureBox2.Image?.Dispose();
-            pictureBox2.Image = null;
             pictureBox3.Image?.Dispose();
             pictureBox3.Image = null;
+            pictureBox2.Image?.Dispose();
+            pictureBox2.Image = null;
             _tcpServer?.Stop();
 
             myLighting?.Dispose();
@@ -828,41 +830,57 @@ namespace TPU_Assembly_Inspection_Paddle
 
         #region 3. Load Models
 
-        private void btnLoadModel_Click(object sender, EventArgs e)
+        private async void btnLoadModel_Click(object sender, EventArgs e)
         {
             if (IsRunning)
             {
                 MessageBox.Show("Please STOP Before Change Models");
                 return;
             }
+
             ButtonIsEnableLoadJob(false);
+
             try
             {
-                using (JobSelectionForm jobSelector = new JobSelectionForm())
+                using (JobSelectionForm jobSelector = new())
                 {
                     if (jobSelector.ShowDialog() == DialogResult.OK)
                     {
                         string selectedJob = jobSelector.FullJobFolderPath;
                         if (!string.IsNullOrEmpty(selectedJob))
                         {
-                            this.Cursor = Cursors.WaitCursor;
-
-                            inferenceEngine?.Dispose();
-                            inferenceEngine = new YoloInferenceEngine(selectedJob);
+                            LoadingForm loadingForm = new LoadingForm("Đang tải Model, vui lòng đợi...");
+                            loadingForm.ShowWithOverlay(this);
 
                             try
                             {
-                                if (_ocrEngine == null)
+                                await Task.Run(() =>
                                 {
-                                    InspectionZones.SetupPaddlePaths();
-                                    _ocrEngine = new PaddleOCREngine(null, new OCRParameter());
-                                }
-                            }
-                            catch { MSystem.InsertAndSaveLogs("PaddleOCR Engine Init Failed!", Color.Red); }
-                            this.Cursor = Cursors.Default;
+                                    inferenceEngine?.Dispose();
+                                    inferenceEngine = new YoloInferenceEngine(selectedJob);
 
-                            btnLoadModel.BackColor = Color.Lime;
-                            MSystem.InsertAndSaveLogs("Load Models Successfully!", Color.Green);
+                                    try
+                                    {
+                                        if (_ocrEngine == null)
+                                        {
+                                            InspectionZones.SetupPaddlePaths();
+                                            _ocrEngine = new PaddleOCREngine(null, new OCRParameter());
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        MSystem.InsertAndSaveLogs("PaddleOCR Engine Init Failed!", Color.Red);
+                                    }
+                                });
+
+                                btnLoadModel.BackColor = Color.Lime;
+                                MSystem.InsertAndSaveLogs("Load Models Successfully!", Color.Green);
+                            }
+                            finally
+                            {
+                                loadingForm.Close();
+                                loadingForm.Dispose();
+                            }
                         }
                     }
                 }
@@ -870,7 +888,7 @@ namespace TPU_Assembly_Inspection_Paddle
             catch (Exception ex)
             {
                 btnLoadModel.BackColor = Color.Red;
-                MSystem.InsertAndSaveLogs($"Load Modesl Fail: {ex}", Color.Red);
+                MSystem.InsertAndSaveLogs($"Load Models Fail: {ex}", Color.Red);
             }
             finally
             {
@@ -879,50 +897,59 @@ namespace TPU_Assembly_Inspection_Paddle
                     btnStart_Click(null, null);
                 }
                 ButtonIsEnableLoadJob(true);
-                this.Cursor = Cursors.Default;
             }
-
         }
 
         private async void AutoLoadModel()
         {
+            string modelFolderPath = Path.Combine(Application.StartupPath, "models");
+            string modelFilePath = Path.Combine(modelFolderPath, "best.onnx");
+
+            if (!File.Exists(modelFilePath))
+            {
+                MSystem.InsertAndSaveLogs($"Không tìm thấy file model tại: {modelFilePath}", Color.Red);
+                return;
+            }
             try
             {
                 ButtonIsEnableLoadJob(false);
                 this.Cursor = Cursors.WaitCursor;
 
-                string modelFolderPath = Path.Combine(Application.StartupPath, "models");
-                string modelFilePath = Path.Combine(modelFolderPath, "best.onnx");
+                LoadingForm loadingForm = new LoadingForm("Đang tải Model, vui lòng đợi...");
+                loadingForm.ShowWithOverlay(this);
 
-                if (!File.Exists(modelFilePath))
+                try
                 {
-                    MSystem.InsertAndSaveLogs($"Không tìm thấy file model tại: {modelFilePath}", Color.Red);
-                    return;
-                }
-                await Task.Run(() =>
-                {
-                    inferenceEngine?.Dispose();
-                    inferenceEngine = new YoloInferenceEngine(modelFilePath);
-
-                    try
+                    await Task.Run(() =>
                     {
-                        if (_ocrEngine == null)
+                        inferenceEngine?.Dispose();
+                        inferenceEngine = new YoloInferenceEngine(modelFilePath);
+
+                        try
                         {
-                            InspectionZones.SetupPaddlePaths();
-                            _ocrEngine = new PaddleOCREngine(null, new OCRParameter());
+                            if (_ocrEngine == null)
+                            {
+                                InspectionZones.SetupPaddlePaths();
+                                _ocrEngine = new PaddleOCREngine(null, new OCRParameter());
+                            }
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        this.Invoke(new Action(() =>
+                        catch (Exception ex)
                         {
-                            MSystem.InsertAndSaveLogs($"PaddleOCR Engine Init Failed! {ex.Message}", Color.Red);
-                        }));
-                    }
-                });
+                            this.Invoke(new Action(() =>
+                            {
+                                MSystem.InsertAndSaveLogs($"PaddleOCR Engine Init Failed! {ex.Message}", Color.Red);
+                            }));
+                        }
+                    });
 
-                btnLoadModel.BackColor = Color.Lime;
-                MSystem.InsertAndSaveLogs("Auto Load Models Successfully!", Color.Green);
+                    btnLoadModel.BackColor = Color.Lime;
+                    MSystem.InsertAndSaveLogs("Auto Load Models Successfully!", Color.Green);
+                }
+                finally
+                {
+                    loadingForm.Close();
+                    loadingForm.Dispose();
+                }
             }
             catch (Exception ex)
             {
@@ -1183,11 +1210,11 @@ namespace TPU_Assembly_Inspection_Paddle
         public void ClearThumbnails(object sender, EventArgs e)
         {
             pictureBox1.Image?.Dispose();
-            pictureBox2.Image?.Dispose();
             pictureBox3.Image?.Dispose();
+            pictureBox2.Image?.Dispose();
             pictureBox1.Image = null;
-            pictureBox2.Image = null;
             pictureBox3.Image = null;
+            pictureBox2.Image = null;
 
             foreach (Control ctrl in flowLayoutPanelThumbnails.Controls)
             {
@@ -1565,7 +1592,7 @@ namespace TPU_Assembly_Inspection_Paddle
                 UpdatePictureBoxSafe(pictureBox3, bm3, det3);
 
                 bool isCam2OK = det2.Count >= 3;
-                bool isCam3OK = det3.Count >= 3;
+                bool isCam3OK = det3.Count >= 5;
                 bool isOCROK = !string.IsNullOrEmpty(ocrResult);
 
                 List<string> errorCams = [];
@@ -1686,9 +1713,9 @@ namespace TPU_Assembly_Inspection_Paddle
         }
         private async void Run_Vision_CAMERA2_Click(object sender, EventArgs e)
         {
-            if (pictureBox2.Image == null) return;
+            if (pictureBox3.Image == null) return;
 
-            Bitmap workingImage = new Bitmap(pictureBox2.Image);
+            Bitmap workingImage = new Bitmap(pictureBox3.Image);
 
             try
             {
@@ -1710,9 +1737,9 @@ namespace TPU_Assembly_Inspection_Paddle
                 stopWatch.Stop();
                 BT_Time.Text = stopWatch.ElapsedMilliseconds.ToString() + " ms";
 
-                var oldImage = pictureBox2.Image;
+                var oldImage = pictureBox3.Image;
 
-                pictureBox2.Image = resultData.ResultImage;
+                pictureBox3.Image = resultData.ResultImage;
 
                 oldImage?.Dispose();
 
@@ -1720,7 +1747,7 @@ namespace TPU_Assembly_Inspection_Paddle
 
                 string status = (resultData.Detections.Count >= 3) ? "OK" : "NG";
 
-                SaveResultToDisk((Bitmap)pictureBox2.Image, baseName, status);
+                SaveResultToDisk((Bitmap)pictureBox3.Image, baseName, status);
 
             }
             catch (Exception ex)

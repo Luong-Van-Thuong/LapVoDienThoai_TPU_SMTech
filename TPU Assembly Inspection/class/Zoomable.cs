@@ -26,7 +26,7 @@ namespace TPU_Assembly.Class
         #region 10. Zoomable Image
         public void InitializePictureBoxEvents()
         {
-            PictureBox[] pbs = { MainForm.pictureBox1, MainForm.pictureBox2, MainForm.pictureBox3};
+            PictureBox[] pbs = { MainForm.pictureBox1, MainForm.pictureBox3, MainForm.pictureBox2};
 
             foreach (var pb in pbs)
             {

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net10.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
     <RootNamespace>TPU_Assembly_Inspection</RootNamespace>
     <Nullable>disable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
@@ -12,6 +12,7 @@
     <ApplicationIcon>Resource\Picture1.ico</ApplicationIcon>
     <AssemblyName>TPUAssemblyInspection</AssemblyName>
     <AssemblyTitle>TPUAssemblyInspection</AssemblyTitle>
+    <UseWPF>False</UseWPF>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,7 +21,7 @@
 
   <ItemGroup>
     <PackageReference Include="FontAwesome.Sharp" Version="6.6.0" />
-    <PackageReference Include="Intel.ML.OnnxRuntime.OpenVino" Version="1.24.1" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.24.3" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="OpenCvSharp4" Version="4.13.0.20260308" />
     <PackageReference Include="OpenCvSharp4.Extensions" Version="4.13.0.20260308" />

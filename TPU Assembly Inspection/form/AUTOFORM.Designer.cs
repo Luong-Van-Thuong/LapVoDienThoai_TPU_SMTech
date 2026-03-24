@@ -38,18 +38,18 @@
             percentOK = new Label();
             Panel_Home = new Panel();
             pictureBox4 = new PictureBox();
-            Import_Image2 = new FontAwesome.Sharp.IconButton();
-            BT_GrapImage2 = new FontAwesome.Sharp.IconButton();
-            Run_Vision_CAMERA2 = new FontAwesome.Sharp.IconButton();
             Import_Image3 = new FontAwesome.Sharp.IconButton();
             BT_GrapImage3 = new FontAwesome.Sharp.IconButton();
             Run_Vision_CAMERA3 = new FontAwesome.Sharp.IconButton();
+            Import_Image2 = new FontAwesome.Sharp.IconButton();
+            BT_GrapImage2 = new FontAwesome.Sharp.IconButton();
+            Run_Vision_CAMERA2 = new FontAwesome.Sharp.IconButton();
             Import_Image = new FontAwesome.Sharp.IconButton();
-            pictureBox3 = new PictureBox();
+            pictureBox2 = new PictureBox();
             MenuStripPic3 = new ContextMenuStrip(components);
             Fit_Image3 = new ToolStripMenuItem();
             Clear_Image3 = new ToolStripMenuItem();
-            pictureBox2 = new PictureBox();
+            pictureBox3 = new PictureBox();
             MenuStripPic2 = new ContextMenuStrip(components);
             Fit_Image2 = new ToolStripMenuItem();
             Clear_Image2 = new ToolStripMenuItem();
@@ -116,9 +116,9 @@
             Panel_Menu.SuspendLayout();
             Panel_Home.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox4).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
-            MenuStripPic3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
+            MenuStripPic3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
             MenuStripPic2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             MenuStripPic1.SuspendLayout();
@@ -235,15 +235,15 @@
             // 
             Panel_Home.BackColor = Color.White;
             Panel_Home.Controls.Add(pictureBox4);
-            Panel_Home.Controls.Add(Import_Image2);
-            Panel_Home.Controls.Add(BT_GrapImage2);
-            Panel_Home.Controls.Add(Run_Vision_CAMERA2);
             Panel_Home.Controls.Add(Import_Image3);
             Panel_Home.Controls.Add(BT_GrapImage3);
             Panel_Home.Controls.Add(Run_Vision_CAMERA3);
+            Panel_Home.Controls.Add(Import_Image2);
+            Panel_Home.Controls.Add(BT_GrapImage2);
+            Panel_Home.Controls.Add(Run_Vision_CAMERA2);
             Panel_Home.Controls.Add(Import_Image);
-            Panel_Home.Controls.Add(pictureBox3);
             Panel_Home.Controls.Add(pictureBox2);
+            Panel_Home.Controls.Add(pictureBox3);
             Panel_Home.Controls.Add(pictureBox1);
             Panel_Home.Controls.Add(BT_GrapImage1);
             Panel_Home.Controls.Add(Run_Vision_CAMERA1);
@@ -266,64 +266,17 @@
             pictureBox4.TabIndex = 1255;
             pictureBox4.TabStop = false;
             // 
-            // Import_Image2
-            // 
-            Import_Image2.FlatStyle = FlatStyle.Flat;
-            Import_Image2.IconChar = FontAwesome.Sharp.IconChar.None;
-            Import_Image2.IconColor = Color.Black;
-            Import_Image2.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            Import_Image2.Location = new Point(1220, 429);
-            Import_Image2.Margin = new Padding(4, 3, 4, 3);
-            Import_Image2.Name = "Import_Image2";
-            Import_Image2.Size = new Size(76, 46);
-            Import_Image2.TabIndex = 1253;
-            Import_Image2.Text = "Import Image";
-            Import_Image2.UseVisualStyleBackColor = true;
-            Import_Image2.Click += Universal_Import_Click;
-            // 
-            // BT_GrapImage2
-            // 
-            BT_GrapImage2.FlatStyle = FlatStyle.Flat;
-            BT_GrapImage2.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            BT_GrapImage2.IconChar = FontAwesome.Sharp.IconChar.None;
-            BT_GrapImage2.IconColor = Color.Black;
-            BT_GrapImage2.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            BT_GrapImage2.Location = new Point(1220, 484);
-            BT_GrapImage2.Margin = new Padding(4, 3, 4, 3);
-            BT_GrapImage2.Name = "BT_GrapImage2";
-            BT_GrapImage2.Size = new Size(76, 46);
-            BT_GrapImage2.TabIndex = 1252;
-            BT_GrapImage2.Text = "Grap Image";
-            BT_GrapImage2.UseVisualStyleBackColor = true;
-            BT_GrapImage2.Click += Universal_GrabImage_Click;
-            // 
-            // Run_Vision_CAMERA2
-            // 
-            Run_Vision_CAMERA2.BackColor = Color.Transparent;
-            Run_Vision_CAMERA2.FlatStyle = FlatStyle.Flat;
-            Run_Vision_CAMERA2.IconChar = FontAwesome.Sharp.IconChar.None;
-            Run_Vision_CAMERA2.IconColor = Color.Black;
-            Run_Vision_CAMERA2.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            Run_Vision_CAMERA2.Location = new Point(1220, 545);
-            Run_Vision_CAMERA2.Margin = new Padding(4, 3, 4, 3);
-            Run_Vision_CAMERA2.Name = "Run_Vision_CAMERA2";
-            Run_Vision_CAMERA2.Size = new Size(76, 46);
-            Run_Vision_CAMERA2.TabIndex = 1254;
-            Run_Vision_CAMERA2.Text = "Run All PRG";
-            Run_Vision_CAMERA2.UseVisualStyleBackColor = false;
-            Run_Vision_CAMERA2.Click += Run_Vision_CAMERA2_Click;
-            // 
             // Import_Image3
             // 
             Import_Image3.FlatStyle = FlatStyle.Flat;
             Import_Image3.IconChar = FontAwesome.Sharp.IconChar.None;
             Import_Image3.IconColor = Color.Black;
             Import_Image3.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            Import_Image3.Location = new Point(18, 429);
+            Import_Image3.Location = new Point(1220, 429);
             Import_Image3.Margin = new Padding(4, 3, 4, 3);
             Import_Image3.Name = "Import_Image3";
             Import_Image3.Size = new Size(76, 46);
-            Import_Image3.TabIndex = 1250;
+            Import_Image3.TabIndex = 1253;
             Import_Image3.Text = "Import Image";
             Import_Image3.UseVisualStyleBackColor = true;
             Import_Image3.Click += Universal_Import_Click;
@@ -335,11 +288,11 @@
             BT_GrapImage3.IconChar = FontAwesome.Sharp.IconChar.None;
             BT_GrapImage3.IconColor = Color.Black;
             BT_GrapImage3.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            BT_GrapImage3.Location = new Point(18, 484);
+            BT_GrapImage3.Location = new Point(1220, 484);
             BT_GrapImage3.Margin = new Padding(4, 3, 4, 3);
             BT_GrapImage3.Name = "BT_GrapImage3";
             BT_GrapImage3.Size = new Size(76, 46);
-            BT_GrapImage3.TabIndex = 1249;
+            BT_GrapImage3.TabIndex = 1252;
             BT_GrapImage3.Text = "Grap Image";
             BT_GrapImage3.UseVisualStyleBackColor = true;
             BT_GrapImage3.Click += Universal_GrabImage_Click;
@@ -351,14 +304,61 @@
             Run_Vision_CAMERA3.IconChar = FontAwesome.Sharp.IconChar.None;
             Run_Vision_CAMERA3.IconColor = Color.Black;
             Run_Vision_CAMERA3.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            Run_Vision_CAMERA3.Location = new Point(18, 545);
+            Run_Vision_CAMERA3.Location = new Point(1220, 545);
             Run_Vision_CAMERA3.Margin = new Padding(4, 3, 4, 3);
             Run_Vision_CAMERA3.Name = "Run_Vision_CAMERA3";
             Run_Vision_CAMERA3.Size = new Size(76, 46);
-            Run_Vision_CAMERA3.TabIndex = 1251;
+            Run_Vision_CAMERA3.TabIndex = 1254;
             Run_Vision_CAMERA3.Text = "Run All PRG";
             Run_Vision_CAMERA3.UseVisualStyleBackColor = false;
             Run_Vision_CAMERA3.Click += Run_Vision_CAMERA3_Click;
+            // 
+            // Import_Image2
+            // 
+            Import_Image2.FlatStyle = FlatStyle.Flat;
+            Import_Image2.IconChar = FontAwesome.Sharp.IconChar.None;
+            Import_Image2.IconColor = Color.Black;
+            Import_Image2.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            Import_Image2.Location = new Point(18, 429);
+            Import_Image2.Margin = new Padding(4, 3, 4, 3);
+            Import_Image2.Name = "Import_Image2";
+            Import_Image2.Size = new Size(76, 46);
+            Import_Image2.TabIndex = 1250;
+            Import_Image2.Text = "Import Image";
+            Import_Image2.UseVisualStyleBackColor = true;
+            Import_Image2.Click += Universal_Import_Click;
+            // 
+            // BT_GrapImage2
+            // 
+            BT_GrapImage2.FlatStyle = FlatStyle.Flat;
+            BT_GrapImage2.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            BT_GrapImage2.IconChar = FontAwesome.Sharp.IconChar.None;
+            BT_GrapImage2.IconColor = Color.Black;
+            BT_GrapImage2.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            BT_GrapImage2.Location = new Point(18, 484);
+            BT_GrapImage2.Margin = new Padding(4, 3, 4, 3);
+            BT_GrapImage2.Name = "BT_GrapImage2";
+            BT_GrapImage2.Size = new Size(76, 46);
+            BT_GrapImage2.TabIndex = 1249;
+            BT_GrapImage2.Text = "Grap Image";
+            BT_GrapImage2.UseVisualStyleBackColor = true;
+            BT_GrapImage2.Click += Universal_GrabImage_Click;
+            // 
+            // Run_Vision_CAMERA2
+            // 
+            Run_Vision_CAMERA2.BackColor = Color.Transparent;
+            Run_Vision_CAMERA2.FlatStyle = FlatStyle.Flat;
+            Run_Vision_CAMERA2.IconChar = FontAwesome.Sharp.IconChar.None;
+            Run_Vision_CAMERA2.IconColor = Color.Black;
+            Run_Vision_CAMERA2.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            Run_Vision_CAMERA2.Location = new Point(18, 545);
+            Run_Vision_CAMERA2.Margin = new Padding(4, 3, 4, 3);
+            Run_Vision_CAMERA2.Name = "Run_Vision_CAMERA2";
+            Run_Vision_CAMERA2.Size = new Size(76, 46);
+            Run_Vision_CAMERA2.TabIndex = 1251;
+            Run_Vision_CAMERA2.Text = "Run All PRG";
+            Run_Vision_CAMERA2.UseVisualStyleBackColor = false;
+            Run_Vision_CAMERA2.Click += Run_Vision_CAMERA2_Click;
             // 
             // Import_Image
             // 
@@ -375,18 +375,18 @@
             Import_Image.UseVisualStyleBackColor = true;
             Import_Image.Click += Universal_Import_Click;
             // 
-            // pictureBox3
+            // pictureBox2
             // 
-            pictureBox3.BackColor = Color.DarkBlue;
-            pictureBox3.BorderStyle = BorderStyle.FixedSingle;
-            pictureBox3.ContextMenuStrip = MenuStripPic3;
-            pictureBox3.Location = new Point(102, 429);
-            pictureBox3.Margin = new Padding(4, 3, 4, 3);
-            pictureBox3.Name = "pictureBox3";
-            pictureBox3.Size = new Size(556, 402);
-            pictureBox3.SizeMode = PictureBoxSizeMode.Zoom;
-            pictureBox3.TabIndex = 3;
-            pictureBox3.TabStop = false;
+            pictureBox2.BackColor = Color.DarkBlue;
+            pictureBox2.BorderStyle = BorderStyle.FixedSingle;
+            pictureBox2.ContextMenuStrip = MenuStripPic3;
+            pictureBox2.Location = new Point(102, 429);
+            pictureBox2.Margin = new Padding(4, 3, 4, 3);
+            pictureBox2.Name = "pictureBox2";
+            pictureBox2.Size = new Size(556, 402);
+            pictureBox2.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox2.TabIndex = 3;
+            pictureBox2.TabStop = false;
             // 
             // MenuStripPic3
             // 
@@ -412,18 +412,18 @@
             Clear_Image3.Text = "Clear Image";
             Clear_Image3.Click += Universal_Clear_Click;
             // 
-            // pictureBox2
+            // pictureBox3
             // 
-            pictureBox2.BackColor = Color.DarkBlue;
-            pictureBox2.BorderStyle = BorderStyle.FixedSingle;
-            pictureBox2.ContextMenuStrip = MenuStripPic2;
-            pictureBox2.Location = new Point(666, 429);
-            pictureBox2.Margin = new Padding(4, 3, 4, 3);
-            pictureBox2.Name = "pictureBox2";
-            pictureBox2.Size = new Size(546, 402);
-            pictureBox2.SizeMode = PictureBoxSizeMode.Zoom;
-            pictureBox2.TabIndex = 1;
-            pictureBox2.TabStop = false;
+            pictureBox3.BackColor = Color.DarkBlue;
+            pictureBox3.BorderStyle = BorderStyle.FixedSingle;
+            pictureBox3.ContextMenuStrip = MenuStripPic2;
+            pictureBox3.Location = new Point(666, 429);
+            pictureBox3.Margin = new Padding(4, 3, 4, 3);
+            pictureBox3.Name = "pictureBox3";
+            pictureBox3.Size = new Size(546, 402);
+            pictureBox3.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox3.TabIndex = 1;
+            pictureBox3.TabStop = false;
             // 
             // MenuStripPic2
             // 
@@ -1290,9 +1290,9 @@
             Panel_Menu.ResumeLayout(false);
             Panel_Home.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pictureBox4).EndInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox3).EndInit();
-            MenuStripPic3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
+            MenuStripPic3.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)pictureBox3).EndInit();
             MenuStripPic2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             MenuStripPic1.ResumeLayout(false);
@@ -1366,8 +1366,8 @@
         private System.Windows.Forms.Label Label4;
         public System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.ToolStripMenuItem Fit_Image;
-        public System.Windows.Forms.PictureBox pictureBox3;
         public System.Windows.Forms.PictureBox pictureBox2;
+        public System.Windows.Forms.PictureBox pictureBox3;
         private FontAwesome.Sharp.IconButton btnCamera2;
         private FontAwesome.Sharp.IconButton btnCamera3;
         private System.Windows.Forms.ContextMenuStrip MenuStripPic2;
@@ -1379,18 +1379,18 @@
         private System.Windows.Forms.ContextMenuStrip MenuStripPic4;
         private System.Windows.Forms.ToolStripMenuItem Fit_Image4;
         private System.Windows.Forms.ToolStripMenuItem Clear_Image4;
-        private FontAwesome.Sharp.IconButton Import_Image3;
-        private FontAwesome.Sharp.IconButton BT_GrapImage3;
-        private FontAwesome.Sharp.IconButton Run_Vision_CAMERA3;
+        private FontAwesome.Sharp.IconButton Import_Image2;
+        private FontAwesome.Sharp.IconButton BT_GrapImage2;
+        private FontAwesome.Sharp.IconButton Run_Vision_CAMERA2;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.ProgressBar progressBar1;
         private FontAwesome.Sharp.IconButton btnAddtoArchive;
         private FontAwesome.Sharp.IconButton btnExtract;
         private System.Windows.Forms.ToolStripMenuItem selectROIstrip;
         private FontAwesome.Sharp.IconButton Import_Multi_Image;
-        private FontAwesome.Sharp.IconButton Import_Image2;
-        private FontAwesome.Sharp.IconButton BT_GrapImage2;
-        private FontAwesome.Sharp.IconButton Run_Vision_CAMERA2;
+        private FontAwesome.Sharp.IconButton Import_Image3;
+        private FontAwesome.Sharp.IconButton BT_GrapImage3;
+        private FontAwesome.Sharp.IconButton Run_Vision_CAMERA3;
         private FontAwesome.Sharp.IconButton btnLightingOff;
         private FontAwesome.Sharp.IconButton btnLightingOn;
         private GroupBox groupBox2;
