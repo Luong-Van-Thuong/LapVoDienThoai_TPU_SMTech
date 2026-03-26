@@ -1,4 +1,5 @@
 ﻿using Basler.Pylon;
+using OpenCvSharp;
 using System.Diagnostics;
 using System.Drawing.Imaging;
 
@@ -27,6 +28,7 @@ namespace TPU_Assembly.Class
         private readonly PixelDataConverter converter = new();
 
         private readonly AutoResetEvent _waitForImageEvent = new(false);
+
 
         public override bool isContinuous() => isContinue;
 
@@ -90,63 +92,51 @@ namespace TPU_Assembly.Class
         }
         public override bool ReOpenCamera()
         {
+            try
             {
-                try
-                {
-                    Stop();
-                    Thread.Sleep(200);
-                    DestroyCamera();
-                    Thread.Sleep(200);
-                }
-                catch (Exception)
-                {
-                }
+                Stop();
+                Thread.Sleep(200);
+                DestroyCamera();
+                Thread.Sleep(200);
+            }
+            catch (Exception)
+            {
+            }
 
-                List<ICameraInfo> allCameras = CameraFinder.Enumerate();
-                try
+            List<ICameraInfo> allCameras = CameraFinder.Enumerate();
+            try
+            {
+                foreach (ICameraInfo cameraInfo in allCameras)
                 {
-                    foreach (ICameraInfo cameraInfo in allCameras)
+                    if (cameraInfo[CameraInfoKey.UserDefinedName] == cameraName)
                     {
-                        if (cameraInfo[CameraInfoKey.UserDefinedName] == cameraName)
-                        {
-                            string cameraSerial = cameraInfo[CameraInfoKey.SerialNumber];
-                            camera = new Camera(cameraSerial);
-                            deviceType = cameraInfo[CameraInfoKey.DeviceType];
+                        string cameraSerial = cameraInfo[CameraInfoKey.SerialNumber];
+                        camera = new Camera(cameraSerial);
+                        deviceType = cameraInfo[CameraInfoKey.DeviceType];
 
-                            camera.CameraOpened += Configuration.AcquireContinuous;
-                            camera.ConnectionLost += OnConnectionLost;
-                            camera.CameraOpened += OnCameraOpened;
-                            camera.CameraClosed += OnCameraClosed;
-                            camera.StreamGrabber.GrabStarted += OnGrabStarted;
-                            camera.StreamGrabber.ImageGrabbed += OnImageGrabbed;
-                            camera.StreamGrabber.GrabStopped += OnGrabStopped;
+                        camera.CameraOpened += Configuration.AcquireContinuous;
+                        camera.ConnectionLost += OnConnectionLost;
+                        camera.CameraOpened += OnCameraOpened;
+                        camera.CameraClosed += OnCameraClosed;
+                        camera.StreamGrabber.GrabStarted += OnGrabStarted;
+                        camera.StreamGrabber.ImageGrabbed += OnImageGrabbed;
+                        camera.StreamGrabber.GrabStopped += OnGrabStopped;
 
-                            camera.Open();
-
-                            isOpened = true;
-
-                            camera.Parameters[PLCamera.UserSetLoad].Execute();
-
-                        }
-                        MSystem.InsertAndSaveLogs($"ReOpened camera: {cameraName}", Color.Red);
-                        return true;
-                    }
-                }
-                catch
-                {
-                    Thread.Sleep(300);
-                    try
-                    {
                         camera.Open();
-                        MSystem.InsertAndSaveLogs($"ReOpened camera: {cameraName}", Color.Red);
-                        return true;
+
+                        isOpened = true;
+
+                        camera.Parameters[PLCamera.UserSetLoad].Execute();
+
                     }
-                    catch (Exception)
-                    {
-                        MSystem.InsertAndSaveLogs($"Failed to ReOpen camera: {cameraName}", Color.Red);
-                        return false;
-                    }
+                    MSystem.InsertAndSaveLogs($"ReOpened camera: {cameraName}", Color.Red);
+                    return true;
                 }
+            }
+            catch
+            {
+                MSystem.InsertAndSaveLogs($"Failed to ReOpen camera: {cameraName}", Color.Red);
+                return false;
             }
             return false;
         }
@@ -172,6 +162,123 @@ namespace TPU_Assembly.Class
 
 
         }
+
+
+        #region Set /Get Camera Parameters
+        public override bool SetExposureTime(double exposuretime)
+        {
+            try
+            {
+                if (camera == null || !camera.IsOpen) return false;
+
+                if (camera.Parameters[PLCamera.ExposureTime].IsWritable)
+                {
+                    camera.Parameters[PLCamera.ExposureTime].SetValue(exposuretime);
+                    return true;
+                }
+                else
+                {
+                    MSystem.InsertAndSaveLogs($"Exposure time parameter is not writable for camera: {cameraName}", Color.Red);
+                    return false;
+                }
+            }
+            catch (Exception) { return false; }
+        }
+
+
+        public override double GetGain()
+        {
+            try
+            {
+                if (camera == null || !camera.IsOpen) return 0;
+                double gain = camera.Parameters[PLCamera.Gain].GetValue();
+                return gain;
+            }
+            catch (Exception)
+            {
+                MSystem.InsertAndSaveLogs($"Failed to get gain for camera: {cameraName}", Color.Red);
+                return 0;
+            }
+        }
+
+        public override bool SetGain(double gain)
+        {
+            try
+            {
+                if (camera == null || !camera.IsOpen) return false;
+                if (camera.Parameters[PLCamera.Gain].IsWritable)
+                {
+                    camera.Parameters[PLCamera.Gain].SetValue(gain);
+                    return true;
+                }
+                else
+                {
+                    MSystem.InsertAndSaveLogs($"Gain parameter is not writable for camera: {cameraName}", Color.Red);
+                    return false;
+                }
+            }
+            catch (Exception) { return false; }
+        }
+
+        public override double GetExposureTime()
+        {
+            try
+            {
+                if (camera == null || !camera.IsOpen) return 0;
+                double exposureTime = camera.Parameters[PLCamera.ExposureTime].GetValue();
+                return exposureTime;
+            }
+            catch (Exception)
+            {
+                MSystem.InsertAndSaveLogs($"Failed to get exposure time for camera: {cameraName}", Color.Red);
+                return 0;
+            }
+        }
+
+        public override double GetGamma()
+        {
+            try
+            {
+                if (camera == null || !camera.IsOpen) return 0;
+                double gamma = camera.Parameters[PLCamera.Gamma].GetValue();
+                return gamma;
+
+            }
+            catch(Exception) { return 0; }
+        }
+
+        public override bool SetGamma(double gamma)
+        {
+            try
+            {
+                if (camera == null || !camera.IsOpen) return false;
+                if (camera.Parameters[PLCamera.Gamma].IsWritable)
+                {
+                    camera.Parameters[PLCamera.Gamma].SetValue(gamma);
+                    return true;
+                }
+                else
+                {
+                    MSystem.InsertAndSaveLogs($"Gamma parameter is not writable for camera: {cameraName}", Color.Red);
+                    return false;
+                }
+            }
+            catch (Exception) { return false; }
+        }
+        public override bool UserSetSave()
+        {
+            try
+            {
+                if (camera == null || !camera.IsOpen) return false;
+                camera.Parameters[PLCamera.UserSetSelector].SetValue(PLCamera.UserSetSelector.UserSet1);
+                camera.Parameters[PLCamera.UserSetDefault].SetValue(PLCamera.UserSetDefault.UserSet1);
+                camera.Parameters[PLCamera.UserSetSave].Execute();
+                return true;
+            } catch (Exception) { return false; }
+        }
+
+        #endregion
+
         public override bool IsOpened()
         {
             return isOpened;

@@ -16,6 +16,7 @@ namespace TPU_Assembly.Class
                 SaveSetting("ConfidenceThreshold", MAINFORM.ConfidenceThreshold.ToString());
                 SaveSetting("IPAddress", MAINFORM.IPAddress.ToString());
                 SaveSetting("Port", MAINFORM.Port.ToString());
+                SaveSetting("AutoLoadModel", MAINFORM.AutoLoadModel.ToString());
             }
             catch (Exception ex)
             {
@@ -68,6 +69,7 @@ namespace TPU_Assembly.Class
                 MAINFORM.ConfidenceThreshold = float.Parse(appSettings["ConfidenceThreshold"] ?? "0.65");
                 MAINFORM.IPAddress = appSettings["IPAddress"] ?? "127.0.0.1";
                 MAINFORM.Port = int.Parse(appSettings["Port"] ?? "9900");
+                MAINFORM.AutoLoadModel = bool.Parse(appSettings["AutoLoadModel"] ?? "false");
             }
             catch { }
         }

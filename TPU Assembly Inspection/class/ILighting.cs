@@ -7,8 +7,8 @@
         void Disconnect();
         bool LightON(int channel, int val);
         bool LightOFF(int channel);
-        void MutilChannelON(int val);
-        void MutilChannelOFF();
+        bool MutilChannelON(int val);
+        bool MutilChannelOFF();
         List<(string channel, string value)> GetLights();
     }
 }

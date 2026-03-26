@@ -47,13 +47,23 @@ namespace TPU_Assembly.Class
         }
 
 
-        [Category("3. ConfidenceThreshold")]
+        [Category("3. Settings Model AI")]
         [DisplayName("Confidence")]
         [Description("Xác định ngưỡng chính xác của đối tượng")]
         public float ConfidenceThreshold
         {
             get { return MAINFORM.ConfidenceThreshold; }
             set { MAINFORM.ConfidenceThreshold = value; }
+        }
+
+
+        [Category("3. Settings Model AI")]
+        [DisplayName("AutoLoadModel")]
+        [Description("Tự động load model khi khởi động ứng dụng")]
+        public bool AutoLoadModel
+        {
+            get { return MAINFORM.AutoLoadModel; }
+            set { MAINFORM.AutoLoadModel = value; }
         }
 
         [Category("4. TCP/IP")]

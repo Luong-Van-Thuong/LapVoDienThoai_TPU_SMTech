@@ -97,6 +97,16 @@
             BT_Exit = new FontAwesome.Sharp.IconButton();
             BT_Hide = new FontAwesome.Sharp.IconButton();
             Panel_Teaching = new Panel();
+            groupBox3 = new GroupBox();
+            comboBoxCamera = new ComboBox();
+            numericGamma = new NumericUpDown();
+            label8 = new Label();
+            numericGain = new NumericUpDown();
+            label7 = new Label();
+            label9 = new Label();
+            label5 = new Label();
+            btnSave_Parameter = new FontAwesome.Sharp.IconButton();
+            numericExposure_Time = new NumericUpDown();
             Panel_Settings = new Panel();
             groupBox2 = new GroupBox();
             btnLightingOn = new FontAwesome.Sharp.IconButton();
@@ -128,6 +138,11 @@
             Panel_Header.SuspendLayout();
             panel1.SuspendLayout();
             groupboxConnection.SuspendLayout();
+            Panel_Teaching.SuspendLayout();
+            groupBox3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)numericGamma).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numericGain).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numericExposure_Time).BeginInit();
             Panel_Settings.SuspendLayout();
             groupBox2.SuspendLayout();
             groupBox1.SuspendLayout();
@@ -1034,12 +1049,128 @@
             // Panel_Teaching
             // 
             Panel_Teaching.BackColor = Color.White;
+            Panel_Teaching.Controls.Add(groupBox3);
             Panel_Teaching.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             Panel_Teaching.Location = new Point(208, 81);
             Panel_Teaching.Margin = new Padding(4, 3, 4, 3);
             Panel_Teaching.Name = "Panel_Teaching";
             Panel_Teaching.Size = new Size(1310, 841);
             Panel_Teaching.TabIndex = 1235;
+            // 
+            // groupBox3
+            // 
+            groupBox3.Controls.Add(comboBoxCamera);
+            groupBox3.Controls.Add(numericGamma);
+            groupBox3.Controls.Add(label8);
+            groupBox3.Controls.Add(numericGain);
+            groupBox3.Controls.Add(label7);
+            groupBox3.Controls.Add(label9);
+            groupBox3.Controls.Add(label5);
+            groupBox3.Controls.Add(btnSave_Parameter);
+            groupBox3.Controls.Add(numericExposure_Time);
+            groupBox3.Location = new Point(34, 51);
+            groupBox3.Name = "groupBox3";
+            groupBox3.Size = new Size(329, 372);
+            groupBox3.TabIndex = 1245;
+            groupBox3.TabStop = false;
+            groupBox3.Text = "Camera";
+            // 
+            // comboBoxCamera
+            // 
+            comboBoxCamera.FormattingEnabled = true;
+            comboBoxCamera.Location = new Point(141, 62);
+            comboBoxCamera.Name = "comboBoxCamera";
+            comboBoxCamera.Size = new Size(121, 29);
+            comboBoxCamera.TabIndex = 1250;
+            comboBoxCamera.SelectedIndexChanged += comboBoxCamera_SelectedIndexChanged;
+            // 
+            // numericGamma
+            // 
+            numericGamma.DecimalPlaces = 3;
+            numericGamma.Location = new Point(142, 208);
+            numericGamma.Maximum = new decimal(new int[] { 4, 0, 0, 0 });
+            numericGamma.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            numericGamma.Name = "numericGamma";
+            numericGamma.Size = new Size(120, 29);
+            numericGamma.TabIndex = 1248;
+            numericGamma.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            numericGamma.ValueChanged += numericGamma_ValueChanged;
+            // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.Location = new Point(17, 213);
+            label8.Name = "label8";
+            label8.Size = new Size(65, 21);
+            label8.TabIndex = 1247;
+            label8.Text = "Gamma";
+            // 
+            // numericGain
+            // 
+            numericGain.DecimalPlaces = 3;
+            numericGain.Location = new Point(142, 163);
+            numericGain.Maximum = new decimal(new int[] { 20, 0, 0, 0 });
+            numericGain.Name = "numericGain";
+            numericGain.Size = new Size(120, 29);
+            numericGain.TabIndex = 1246;
+            numericGain.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            numericGain.ValueChanged += numericGain_ValueChanged;
+            // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Location = new Point(17, 168);
+            label7.Name = "label7";
+            label7.Size = new Size(42, 21);
+            label7.TabIndex = 1245;
+            label7.Text = "Gain";
+            // 
+            // label9
+            // 
+            label9.AutoSize = true;
+            label9.Location = new Point(14, 65);
+            label9.Name = "label9";
+            label9.Size = new Size(72, 21);
+            label9.TabIndex = 1244;
+            label9.Text = "CAMERA";
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Location = new Point(14, 123);
+            label5.Name = "label5";
+            label5.Size = new Size(111, 21);
+            label5.TabIndex = 1244;
+            label5.Text = "Exposure Time";
+            // 
+            // btnSave_Parameter
+            // 
+            btnSave_Parameter.BackColor = Color.Lime;
+            btnSave_Parameter.FlatStyle = FlatStyle.Flat;
+            btnSave_Parameter.IconChar = FontAwesome.Sharp.IconChar.None;
+            btnSave_Parameter.IconColor = Color.Black;
+            btnSave_Parameter.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            btnSave_Parameter.Location = new Point(153, 284);
+            btnSave_Parameter.Margin = new Padding(4, 3, 4, 3);
+            btnSave_Parameter.Name = "btnSave_Parameter";
+            btnSave_Parameter.Size = new Size(131, 66);
+            btnSave_Parameter.TabIndex = 1242;
+            btnSave_Parameter.Text = "Save Parameter";
+            btnSave_Parameter.UseVisualStyleBackColor = false;
+            btnSave_Parameter.Click += btnSave_Parameter_Click;
+            // 
+            // numericExposure_Time
+            // 
+            numericExposure_Time.DecimalPlaces = 3;
+            numericExposure_Time.Increment = new decimal(new int[] { 500, 0, 0, 0 });
+            numericExposure_Time.Location = new Point(142, 121);
+            numericExposure_Time.Maximum = new decimal(new int[] { 1000000, 0, 0, 0 });
+            numericExposure_Time.Minimum = new decimal(new int[] { 500, 0, 0, 0 });
+            numericExposure_Time.Name = "numericExposure_Time";
+            numericExposure_Time.Size = new Size(120, 29);
+            numericExposure_Time.TabIndex = 1243;
+            numericExposure_Time.Value = new decimal(new int[] { 5000, 0, 0, 0 });
+            numericExposure_Time.ValueChanged += numericExposure_Time_ValueChanged;
             // 
             // Panel_Settings
             // 
@@ -1279,9 +1410,9 @@
             Controls.Add(Panel_Menu);
             Controls.Add(btnLabelOCR);
             Controls.Add(panel1);
-            Controls.Add(Panel_Home);
             Controls.Add(Panel_Teaching);
             Controls.Add(Panel_Settings);
+            Controls.Add(Panel_Home);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(4, 3, 4, 3);
             Name = "MAINFORM";
@@ -1304,6 +1435,12 @@
             Panel_Header.PerformLayout();
             panel1.ResumeLayout(false);
             groupboxConnection.ResumeLayout(false);
+            Panel_Teaching.ResumeLayout(false);
+            groupBox3.ResumeLayout(false);
+            groupBox3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)numericGamma).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numericGain).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numericExposure_Time).EndInit();
             Panel_Settings.ResumeLayout(false);
             groupBox2.ResumeLayout(false);
             groupBox1.ResumeLayout(false);
@@ -1397,6 +1534,16 @@
         private ToolStripMenuItem listROIstrip;
         private ToolStripMenuItem showROIstrip;
         public PictureBox pictureBox4;
+        private FontAwesome.Sharp.IconButton btnSave_Parameter;
+        private NumericUpDown numericExposure_Time;
+        private Label label5;
+        private GroupBox groupBox3;
+        private Label label7;
+        private NumericUpDown numericGain;
+        private NumericUpDown numericGamma;
+        private Label label8;
+        private Label label9;
+        private ComboBox comboBoxCamera;
     }
 }
 

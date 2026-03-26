@@ -4,8 +4,6 @@
     {
         public delegate void CaptureCompleteEventArgs(object sender, CaptureCompleteEventArgs args);
 
-        public CameraParams cameraParams = new CameraParams();
-
         public abstract Bitmap OneShot_();
         public abstract bool IsOpened();
         public abstract void Stop();
@@ -13,31 +11,18 @@
         public abstract void DestroyCamera();
         public abstract void SetPictureBox(PictureBox contorl);
         public abstract bool isContinuous();
-    }
 
-    public class CameraParams
-    {
-        public long ExposureValue;
-        public long MinExposure;
-        public long MaxExposure;
+        #region Settings
+        public abstract double GetGain();
+        public abstract double GetGamma();
+        public abstract double GetExposureTime();
+        public abstract bool SetGain(double gain);
+        public abstract bool SetGamma(double gamma);
+        public abstract bool SetExposureTime(double exposuretime);
+        public abstract bool UserSetSave();
 
-        public long Width;
-        public long MinWidth;
-        public long MaxWidth;
+        #endregion
 
-        public long Height;
-        public long MinHeight;
-        public long MaxHeight;
 
-        public long Xoffset;
-        public long MinXoffset;
-        public long MaxXoffset;
-
-        public long Yoffset;
-        public long MinYoffset;
-        public long MaxYoffset;
-
-        public long EndX;
-        public long EndY;
     }
 }

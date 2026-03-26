@@ -95,22 +95,27 @@ namespace Lighting_ALT
             return channelList;
         }
 
-        public void MutilChannelON(int val)
+        public bool MutilChannelON(int val)
         {
-            foreach (int i in FormatMultiChannel())
+            try
             {
-                LightON(i, val);
-                Thread.Sleep(30);
+                foreach (int i in FormatMultiChannel())
+                {
+                    LightON(i, val);
+                    Thread.Sleep(30);
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MSystem.InsertAndSaveLogs($"[Lighting Error] Lỗi khi bật đèn: {ex.Message}", Color.Red);
+                return false;
             }
         }
 
-        public void MutilChannelOFF()
+        public bool MutilChannelOFF()
         {
-            foreach (int i in FormatMultiChannel())
-            {
-                LightOFF(i);
-                Thread.Sleep(30);
-            }
+            return MutilChannelON(0);
         }
 
         public List<(string channel, string value)> GetLights()

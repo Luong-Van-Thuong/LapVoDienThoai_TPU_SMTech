@@ -23,6 +23,8 @@ namespace TPU_Assembly_Inspection_Paddle
 
         public static int SaveLogDays, Port;
 
+        public static bool AutoLoadModel;
+
         public static float ConfidenceThreshold;
 
         public static string IPAddress;
@@ -153,7 +155,10 @@ namespace TPU_Assembly_Inspection_Paddle
             Start_Server();
             AutoDeleteOldLogs();
             Menu_Strip();
-            AutoLoadModel();
+            if (AutoLoadModel)
+            {
+                TaskAutoLoadModel();
+            }
         }
 
         #region Open Server TCP/IP
@@ -226,7 +231,7 @@ namespace TPU_Assembly_Inspection_Paddle
             //// xử lý data nhận được
             if (data.Contains("TRIGGER"))
             {
-                if (!myLighting.LightON(myLighting.Channel, myLighting.Brightness))
+                if (!myLighting.MutilChannelON(myLighting.Brightness))
                 {
                     MSystem.InsertAndSaveLogs("ERROR ON LIGHT", Color.Red);
                     _tcpServer.Send("GRAB_ERROR");
@@ -313,10 +318,10 @@ namespace TPU_Assembly_Inspection_Paddle
 
                 float tongDienTichLoi = res2.Detections.Where(d => d.ClassName == "2").Sum(d => d.Area);
 
-                if (isAllOK) _tcpServer.Send("OK:"+ OcrText);
-                else if (!isOCROK && errorCams.Count >= 2) _tcpServer.Send("NG_ALL:"+ OcrText);
-                else if (!isOCROK && errorCams.Count < 2) _tcpServer.Send("NG_OCR:"+ OcrText);
-                else if ((isOCROK && errorCams.Count > 0) || tongDienTichLoi < 200000) _tcpServer.Send("NG_TPU:"+ OcrText);
+                if (isAllOK) _tcpServer.Send("OK:" + OcrText);
+                else if (!isOCROK && errorCams.Count >= 2) _tcpServer.Send("NG_ALL:" + OcrText);
+                else if (!isOCROK && errorCams.Count < 2) _tcpServer.Send("NG_OCR:" + OcrText);
+                else if ((isOCROK && errorCams.Count > 0) || tongDienTichLoi < 200000) _tcpServer.Send("NG_TPU:" + OcrText);
 
 
                 stopWatch_Run.Stop();
@@ -365,7 +370,7 @@ namespace TPU_Assembly_Inspection_Paddle
             }
             finally
             {
-                if (!myLighting.LightOFF(myLighting.Channel))
+                if (!myLighting.MutilChannelOFF())
                 {
                     MSystem.InsertAndSaveLogs("ERROR OFF LIGHT", Color.Red);
                 }
@@ -541,7 +546,7 @@ namespace TPU_Assembly_Inspection_Paddle
         {
             if (myLighting.IsConnected())
             {
-                if (!myLighting.LightON(myLighting.Channel, myLighting.Brightness)) MSystem.InsertAndSaveLogs("ERROR ON Light", Color.Red);
+                if (!myLighting.MutilChannelON(myLighting.Brightness)) MSystem.InsertAndSaveLogs("ERROR ON Light", Color.Red);
             }
         }
 
@@ -549,7 +554,7 @@ namespace TPU_Assembly_Inspection_Paddle
         {
             if (myLighting.IsConnected())
             {
-                if (!myLighting.LightOFF(myLighting.Channel)) MSystem.InsertAndSaveLogs("ERROR OFF Light", Color.Red);
+                if (!myLighting.MutilChannelOFF()) MSystem.InsertAndSaveLogs("ERROR OFF Light", Color.Red);
             }
         }
 
@@ -900,7 +905,7 @@ namespace TPU_Assembly_Inspection_Paddle
             }
         }
 
-        private async void AutoLoadModel()
+        private async void TaskAutoLoadModel()
         {
             string modelFolderPath = Path.Combine(Application.StartupPath, "models");
             string modelFilePath = Path.Combine(modelFolderPath, "best.onnx");
@@ -1019,6 +1024,19 @@ namespace TPU_Assembly_Inspection_Paddle
             btnCamera1.BackColor = (CameraBasler.CheckConnectCam("CAMERA1")) ? Color.Lime : Color.Red;
             btnCamera2.BackColor = (CameraBasler.CheckConnectCam("CAMERA2")) ? Color.Lime : Color.Red;
             btnCamera3.BackColor = (CameraBasler.CheckConnectCam("CAMERA3")) ? Color.Lime : Color.Red;
+
+            if (CameraBasler.CheckConnectCam("CAMERA1"))
+            {
+                comboBoxCamera.Items.Add("CAMERA1");
+            }
+            if (CameraBasler.CheckConnectCam("CAMERA2"))
+            {
+                comboBoxCamera.Items.Add("CAMERA2");
+            }
+            if (CameraBasler.CheckConnectCam("CAMERA3"))
+            {
+                comboBoxCamera.Items.Add("CAMERA3");
+            }
         }
 
         #endregion
@@ -1041,7 +1059,7 @@ namespace TPU_Assembly_Inspection_Paddle
 
                 PictureBox targetPB = cameraConfig.TargetPictureBox;
 
-                if (!myLighting.LightON(myLighting.Channel, myLighting.Brightness))
+                if (!myLighting.MutilChannelON(myLighting.Brightness))
                 {
                     MSystem.InsertAndSaveLogs("ERROR ON LIGHT", Color.Red);
                     //return;
@@ -1061,7 +1079,7 @@ namespace TPU_Assembly_Inspection_Paddle
             }
             finally
             {
-                if (!myLighting.LightOFF(myLighting.Channel))
+                if (!myLighting.MutilChannelOFF())
                 {
                     MSystem.InsertAndSaveLogs("ERROR OFF LIGHT", Color.Red);
                 }
@@ -1836,7 +1854,8 @@ namespace TPU_Assembly_Inspection_Paddle
         #region 13. Start Engine
         private void btnStart_Click(object sender, EventArgs e)
         {
-            if (inferenceEngine == null) { 
+            if (inferenceEngine == null)
+            {
                 MSystem.InsertAndSaveLogs("Inference Engine chưa được khởi tạo!", Color.Red);
                 return;
             }
@@ -1856,6 +1875,87 @@ namespace TPU_Assembly_Inspection_Paddle
             btnStop.BackColor = Color.Red;
             btnStart.BackColor = Color.White;
         }
+        #endregion
+
+        #region 14. Camera Settings
+        private void comboBoxCamera_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                string selectedCam = comboBoxCamera.SelectedItem.ToString();
+                numericExposure_Time.Value = (decimal)CameraBasler.GetExposureTime(selectedCam);
+                numericGain.Value = (decimal)CameraBasler.GetGain(selectedCam);
+                numericGamma.Value = (decimal)CameraBasler.GetGamma(selectedCam);
+            }
+            catch (Exception ex) 
+            {
+                MSystem.InsertAndSaveLogs("Lỗi khi lấy parameter camera: " + ex.ToString(), Color.Red); 
+            }
+        }
+
+        private void numericExposure_Time_ValueChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (CameraBasler.SetExposureTime(comboBoxCamera.SelectedItem.ToString(), (double)numericExposure_Time.Value))
+                {
+                    MSystem.InsertAndSaveLogs($"Set Exposure Time {comboBoxCamera.SelectedItem}: {(double)numericExposure_Time.Value}", Color.Green);
+                    return;
+                }
+                MSystem.InsertAndSaveLogs($"Failed to set Exposure Time for {comboBoxCamera.SelectedItem}", Color.Red);
+            }
+            catch (Exception ex)
+            {
+                MSystem.InsertAndSaveLogs(ex.ToString(), Color.Red);
+            }
+        }
+
+        private void numericGain_ValueChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if(CameraBasler.SetGain(comboBoxCamera.SelectedItem.ToString(), (double)numericGain.Value))               
+                {
+                    MSystem.InsertAndSaveLogs($"Set Gain {comboBoxCamera.SelectedItem}: {(double)numericGain.Value}", Color.Green);
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                MSystem.InsertAndSaveLogs(ex.ToString(), Color.Red);
+            }
+        }
+
+        private void numericGamma_ValueChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (CameraBasler.SetGamma(comboBoxCamera.SelectedItem.ToString(), (double)numericGamma.Value))
+                {
+                    MSystem.InsertAndSaveLogs($"Set Gamma {comboBoxCamera.SelectedItem}: {(double)numericGamma.Value}", Color.Green);
+                }
+            }
+            catch (Exception ex)
+            {
+                MSystem.InsertAndSaveLogs(ex.ToString(), Color.Red);
+            }
+        }
+        private void btnSave_Parameter_Click(object sender, EventArgs e)
+        {
+            if (comboBoxCamera.SelectedItem == null) return;
+            try
+            {
+                if (CameraBasler.UserSetSave(comboBoxCamera.SelectedItem.ToString()))
+                {
+                    NotificationDialog.Show($"Parameters for {comboBoxCamera.SelectedItem} saved successfully!");
+                    return;
+                }
+                NotificationDialog.Show($"Failed to save parameters for {comboBoxCamera.SelectedItem}. Please check the camera connection and try again.");
+            }
+            catch { }
+
+        }
+
         #endregion
     }
 
