@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO.Compression;
 using System.Runtime;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using TPU_Assembly.Class;
 using TPU_Assembly.JobSelection;
 using TPU_Assembly_Inspection;
@@ -481,14 +482,14 @@ namespace TPU_Assembly_Inspection_Paddle
         public string GetResultFromZone(Bitmap fullImage, string zoneName)
         {
             var zone = _inspectionZones.Find(z => z.Name == zoneName);
-            if (zone == null) return "N/A";
+            if (zone == null) return "";
 
             try
             {
                 Rectangle cropRect = zone.Rect;
                 cropRect.Intersect(new Rectangle(0, 0, fullImage.Width, fullImage.Height));
 
-                if (cropRect.Width == 0 || cropRect.Height == 0) return "Error_Size";
+                if (cropRect.Width == 0 || cropRect.Height == 0) return "";
 
                 string resultText = "";
                 Color boxColor = Color.Lime;
@@ -499,6 +500,45 @@ namespace TPU_Assembly_Inspection_Paddle
                     {
                         var ocrResult = _ocrEngine.DetectText(roi);
                         resultText = ocrResult != null ? ocrResult.Text.Trim() : "";
+
+                        if (!string.IsNullOrEmpty(resultText))
+                        {
+                            resultText = Regex.Replace(resultText, @"[^a-zA-Z0-9#\-\><%\s]", "");
+
+                            int index37 = resultText.IndexOf("37");
+                            int index26 = resultText.IndexOf("26");
+
+                            int targetIndex = -1;
+
+                            if (index37 >= 0 && index26 >= 0)
+                                targetIndex = Math.Min(index37, index26);
+                            else if (index37 >= 0)
+                                targetIndex = index37;
+                            else if (index26 >= 0)
+                                targetIndex = index26;
+
+                            if (targetIndex >= 0)
+                            {
+                                if (targetIndex > 0 && resultText[targetIndex - 1] == 'A')
+                                {
+                                    resultText = resultText.Substring(targetIndex - 1);
+                                }
+                                else
+                                {
+                                    resultText = "A" + resultText.Substring(targetIndex);
+                                }
+                            }
+
+                            if (!string.IsNullOrEmpty(resultText))
+                            {
+                                int indexLastBracket = resultText.LastIndexOf('<');
+                                if (indexLastBracket >= 17)
+                                {
+                                    resultText = resultText.Substring(0, indexLastBracket + 1);
+                                }
+                            }
+                        }
+
                     }
                 }
 
@@ -525,7 +565,7 @@ namespace TPU_Assembly_Inspection_Paddle
             catch (Exception ex)
             {
                 MSystem.InsertAndSaveLogs("Lỗi xử lý OCR: " + ex.Message, Color.Red);
-                return "Error: " + ex.Message;
+                return "";
             }
         }
 
@@ -848,6 +888,7 @@ namespace TPU_Assembly_Inspection_Paddle
                         if (!string.IsNullOrEmpty(selectedJob))
                         {
                             LoadingForm loadingForm = new LoadingForm("Đang tải Model, vui lòng đợi...");
+                            loadingForm.Owner = this;
                             loadingForm.ShowWithOverlay(this);
 
                             try
@@ -861,8 +902,13 @@ namespace TPU_Assembly_Inspection_Paddle
                                     {
                                         if (_ocrEngine == null)
                                         {
+                                            OCRParameter ocrParam = new()
+                                            {
+                                                det_db_thresh = 0.5f,
+                                                det_db_box_thresh = 0.5f
+                                            };
                                             InspectionZones.SetupPaddlePaths();
-                                            _ocrEngine = new PaddleOCREngine(null, new OCRParameter());
+                                            _ocrEngine = new PaddleOCREngine(null, ocrParam);
                                         }
                                     }
                                     catch
@@ -914,6 +960,7 @@ namespace TPU_Assembly_Inspection_Paddle
                 this.Cursor = Cursors.WaitCursor;
 
                 LoadingForm loadingForm = new LoadingForm("Đang tải Model, vui lòng đợi...");
+                loadingForm.Owner = this;
                 loadingForm.ShowWithOverlay(this);
 
                 try
@@ -927,8 +974,13 @@ namespace TPU_Assembly_Inspection_Paddle
                         {
                             if (_ocrEngine == null)
                             {
+                                OCRParameter ocrParam = new()
+                                {
+                                    det_db_thresh = 0.5f,
+                                    det_db_box_thresh = 0.5f
+                                };
                                 InspectionZones.SetupPaddlePaths();
-                                _ocrEngine = new PaddleOCREngine(null, new OCRParameter());
+                                _ocrEngine = new PaddleOCREngine(null, ocrParam);
                             }
                         }
                         catch (Exception ex)
@@ -1419,7 +1471,7 @@ namespace TPU_Assembly_Inspection_Paddle
         #endregion
 
         #region 10. Select ROI
-        private void btnSelcectROI_Click(object sender, EventArgs e)
+        public void btnSelcectROI_Click(object sender, EventArgs e)
         {
             IsRoiMode = !IsRoiMode;
             if (IsRoiMode) pictureBox1.Cursor = Cursors.Cross;

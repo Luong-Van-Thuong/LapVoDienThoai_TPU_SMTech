@@ -227,6 +227,7 @@ namespace TPU_Assembly.Class
                             Rect = new Rectangle(finalX, finalY, finalW, finalH)
                         });
                         SaveOcrZones();
+                        MainForm.btnSelcectROI_Click(null,null);
                     }
                 }
                 pb.Invalidate();
