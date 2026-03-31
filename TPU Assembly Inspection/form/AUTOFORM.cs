@@ -711,15 +711,8 @@ namespace TPU_Assembly_Inspection_Paddle
         }
         private void btnTeaching_Click(object sender, EventArgs e)
         {
-            using (FullTouchKeyboard kboard = new FullTouchKeyboard("PASSWORD", true, "1"))
-            {
-                if (kboard.ShowDialog() == DialogResult.OK)
-                {
-                    ShowPanel(Panel_Teaching);
-                    SetActiveMenuButton(btnTeaching);
-                }
-            }
-
+            ShowPanel(Panel_Teaching);
+            SetActiveMenuButton(btnTeaching);
         }
 
         private void btnSettings_Click(object sender, EventArgs e)
@@ -1019,11 +1012,34 @@ namespace TPU_Assembly_Inspection_Paddle
 
         #region 5. Check Connection Camera
 
+        private void UpdateCameraStatusUI(string camName, bool isConnected)
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action(() => UpdateCameraStatusUI(camName, isConnected)));
+                return;
+            }
+
+            Color statusColor = isConnected ? Color.Lime : Color.Red;
+
+            if (camName == "CAMERA1") btnCamera1.BackColor = statusColor;
+            else if (camName == "CAMERA2") btnCamera2.BackColor = statusColor;
+            else if (camName == "CAMERA3") btnCamera3.BackColor = statusColor;
+
+        }
+
         private void UpdateStatusCamera()
         {
             btnCamera1.BackColor = (CameraBasler.CheckConnectCam("CAMERA1")) ? Color.Lime : Color.Red;
             btnCamera2.BackColor = (CameraBasler.CheckConnectCam("CAMERA2")) ? Color.Lime : Color.Red;
             btnCamera3.BackColor = (CameraBasler.CheckConnectCam("CAMERA3")) ? Color.Lime : Color.Red;
+            foreach (var cam in MAINFORM._cameraDict.Values)
+            {
+                if (cam.CameraInterface is BaslerCam baslerCam)
+                {
+                    baslerCam.ConnectionStatusChangedEvent += UpdateCameraStatusUI;
+                }
+            }
 
             if (CameraBasler.CheckConnectCam("CAMERA1"))
             {
@@ -1037,6 +1053,21 @@ namespace TPU_Assembly_Inspection_Paddle
             {
                 comboBoxCamera.Items.Add("CAMERA3");
             }
+        }
+
+        private void btnCamera1_Click(object sender, EventArgs e)
+        {
+            if (!CameraBasler.CheckConnectCam("CAMERA1")) CameraBasler.ReOpenCamera("CAMERA1");
+        }
+
+        private void btnCamera2_Click(object sender, EventArgs e)
+        {
+            if (!CameraBasler.CheckConnectCam("CAMERA2")) CameraBasler.ReOpenCamera("CAMERA2");
+        }
+
+        private void btnCamera3_Click(object sender, EventArgs e)
+        {
+            if (!CameraBasler.CheckConnectCam("CAMERA3")) CameraBasler.ReOpenCamera("CAMERA3");
         }
 
         #endregion
@@ -1205,7 +1236,8 @@ namespace TPU_Assembly_Inspection_Paddle
 
         private void BT_Folder_Img_Click(object sender, EventArgs e)
         {
-            string folderPath = $@"C:\FA\TPU_Assembly_Inspection_Paddle\Images\";
+            string dateString = DateTime.Now.ToString("ddMMyyyy");
+            string folderPath = $@"C:\FA\TPU_Assembly_Inspection_Paddle\Images\{dateString}";
 
             if (!Directory.Exists(folderPath))
             {
@@ -1731,9 +1763,9 @@ namespace TPU_Assembly_Inspection_Paddle
         }
         private async void Run_Vision_CAMERA2_Click(object sender, EventArgs e)
         {
-            if (pictureBox3.Image == null) return;
+            if (pictureBox2.Image == null) return;
 
-            Bitmap workingImage = new Bitmap(pictureBox3.Image);
+            Bitmap workingImage = new(pictureBox2.Image);
 
             try
             {
@@ -1755,9 +1787,9 @@ namespace TPU_Assembly_Inspection_Paddle
                 stopWatch.Stop();
                 BT_Time.Text = stopWatch.ElapsedMilliseconds.ToString() + " ms";
 
-                var oldImage = pictureBox3.Image;
+                var oldImage = pictureBox2.Image;
 
-                pictureBox3.Image = resultData.ResultImage;
+                pictureBox2.Image = resultData.ResultImage;
 
                 oldImage?.Dispose();
 
@@ -1765,7 +1797,7 @@ namespace TPU_Assembly_Inspection_Paddle
 
                 string status = (resultData.Detections.Count >= 3) ? "OK" : "NG";
 
-                SaveResultToDisk((Bitmap)pictureBox3.Image, baseName, status);
+                SaveResultToDisk((Bitmap)pictureBox2.Image, baseName, status);
 
             }
             catch (Exception ex)
@@ -1783,7 +1815,7 @@ namespace TPU_Assembly_Inspection_Paddle
         {
             if (pictureBox3.Image == null) return;
 
-            Bitmap workingImage = new Bitmap(pictureBox3.Image);
+            Bitmap workingImage = new(pictureBox3.Image);
 
             try
             {
@@ -1813,7 +1845,7 @@ namespace TPU_Assembly_Inspection_Paddle
 
                 workingImage.Dispose();
 
-                string status = (resultData.Detections.Count >= 3) ? "OK" : "NG";
+                string status = (resultData.Detections.Count >= 5) ? "OK" : "NG";
 
                 SaveResultToDisk((Bitmap)pictureBox3.Image, baseName, status);
 
@@ -1887,9 +1919,9 @@ namespace TPU_Assembly_Inspection_Paddle
                 numericGain.Value = (decimal)CameraBasler.GetGain(selectedCam);
                 numericGamma.Value = (decimal)CameraBasler.GetGamma(selectedCam);
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
-                MSystem.InsertAndSaveLogs("Lỗi khi lấy parameter camera: " + ex.ToString(), Color.Red); 
+                MSystem.InsertAndSaveLogs("Lỗi khi lấy parameter camera: " + ex.ToString(), Color.Red);
             }
         }
 
@@ -1914,7 +1946,7 @@ namespace TPU_Assembly_Inspection_Paddle
         {
             try
             {
-                if(CameraBasler.SetGain(comboBoxCamera.SelectedItem.ToString(), (double)numericGain.Value))               
+                if (CameraBasler.SetGain(comboBoxCamera.SelectedItem.ToString(), (double)numericGain.Value))
                 {
                     MSystem.InsertAndSaveLogs($"Set Gain {comboBoxCamera.SelectedItem}: {(double)numericGain.Value}", Color.Green);
                     return;

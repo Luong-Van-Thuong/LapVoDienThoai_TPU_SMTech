@@ -869,6 +869,7 @@
             btnCamera1.Text = "Camera1";
             btnCamera1.TextImageRelation = TextImageRelation.ImageBeforeText;
             btnCamera1.UseVisualStyleBackColor = true;
+            btnCamera1.Click += btnCamera1_Click;
             // 
             // Panel_Header
             // 
@@ -958,6 +959,7 @@
             btnCamera2.Text = "Camera2";
             btnCamera2.TextImageRelation = TextImageRelation.ImageBeforeText;
             btnCamera2.UseVisualStyleBackColor = true;
+            btnCamera2.Click += btnCamera2_Click;
             // 
             // btnCamera3
             // 
@@ -975,6 +977,7 @@
             btnCamera3.Text = "Camera3";
             btnCamera3.TextImageRelation = TextImageRelation.ImageBeforeText;
             btnCamera3.UseVisualStyleBackColor = true;
+            btnCamera3.Click += btnCamera3_Click;
             // 
             // btnStop
             // 
@@ -1410,9 +1413,9 @@
             Controls.Add(Panel_Menu);
             Controls.Add(btnLabelOCR);
             Controls.Add(panel1);
+            Controls.Add(Panel_Home);
             Controls.Add(Panel_Teaching);
             Controls.Add(Panel_Settings);
-            Controls.Add(Panel_Home);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(4, 3, 4, 3);
             Name = "MAINFORM";

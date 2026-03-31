@@ -20,10 +20,12 @@ namespace TPU_Assembly.Class
 
             if (!config.CameraInterface.IsOpened())
             {
-                MSystem.InsertAndSaveLogs($"Camera {indexCamera} Is Not Open", Color.Red);
-                return null;
+                if (!config.CameraInterface.ReOpenCamera())
+                {
+                    MSystem.InsertAndSaveLogs($"Camera {indexCamera} Is Not Open", Color.Red);
+                    return null;
+                }
             }
-
             try
             {
                 using (Bitmap bitmap_grapIMG = config.CameraInterface.OneShot_())
@@ -48,7 +50,6 @@ namespace TPU_Assembly.Class
             }
         }
 
-
         public static bool UserSetSave(string indexCamera)
         {
             try
@@ -67,6 +68,22 @@ namespace TPU_Assembly.Class
             }
         }
 
+        public static bool ReOpenCamera(string indexCamera)
+        {
+            try
+            {
+                if (MAINFORM._cameraDict.TryGetValue(indexCamera, out var config))
+                {
+                    return config.CameraInterface.ReOpenCamera();
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                MSystem.InsertAndSaveLogs(ex.ToString(), Color.Red);
+                return false;
+            }
+        }
 
         public static bool SetExposureTime(string indexCamera, double exposuretime)
         {

@@ -29,6 +29,8 @@ namespace TPU_Assembly.Class
 
         private readonly AutoResetEvent _waitForImageEvent = new(false);
 
+        public delegate void ConnectionStatusChangedHandler(string cameraName, bool isConnected);
+        public event ConnectionStatusChangedHandler ConnectionStatusChangedEvent;
 
         public override bool isContinuous() => isContinue;
 
@@ -66,28 +68,21 @@ namespace TPU_Assembly.Class
                         camera.StreamGrabber.GrabStopped += OnGrabStopped;
 
                         camera.Open();
-
                         isOpened = true;
 
-                        camera.Parameters[PLCamera.UserSetLoad].Execute();
                     }
                 }
             }
             catch
             {
-                Thread.Sleep(300);
-                try
-                {
-                    // Retry to open camera
-                    camera.Open();
-                    isOpened = true;
+                isOpened = false;
+                MSystem.InsertAndSaveLogs($"Failed to open camera: {userDefinedName}", Color.Red);
+                ConnectionStatusChangedEvent?.Invoke(cameraName, isOpened);
 
-                    camera.Parameters[PLCamera.UserSetLoad].Execute();
-                }
-                catch (Exception)
-                {
-                    MSystem.InsertAndSaveLogs($"Failed to open camera: {userDefinedName}", Color.Red);
-                }
+            }
+            finally
+            {
+                ConnectionStatusChangedEvent?.Invoke(cameraName, isOpened);
             }
         }
         public override bool ReOpenCamera()
@@ -126,7 +121,6 @@ namespace TPU_Assembly.Class
 
                         isOpened = true;
 
-                        camera.Parameters[PLCamera.UserSetLoad].Execute();
 
                     }
                     MSystem.InsertAndSaveLogs($"ReOpened camera: {cameraName}", Color.Red);
@@ -279,11 +273,7 @@ namespace TPU_Assembly.Class
 
         #endregion
 
-        public override bool IsOpened()
-        {
-            return isOpened;
-        }
-
+        #region Event 
         private void OnConnectionLost(Object sender, EventArgs e)
         {
             if (isContinue)
@@ -310,7 +300,9 @@ namespace TPU_Assembly.Class
             }
             finally
             {
+
                 isOpened = false;
+                ConnectionStatusChangedEvent?.Invoke(cameraName, isOpened);
                 ReOpenCamera();
             }
         }
@@ -325,6 +317,8 @@ namespace TPU_Assembly.Class
                     return;
                 }
             }
+            isOpened = true;
+            ConnectionStatusChangedEvent?.Invoke(cameraName, isOpened);
         }
 
         private void OnCameraClosed(Object sender, EventArgs e)
@@ -356,32 +350,34 @@ namespace TPU_Assembly.Class
 
         }
 
+        #endregion
+
+        public override bool IsOpened()
+        {
+            return isOpened;
+        }
+
         public override Bitmap OneShot_()
         {
             if (camera == null || !camera.IsOpen) return null;
-            int maxRetries = 4;
 
-            for (int i = 0; i < maxRetries; i++)
+            _waitForImageEvent.Reset();
+
+            if (!OneShot())
             {
-                if (i > 0) ReOpenCamera();
-                _waitForImageEvent.Reset();
+                return null;
+            }
 
-                if (!OneShot())
+            if (_waitForImageEvent.WaitOne(2500))
+            {
+                if (Image_BASLER != null)
                 {
-                    continue;
+                    return Image_BASLER;
                 }
-
-                if (_waitForImageEvent.WaitOne(2500))
-                {
-                    if (Image_BASLER != null)
-                    {
-                        return Image_BASLER;
-                    }
-                }
-                MSystem.InsertAndSaveLogs($"Retry shot: {i}", Color.Red);
             }
             return null;
         }
+
         private void OnImageGrabbed(object sender, ImageGrabbedEventArgs e)
         {
             try
