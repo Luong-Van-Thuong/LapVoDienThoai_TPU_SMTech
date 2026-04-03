@@ -9,7 +9,6 @@ namespace TPU_Assembly_Inspection
 
         static void Main()
         {
-
             ApplicationConfiguration.Initialize();
             Application.Run(new MAINFORM());
         }
