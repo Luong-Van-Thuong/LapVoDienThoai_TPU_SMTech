@@ -1,5 +1,4 @@
 ﻿using Basler.Pylon;
-using OpenCvSharp;
 using System.Diagnostics;
 using System.Drawing.Imaging;
 

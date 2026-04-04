@@ -84,6 +84,8 @@ namespace TPU_Assembly_Inspection_Paddle
         public int NGCount = 0;
 
 
+        private static readonly object _lock = new object();
+
         public MAINFORM()
         {
             InitializeComponent();
@@ -1162,6 +1164,8 @@ namespace TPU_Assembly_Inspection_Paddle
                 BT_Time.Text = stopWatch.ElapsedMilliseconds.ToString() + " ms"; // đoạn này trả về 200ms
 
                 if (newImage == null) return;
+
+                newImage.RotateFlip(RotateFlipType.Rotate270FlipNone);
 
                 UpdateCameraImage(cameraName, newImage);
 

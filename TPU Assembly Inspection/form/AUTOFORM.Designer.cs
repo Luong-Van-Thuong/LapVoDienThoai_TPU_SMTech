@@ -172,7 +172,7 @@
             Panel_Menu.Location = new Point(5, 4);
             Panel_Menu.Margin = new Padding(5, 4, 5, 4);
             Panel_Menu.Name = "Panel_Menu";
-            Panel_Menu.Size = new Size(229, 1095);
+            Panel_Menu.Size = new Size(229, 1116);
             Panel_Menu.TabIndex = 0;
             // 
             // btnHome
@@ -240,7 +240,7 @@
             percentNG.AutoSize = true;
             percentNG.Font = new Font("Microsoft Sans Serif", 9.75F, FontStyle.Bold);
             percentNG.ForeColor = Color.Red;
-            percentNG.Location = new Point(184, 97);
+            percentNG.Location = new Point(184, 78);
             percentNG.Margin = new Padding(5, 0, 5, 0);
             percentNG.Name = "percentNG";
             percentNG.Size = new Size(35, 20);
@@ -275,11 +275,12 @@
             Panel_Home.Controls.Add(pictureBox1);
             Panel_Home.Controls.Add(BT_GrapImage1);
             Panel_Home.Controls.Add(Run_Vision_CAMERA1);
+            Panel_Home.Dock = DockStyle.Fill;
             Panel_Home.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            Panel_Home.Location = new Point(751, 43);
+            Panel_Home.Location = new Point(0, 0);
             Panel_Home.Margin = new Padding(5, 4, 5, 4);
             Panel_Home.Name = "Panel_Home";
-            Panel_Home.Size = new Size(1326, 1097);
+            Panel_Home.Size = new Size(1379, 1118);
             Panel_Home.TabIndex = 1;
             // 
             // pictureBox4
@@ -567,11 +568,12 @@
             // 
             // panelContainer
             // 
+            panelContainer.Controls.Add(Panel_Home);
             panelContainer.Controls.Add(Panel_Settings);
             panelContainer.Dock = DockStyle.Fill;
             panelContainer.Location = new Point(242, 3);
             panelContainer.Name = "panelContainer";
-            panelContainer.Size = new Size(1326, 1097);
+            panelContainer.Size = new Size(1379, 1118);
             panelContainer.TabIndex = 1;
             // 
             // Panel_Settings
@@ -581,11 +583,12 @@
             Panel_Settings.Controls.Add(groupBox1);
             Panel_Settings.Controls.Add(propertyGridSettings);
             Panel_Settings.Controls.Add(Panel_Teaching);
+            Panel_Settings.Dock = DockStyle.Fill;
             Panel_Settings.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             Panel_Settings.Location = new Point(0, 0);
             Panel_Settings.Margin = new Padding(5, 4, 5, 4);
             Panel_Settings.Name = "Panel_Settings";
-            Panel_Settings.Size = new Size(1326, 1097);
+            Panel_Settings.Size = new Size(1379, 1118);
             Panel_Settings.TabIndex = 1236;
             // 
             // groupBox2
@@ -699,13 +702,13 @@
             // Panel_Teaching
             // 
             Panel_Teaching.BackColor = Color.White;
-            Panel_Teaching.Controls.Add(Panel_Home);
             Panel_Teaching.Controls.Add(groupBox3);
+            Panel_Teaching.Dock = DockStyle.Fill;
             Panel_Teaching.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            Panel_Teaching.Location = new Point(307, 43);
+            Panel_Teaching.Location = new Point(0, 0);
             Panel_Teaching.Margin = new Padding(5, 4, 5, 4);
             Panel_Teaching.Name = "Panel_Teaching";
-            Panel_Teaching.Size = new Size(1326, 1097);
+            Panel_Teaching.Size = new Size(1379, 1118);
             Panel_Teaching.TabIndex = 1235;
             // 
             // groupBox3
@@ -863,7 +866,7 @@
             groupbox_Teaching.Controls.Add(BT_Folder_Img);
             groupbox_Teaching.FlatStyle = FlatStyle.Flat;
             groupbox_Teaching.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            groupbox_Teaching.Location = new Point(31, 320);
+            groupbox_Teaching.Location = new Point(4, 320);
             groupbox_Teaching.Margin = new Padding(5, 4, 5, 4);
             groupbox_Teaching.Name = "groupbox_Teaching";
             groupbox_Teaching.Padding = new Padding(5, 4, 5, 4);
@@ -1023,10 +1026,10 @@
             btnOCR.IconChar = FontAwesome.Sharp.IconChar.None;
             btnOCR.IconColor = Color.Black;
             btnOCR.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            btnOCR.Location = new Point(187, 81);
+            btnOCR.Location = new Point(187, 73);
             btnOCR.Margin = new Padding(5, 4, 5, 4);
             btnOCR.Name = "btnOCR";
-            btnOCR.Size = new Size(464, 112);
+            btnOCR.Size = new Size(464, 99);
             btnOCR.TabIndex = 1206;
             btnOCR.Text = "OCR";
             btnOCR.UseVisualStyleBackColor = false;
@@ -1040,10 +1043,10 @@
             BT_Time.IconChar = FontAwesome.Sharp.IconChar.None;
             BT_Time.IconColor = Color.Black;
             BT_Time.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            BT_Time.Location = new Point(5, 81);
+            BT_Time.Location = new Point(5, 73);
             BT_Time.Margin = new Padding(5, 4, 5, 4);
             BT_Time.Name = "BT_Time";
-            BT_Time.Size = new Size(172, 112);
+            BT_Time.Size = new Size(172, 99);
             BT_Time.TabIndex = 1171;
             BT_Time.Text = "0 ms";
             BT_Time.UseVisualStyleBackColor = false;
@@ -1059,7 +1062,7 @@
             btnResult.Location = new Point(993, 4);
             btnResult.Margin = new Padding(5, 4, 5, 4);
             btnResult.Name = "btnResult";
-            btnResult.Size = new Size(156, 195);
+            btnResult.Size = new Size(156, 174);
             btnResult.TabIndex = 1;
             btnResult.Text = "NG";
             btnResult.UseVisualStyleBackColor = true;
@@ -1077,7 +1080,7 @@
             BT_cylcetime.Location = new Point(5, 4);
             BT_cylcetime.Margin = new Padding(5, 4, 5, 4);
             BT_cylcetime.Name = "BT_cylcetime";
-            BT_cylcetime.Size = new Size(172, 69);
+            BT_cylcetime.Size = new Size(172, 61);
             BT_cylcetime.TabIndex = 1172;
             BT_cylcetime.Text = "Vision Time";
             BT_cylcetime.TextAlign = ContentAlignment.MiddleRight;
@@ -1095,7 +1098,7 @@
             richTextLog.Margin = new Padding(9, 10, 9, 10);
             richTextLog.Name = "richTextLog";
             richTextLog.ReadOnly = true;
-            richTextLog.Size = new Size(565, 183);
+            richTextLog.Size = new Size(565, 162);
             richTextLog.TabIndex = 0;
             richTextLog.Text = "";
             // 
@@ -1112,7 +1115,7 @@
             btnLabelOCR.Location = new Point(187, 4);
             btnLabelOCR.Margin = new Padding(5, 4, 5, 4);
             btnLabelOCR.Name = "btnLabelOCR";
-            btnLabelOCR.Size = new Size(464, 69);
+            btnLabelOCR.Size = new Size(464, 61);
             btnLabelOCR.TabIndex = 1201;
             btnLabelOCR.Text = "OCR";
             btnLabelOCR.TextAlign = ContentAlignment.MiddleRight;
@@ -1206,10 +1209,10 @@
             panel1.Controls.Add(groupbox_Teaching);
             panel1.Controls.Add(btnStart);
             panel1.Dock = DockStyle.Fill;
-            panel1.Location = new Point(1576, 4);
+            panel1.Location = new Point(1629, 4);
             panel1.Margin = new Padding(5, 4, 5, 4);
             panel1.Name = "panel1";
-            panel1.Size = new Size(464, 1095);
+            panel1.Size = new Size(411, 1116);
             panel1.TabIndex = 1235;
             // 
             // groupboxConnection
@@ -1220,7 +1223,7 @@
             groupboxConnection.Controls.Add(btnCamera1);
             groupboxConnection.Controls.Add(btnRobot);
             groupboxConnection.Font = new Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            groupboxConnection.Location = new Point(31, 10);
+            groupboxConnection.Location = new Point(4, 10);
             groupboxConnection.Margin = new Padding(5, 4, 5, 4);
             groupboxConnection.Name = "groupboxConnection";
             groupboxConnection.Padding = new Padding(5, 4, 5, 4);
@@ -1273,7 +1276,7 @@
             btnStop.IconChar = FontAwesome.Sharp.IconChar.None;
             btnStop.IconColor = Color.Black;
             btnStop.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            btnStop.Location = new Point(31, 996);
+            btnStop.Location = new Point(4, 996);
             btnStop.Margin = new Padding(5, 4, 5, 4);
             btnStop.Name = "btnStop";
             btnStop.Size = new Size(406, 114);
@@ -1290,7 +1293,7 @@
             btnStart.IconChar = FontAwesome.Sharp.IconChar.None;
             btnStart.IconColor = Color.Black;
             btnStart.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            btnStart.Location = new Point(31, 872);
+            btnStart.Location = new Point(4, 872);
             btnStart.Margin = new Padding(5, 4, 5, 4);
             btnStart.Name = "btnStart";
             btnStart.Size = new Size(406, 116);
@@ -1311,7 +1314,7 @@
             BT_Exit.Location = new Point(1899, 4);
             BT_Exit.Margin = new Padding(5, 4, 5, 4);
             BT_Exit.Name = "BT_Exit";
-            BT_Exit.Size = new Size(141, 195);
+            BT_Exit.Size = new Size(141, 174);
             BT_Exit.TabIndex = 1236;
             BT_Exit.Text = "Exit";
             BT_Exit.TextImageRelation = TextImageRelation.ImageBeforeText;
@@ -1330,7 +1333,7 @@
             BT_Hide.Location = new Point(1742, 4);
             BT_Hide.Margin = new Padding(5, 4, 5, 4);
             BT_Hide.Name = "BT_Hide";
-            BT_Hide.Size = new Size(147, 195);
+            BT_Hide.Size = new Size(147, 174);
             BT_Hide.TabIndex = 1235;
             BT_Hide.Text = "Hide";
             BT_Hide.TextImageRelation = TextImageRelation.ImageBeforeText;
@@ -1342,7 +1345,7 @@
             label2.AutoSize = true;
             label2.Font = new Font("Microsoft Sans Serif", 9.75F, FontStyle.Bold);
             label2.ForeColor = Color.Red;
-            label2.Location = new Point(11, 97);
+            label2.Location = new Point(11, 78);
             label2.Margin = new Padding(5, 0, 5, 0);
             label2.Name = "label2";
             label2.Size = new Size(36, 20);
@@ -1390,7 +1393,7 @@
             LabelNG.AutoSize = true;
             LabelNG.Font = new Font("Microsoft Sans Serif", 9.75F, FontStyle.Bold);
             LabelNG.ForeColor = Color.Red;
-            LabelNG.Location = new Point(127, 97);
+            LabelNG.Location = new Point(127, 78);
             LabelNG.Margin = new Padding(5, 0, 5, 0);
             LabelNG.Name = "LabelNG";
             LabelNG.Size = new Size(19, 20);
@@ -1418,7 +1421,7 @@
             btnClearCounter.IconColor = Color.Black;
             btnClearCounter.IconFont = FontAwesome.Sharp.IconFont.Auto;
             btnClearCounter.IconSize = 20;
-            btnClearCounter.Location = new Point(8, 127);
+            btnClearCounter.Location = new Point(8, 108);
             btnClearCounter.Margin = new Padding(5, 4, 5, 4);
             btnClearCounter.Name = "btnClearCounter";
             btnClearCounter.Size = new Size(215, 60);
@@ -1442,7 +1445,7 @@
             tableLayoutPanel1.RowCount = 3;
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 108F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 209F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 188F));
             tableLayoutPanel1.Size = new Size(2051, 1426);
             tableLayoutPanel1.TabIndex = 1247;
             // 
@@ -1451,7 +1454,7 @@
             tableLayoutPanel2.ColumnCount = 3;
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 239F));
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 474F));
+            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 421F));
             tableLayoutPanel2.Controls.Add(panelContainer, 1, 0);
             tableLayoutPanel2.Controls.Add(panel1, 2, 0);
             tableLayoutPanel2.Controls.Add(Panel_Menu, 0, 0);
@@ -1460,7 +1463,7 @@
             tableLayoutPanel2.Name = "tableLayoutPanel2";
             tableLayoutPanel2.RowCount = 1;
             tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel2.Size = new Size(2045, 1103);
+            tableLayoutPanel2.Size = new Size(2045, 1124);
             tableLayoutPanel2.TabIndex = 3;
             // 
             // tableLayoutPanel3
@@ -1479,11 +1482,11 @@
             tableLayoutPanel3.Controls.Add(BT_Hide, 4, 0);
             tableLayoutPanel3.Controls.Add(BT_Exit, 5, 0);
             tableLayoutPanel3.Dock = DockStyle.Fill;
-            tableLayoutPanel3.Location = new Point(3, 1220);
+            tableLayoutPanel3.Location = new Point(3, 1241);
             tableLayoutPanel3.Name = "tableLayoutPanel3";
             tableLayoutPanel3.RowCount = 1;
             tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel3.Size = new Size(2045, 203);
+            tableLayoutPanel3.Size = new Size(2045, 182);
             tableLayoutPanel3.TabIndex = 4;
             // 
             // panel2
@@ -1500,7 +1503,7 @@
             panel2.Dock = DockStyle.Fill;
             panel2.Location = new Point(3, 3);
             panel2.Name = "panel2";
-            panel2.Size = new Size(320, 197);
+            panel2.Size = new Size(320, 176);
             panel2.TabIndex = 0;
             // 
             // tableLayoutPanel4
@@ -1518,7 +1521,7 @@
             tableLayoutPanel4.RowCount = 2;
             tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 39.2136574F));
             tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 60.78634F));
-            tableLayoutPanel4.Size = new Size(656, 197);
+            tableLayoutPanel4.Size = new Size(656, 176);
             tableLayoutPanel4.TabIndex = 1;
             // 
             // MAINFORM
@@ -1566,17 +1569,6 @@
             panel2.PerformLayout();
             tableLayoutPanel4.ResumeLayout(false);
             ResumeLayout(false);
-
-
-            Panel_Home.Parent = panelContainer;
-            Panel_Settings.Parent = panelContainer;
-            Panel_Teaching.Parent = panelContainer;
-
-            Panel_Home.Dock = DockStyle.Fill;
-            Panel_Settings.Dock = DockStyle.Fill;
-            Panel_Teaching.Dock = DockStyle.Fill;
-
-            Panel_Home.BringToFront(); // panel1 sẽ nằm trên cùng
         }
 
         #endregion

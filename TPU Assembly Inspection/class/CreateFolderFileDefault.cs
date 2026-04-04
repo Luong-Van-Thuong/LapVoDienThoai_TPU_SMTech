@@ -1,4 +1,4 @@
-﻿using OpenCvSharp;
+﻿
 using System;
 using System.Drawing;
 using System.IO;
@@ -9,6 +9,8 @@ namespace TPU_Assembly.Class
     {
         public static string Today => DateTime.Now.ToString("ddMMyyyy");
         public static string BasePath = @"C:\FA\TPU_Assembly_Inspection_Paddle\Images";
+        private static readonly object _lock = new object();
+
         public static void CreateSaveFolders()
         {
             string dayFolder = Path.Combine(BasePath, Today);
@@ -35,13 +37,18 @@ namespace TPU_Assembly.Class
             if (!Directory.Exists(saveFolder))
                 Directory.CreateDirectory(saveFolder);
 
-            string filename = DateTime.Now.ToString("HHmmss") + ".bmp";
+            string filename = DateTime.Now.ToString("HHmmssfff") + ".bmp";
             string fullPath = Path.Combine(saveFolder, filename);
 
-            lock (image)
+            lock (_lock)
             {
                 image.Save(fullPath, System.Drawing.Imaging.ImageFormat.Bmp);
             }
+
+            //lock (image)
+            //{
+            //    image.Save(fullPath, System.Drawing.Imaging.ImageFormat.Bmp);
+            //}
         }
 
     }
