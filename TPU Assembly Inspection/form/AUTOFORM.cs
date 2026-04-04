@@ -396,13 +396,17 @@ namespace TPU_Assembly_Inspection_Paddle
                 }
                 try
                 {
-                    Bitmap grabbedImg = CameraBasler.GrabImage(camName);
+                    Bitmap grabbedImg = CameraBasler.GrabImage(camName);                   
                     if (grabbedImg == null)
                     {
                         result.Status = "GRAB_ERROR";
                         return result;
                     }
 
+                    if (camName == "CAMERA1")
+                    {
+                        grabbedImg.RotateFlip(RotateFlipType.Rotate270FlipNone);
+                    }
                     result.RawImage = grabbedImg;
 
                     if (camName == "CAMERA1")
@@ -748,11 +752,13 @@ namespace TPU_Assembly_Inspection_Paddle
         {
             ShowPanel(Panel_Home);
             SetActiveMenuButton(btnHome);
+            Panel_Home.BringToFront();
         }
         private void btnTeaching_Click(object sender, EventArgs e)
         {
             ShowPanel(Panel_Teaching);
             SetActiveMenuButton(btnTeaching);
+            Panel_Teaching.BringToFront();
         }
 
         private void btnSettings_Click(object sender, EventArgs e)
@@ -763,6 +769,7 @@ namespace TPU_Assembly_Inspection_Paddle
                 {
                     ShowPanel(Panel_Settings);
                     SetActiveMenuButton(btnSettings);
+                    Panel_Settings.BringToFront();
                 }
 
             }
@@ -1816,6 +1823,11 @@ namespace TPU_Assembly_Inspection_Paddle
         private async void Run_Vision_CAMERA2_Click(object sender, EventArgs e)
         {
             if (pictureBox2.Image == null) return;
+            if (inferenceEngine == null)
+            {
+                MessageBox.Show("Chưa Load Model.");
+                return;
+            }
 
             Bitmap workingImage = new(pictureBox2.Image);
 
@@ -2041,6 +2053,11 @@ namespace TPU_Assembly_Inspection_Paddle
         }
 
         #endregion
+
+        private void Panel_Header_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
     }
 
     #region Inspection Zones Class

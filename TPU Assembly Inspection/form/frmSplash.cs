@@ -155,6 +155,7 @@ namespace TPU_Assembly_Inspection_Paddle
             catch (Exception ex)
             {
                 Console.WriteLine("Lỗi đóng Splash: " + ex.Message);
+                MessageBox.Show(ex.ToString(), "Lỗi đóng Splash: ");
             }
             finally
             {
