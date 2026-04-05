@@ -164,9 +164,9 @@ namespace TPU_Assembly.Class
             {
                 if (camera == null || !camera.IsOpen) return false;
 
-                if (camera.Parameters[PLCamera.ExposureTime].IsWritable)
+                if (camera.Parameters[PLCamera.ExposureTimeRaw].IsWritable)
                 {
-                    camera.Parameters[PLCamera.ExposureTime].SetValue(exposuretime);
+                    camera.Parameters[PLCamera.ExposureTimeRaw].SetValue((long)exposuretime);
                     return true;
                 }
                 else
@@ -184,7 +184,7 @@ namespace TPU_Assembly.Class
             try
             {
                 if (camera == null || !camera.IsOpen) return 0;
-                double gain = camera.Parameters[PLCamera.Gain].GetValue();
+                double gain = camera.Parameters[PLCamera.GainRaw].GetValue();
                 return gain;
             }
             catch (Exception)
@@ -199,9 +199,9 @@ namespace TPU_Assembly.Class
             try
             {
                 if (camera == null || !camera.IsOpen) return false;
-                if (camera.Parameters[PLCamera.Gain].IsWritable)
+                if (camera.Parameters[PLCamera.GainRaw].IsWritable)
                 {
-                    camera.Parameters[PLCamera.Gain].SetValue(gain);
+                    camera.Parameters[PLCamera.GainRaw].SetValue((long)gain);
                     return true;
                 }
                 else
@@ -218,7 +218,7 @@ namespace TPU_Assembly.Class
             try
             {
                 if (camera == null || !camera.IsOpen) return 0;
-                double exposureTime = camera.Parameters[PLCamera.ExposureTime].GetValue();
+                double exposureTime = camera.Parameters[PLCamera.ExposureTimeRaw].GetValue();
                 return exposureTime;
             }
             catch (Exception)

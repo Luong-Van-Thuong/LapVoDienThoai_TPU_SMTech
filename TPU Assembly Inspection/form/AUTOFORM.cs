@@ -95,29 +95,29 @@ namespace TPU_Assembly_Inspection_Paddle
             MSystem.SetRichTextLogs(this.richTextLog);
 
             _cameraDict = new Dictionary<string, CameraConfig>
-        {
             {
-                "CAMERA1", new CameraConfig {
-                    Name = "CAMERA1",
-                    CameraInterface = BaslerCam.CAMERA1,
-                    TargetPictureBox = pictureBox1
+                {
+                    "CAMERA1", new CameraConfig {
+                        Name = "CAMERA1",
+                        CameraInterface = BaslerCam.CAMERA1,
+                        TargetPictureBox = pictureBox1
+                    }
+                },
+                {
+                    "CAMERA2", new CameraConfig {
+                        Name = "CAMERA2",
+                        CameraInterface = BaslerCam.CAMERA2,
+                        TargetPictureBox = pictureBox2
+                    }
+                },
+                {
+                    "CAMERA3", new CameraConfig {
+                        Name = "CAMERA3",
+                        CameraInterface = BaslerCam.CAMERA3,
+                        TargetPictureBox = pictureBox3
+                    }
                 }
-            },
-            {
-                "CAMERA2", new CameraConfig {
-                    Name = "CAMERA2",
-                    CameraInterface = BaslerCam.CAMERA2,
-                    TargetPictureBox = pictureBox2
-                }
-            },
-            {
-                "CAMERA3", new CameraConfig {
-                    Name = "CAMERA3",
-                    CameraInterface = BaslerCam.CAMERA3,
-                    TargetPictureBox = pictureBox3
-                }
-            }
-        };
+            };
 
             LoadSystemSettings();
 
@@ -146,6 +146,16 @@ namespace TPU_Assembly_Inspection_Paddle
 
         private void MAINFORM_Load(object sender, EventArgs e)
         {
+
+            numericGamma.Minimum = 0;
+            numericGamma.Maximum = 99999999;
+
+            numericGain.Minimum = 0;
+            numericGain.Maximum = 99999999;
+            
+            numericExposure_Time.Minimum = 0;
+            numericExposure_Time.Maximum = 99999999;
+
 
             this.FormBorderStyle = FormBorderStyle.None;
             this.WindowState = FormWindowState.Maximized;
@@ -504,6 +514,12 @@ namespace TPU_Assembly_Inspection_Paddle
                 {
                     if (zoneName.ToUpper().Contains("OCR") || zoneName.ToUpper().Contains("TEXT"))
                     {
+                        if(_ocrEngine == null)
+                        {
+                            MessageBox.Show("Inference Engine chưa được khởi tạo!");
+                            return "";
+                        }
+
                         var ocrResult = _ocrEngine.DetectText(roi);
                         resultText = ocrResult != null ? ocrResult.Text.Trim() : "";
 
@@ -1165,7 +1181,7 @@ namespace TPU_Assembly_Inspection_Paddle
 
                 if (newImage == null) return;
 
-                newImage.RotateFlip(RotateFlipType.Rotate270FlipNone);
+                if(cameraName == "CAMERA1") newImage.RotateFlip(RotateFlipType.Rotate270FlipNone);
 
                 UpdateCameraImage(cameraName, newImage);
 

@@ -38,10 +38,28 @@ namespace TPU_Assembly.Class
                     if (MAINFORM.SaveImageOrigin)
                     {
                         //CreateFolderFileDefault.SaveOriginalBitmap(bitmap_grapIMG);
-                        using (var clone = new Bitmap(bitmap_grapIMG))
+                        //using (var clone = new Bitmap(bitmap_grapIMG))
+                        //{
+                        //    CreateFolderFileDefault.SaveOriginalBitmap(clone);
+                        //}
+
+                        var clone = new Bitmap(bitmap_grapIMG);
+
+                        _ = Task.Run(() =>
                         {
-                            CreateFolderFileDefault.SaveOriginalBitmap(clone);
-                        }
+                            try
+                            {
+                                CreateFolderFileDefault.SaveOriginalBitmap(clone);
+                            }
+                            catch (Exception ex)
+                            {
+                                MSystem.InsertAndSaveLogs(ex.ToString(), Color.Red);
+                            }
+                            finally
+                            {
+                                clone?.Dispose(); 
+                            }
+                        });
                     }
 
                     return returnImg;
