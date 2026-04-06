@@ -93,22 +93,22 @@
 //            _cameraDict = new Dictionary<string, CameraConfig>
 //        {
 //            {
-//                "CAMERA1", new CameraConfig {
-//                    Name = "CAMERA1",
+//                "FRONT", new CameraConfig {
+//                    Name = "FRONT",
 //                    CameraInterface = BaslerCam.CAMERA1,
 //                    TargetPictureBox = pictureBox1
 //                }
 //            },
 //            {
-//                "CAMERA2", new CameraConfig {
-//                    Name = "CAMERA2",
+//                "REAR", new CameraConfig {
+//                    Name = "REAR",
 //                    CameraInterface = BaslerCam.CAMERA2,
 //                    TargetPictureBox = pictureBox2
 //                }
 //            },
 //            {
-//                "CAMERA3", new CameraConfig {
-//                    Name = "CAMERA3",
+//                "LEFT", new CameraConfig {
+//                    Name = "LEFT",
 //                    CameraInterface = BaslerCam.CAMERA3,
 //                    TargetPictureBox = pictureBox3
 //                }
@@ -241,9 +241,9 @@
 //            try
 //            {
 //                stopWatch_Run.Restart();
-//                var taskCam1 = Task.Run(() => ProcessCameraAI("CAMERA1"));
-//                var taskCam2 = Task.Run(() => ProcessCameraAI("CAMERA2"));
-//                var taskCam3 = Task.Run(() => ProcessCameraAI("CAMERA3"));
+//                var taskCam1 = Task.Run(() => ProcessCameraAI("FRONT"));
+//                var taskCam2 = Task.Run(() => ProcessCameraAI("REAR"));
+//                var taskCam3 = Task.Run(() => ProcessCameraAI("LEFT"));
 //                await Task.WhenAll(taskCam1, taskCam2, taskCam3);
 
 //                string[] results = { taskCam1.Result, taskCam2.Result, taskCam3.Result };
@@ -713,9 +713,9 @@
 
 //        private void UpdateStatusCamera()
 //        {
-//            btnCamera1.BackColor = (CameraBasler.CheckConnectCam("CAMERA1")) ? Color.Lime : Color.Red;
-//            btnCamera2.BackColor = (CameraBasler.CheckConnectCam("CAMERA2")) ? Color.Lime : Color.Red;
-//            btnCamera3.BackColor = (CameraBasler.CheckConnectCam("CAMERA3")) ? Color.Lime : Color.Red;
+//            btnCamera1.BackColor = (CameraBasler.CheckConnectCam("FRONT")) ? Color.Lime : Color.Red;
+//            btnCamera2.BackColor = (CameraBasler.CheckConnectCam("REAR")) ? Color.Lime : Color.Red;
+//            btnCamera3.BackColor = (CameraBasler.CheckConnectCam("LEFT")) ? Color.Lime : Color.Red;
 //        }
 
 //        #endregion
@@ -728,9 +728,9 @@
 //                if (sender is not Button btn) return;
 //                string cameraName = btn.Name switch
 //                {
-//                    "BT_GrapImage1" => "CAMERA1",
-//                    "BT_GrapImage2" => "CAMERA2",
-//                    "BT_GrapImage3" => "CAMERA3",
+//                    "BT_GrapImage1" => "FRONT",
+//                    "BT_GrapImage2" => "REAR",
+//                    "BT_GrapImage3" => "LEFT",
 //                    _ => ""
 //                };
 
@@ -812,9 +812,9 @@
 //                    {
 //                        Bitmap originalBmp = LoadBitmapWithoutLocking(ofd.FileName);
 
-//                        UpdateCameraImage("CAMERA1", new Bitmap(originalBmp));
-//                        UpdateCameraImage("CAMERA2", new Bitmap(originalBmp));
-//                        UpdateCameraImage("CAMERA3", new Bitmap(originalBmp));
+//                        UpdateCameraImage("FRONT", new Bitmap(originalBmp));
+//                        UpdateCameraImage("REAR", new Bitmap(originalBmp));
+//                        UpdateCameraImage("LEFT", new Bitmap(originalBmp));
 
 //                        originalBmp.Dispose();
 
@@ -863,9 +863,9 @@
 
 //            switch (btn.Name)
 //            {
-//                case "Import_Image": targetPB = pictureBox1; camName = "CAMERA1"; break;
-//                case "Import_Image2": targetPB = pictureBox2; camName = "CAMERA2"; break;
-//                case "Import_Image3": targetPB = pictureBox3; camName = "CAMERA3"; break;
+//                case "Import_Image": targetPB = pictureBox1; camName = "FRONT"; break;
+//                case "Import_Image2": targetPB = pictureBox2; camName = "REAR"; break;
+//                case "Import_Image3": targetPB = pictureBox3; camName = "LEFT"; break;
 //            }
 
 //            using (OpenFileDialog ofd = new OpenFileDialog())
@@ -1284,9 +1284,9 @@
 //        {
 //            return camName switch
 //            {
-//                "CAMERA1" => pictureBox1,
-//                "CAMERA2" => pictureBox2,
-//                "CAMERA3" => pictureBox3,
+//                "FRONT" => pictureBox1,
+//                "REAR" => pictureBox2,
+//                "LEFT" => pictureBox3,
 //                _ => null,
 //            };
 //        }

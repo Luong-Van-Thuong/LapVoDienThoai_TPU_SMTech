@@ -111,8 +111,12 @@
             btnLoadModel = new FontAwesome.Sharp.IconButton();
             panel1 = new Panel();
             groupboxConnection = new GroupBox();
+            lbProductName = new Label();
             btnCamera2 = new FontAwesome.Sharp.IconButton();
+            btnCreateProductModel = new FontAwesome.Sharp.IconButton();
+            btnSaveProductModel = new FontAwesome.Sharp.IconButton();
             btnCamera3 = new FontAwesome.Sharp.IconButton();
+            btnLoadProductModel = new FontAwesome.Sharp.IconButton();
             btnStop = new FontAwesome.Sharp.IconButton();
             btnStart = new FontAwesome.Sharp.IconButton();
             BT_Exit = new FontAwesome.Sharp.IconButton();
@@ -169,10 +173,10 @@
             Panel_Menu.Dock = DockStyle.Fill;
             Panel_Menu.Font = new Font("Segoe UI", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
             Panel_Menu.ForeColor = SystemColors.ButtonFace;
-            Panel_Menu.Location = new Point(4, 3);
-            Panel_Menu.Margin = new Padding(4, 3, 4, 3);
+            Panel_Menu.Location = new Point(5, 4);
+            Panel_Menu.Margin = new Padding(5, 4, 5, 4);
             Panel_Menu.Name = "Panel_Menu";
-            Panel_Menu.Size = new Size(201, 564);
+            Panel_Menu.Size = new Size(229, 1130);
             Panel_Menu.TabIndex = 0;
             // 
             // btnHome
@@ -185,10 +189,10 @@
             btnHome.IconColor = Color.White;
             btnHome.IconFont = FontAwesome.Sharp.IconFont.Auto;
             btnHome.IconSize = 40;
-            btnHome.Location = new Point(0, 75);
-            btnHome.Margin = new Padding(4, 3, 4, 3);
+            btnHome.Location = new Point(0, 100);
+            btnHome.Margin = new Padding(5, 4, 5, 4);
             btnHome.Name = "btnHome";
-            btnHome.Size = new Size(200, 100);
+            btnHome.Size = new Size(229, 133);
             btnHome.TabIndex = 0;
             btnHome.Text = "Home";
             btnHome.TextImageRelation = TextImageRelation.ImageBeforeText;
@@ -205,10 +209,10 @@
             btnSettings.IconColor = Color.White;
             btnSettings.IconFont = FontAwesome.Sharp.IconFont.Auto;
             btnSettings.IconSize = 40;
-            btnSettings.Location = new Point(0, 276);
-            btnSettings.Margin = new Padding(4, 3, 4, 3);
+            btnSettings.Location = new Point(0, 368);
+            btnSettings.Margin = new Padding(5, 4, 5, 4);
             btnSettings.Name = "btnSettings";
-            btnSettings.Size = new Size(200, 100);
+            btnSettings.Size = new Size(229, 133);
             btnSettings.TabIndex = 2;
             btnSettings.Text = "Settings";
             btnSettings.TextImageRelation = TextImageRelation.ImageBeforeText;
@@ -225,10 +229,10 @@
             btnTeaching.IconColor = Color.White;
             btnTeaching.IconFont = FontAwesome.Sharp.IconFont.Auto;
             btnTeaching.IconSize = 40;
-            btnTeaching.Location = new Point(0, 176);
-            btnTeaching.Margin = new Padding(4, 3, 4, 3);
+            btnTeaching.Location = new Point(0, 235);
+            btnTeaching.Margin = new Padding(5, 4, 5, 4);
             btnTeaching.Name = "btnTeaching";
-            btnTeaching.Size = new Size(200, 100);
+            btnTeaching.Size = new Size(229, 133);
             btnTeaching.TabIndex = 1;
             btnTeaching.Text = "Teaching";
             btnTeaching.TextImageRelation = TextImageRelation.ImageBeforeText;
@@ -240,10 +244,10 @@
             percentNG.AutoSize = true;
             percentNG.Font = new Font("Microsoft Sans Serif", 9.75F, FontStyle.Bold);
             percentNG.ForeColor = Color.Red;
-            percentNG.Location = new Point(161, 58);
-            percentNG.Margin = new Padding(4, 0, 4, 0);
+            percentNG.Location = new Point(184, 77);
+            percentNG.Margin = new Padding(5, 0, 5, 0);
             percentNG.Name = "percentNG";
-            percentNG.Size = new Size(28, 16);
+            percentNG.Size = new Size(35, 20);
             percentNG.TabIndex = 1245;
             percentNG.Text = "0%";
             // 
@@ -252,10 +256,10 @@
             percentOK.AutoSize = true;
             percentOK.Font = new Font("Microsoft Sans Serif", 9.75F, FontStyle.Bold);
             percentOK.ForeColor = Color.Green;
-            percentOK.Location = new Point(161, 37);
-            percentOK.Margin = new Padding(4, 0, 4, 0);
+            percentOK.Location = new Point(184, 49);
+            percentOK.Margin = new Padding(5, 0, 5, 0);
             percentOK.Name = "percentOK";
-            percentOK.Size = new Size(28, 16);
+            percentOK.Size = new Size(35, 20);
             percentOK.TabIndex = 1243;
             percentOK.Text = "0%";
             // 
@@ -278,19 +282,19 @@
             Panel_Home.Dock = DockStyle.Fill;
             Panel_Home.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             Panel_Home.Location = new Point(0, 0);
-            Panel_Home.Margin = new Padding(4, 3, 4, 3);
+            Panel_Home.Margin = new Padding(5, 4, 5, 4);
             Panel_Home.Name = "Panel_Home";
-            Panel_Home.Size = new Size(1095, 566);
+            Panel_Home.Size = new Size(1253, 1132);
             Panel_Home.TabIndex = 1;
             // 
             // pictureBox4
             // 
             pictureBox4.BackColor = Color.DarkBlue;
             pictureBox4.BorderStyle = BorderStyle.FixedSingle;
-            pictureBox4.Location = new Point(666, 21);
-            pictureBox4.Margin = new Padding(4, 3, 4, 3);
+            pictureBox4.Location = new Point(761, 28);
+            pictureBox4.Margin = new Padding(5, 4, 5, 4);
             pictureBox4.Name = "pictureBox4";
-            pictureBox4.Size = new Size(546, 394);
+            pictureBox4.Size = new Size(624, 525);
             pictureBox4.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox4.TabIndex = 1255;
             pictureBox4.TabStop = false;
@@ -301,10 +305,10 @@
             Import_Image3.IconChar = FontAwesome.Sharp.IconChar.None;
             Import_Image3.IconColor = Color.Black;
             Import_Image3.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            Import_Image3.Location = new Point(1220, 429);
-            Import_Image3.Margin = new Padding(4, 3, 4, 3);
+            Import_Image3.Location = new Point(1394, 572);
+            Import_Image3.Margin = new Padding(5, 4, 5, 4);
             Import_Image3.Name = "Import_Image3";
-            Import_Image3.Size = new Size(76, 46);
+            Import_Image3.Size = new Size(87, 61);
             Import_Image3.TabIndex = 1253;
             Import_Image3.Text = "Import Image";
             Import_Image3.UseVisualStyleBackColor = true;
@@ -317,10 +321,10 @@
             BT_GrapImage3.IconChar = FontAwesome.Sharp.IconChar.None;
             BT_GrapImage3.IconColor = Color.Black;
             BT_GrapImage3.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            BT_GrapImage3.Location = new Point(1220, 484);
-            BT_GrapImage3.Margin = new Padding(4, 3, 4, 3);
+            BT_GrapImage3.Location = new Point(1394, 645);
+            BT_GrapImage3.Margin = new Padding(5, 4, 5, 4);
             BT_GrapImage3.Name = "BT_GrapImage3";
-            BT_GrapImage3.Size = new Size(76, 46);
+            BT_GrapImage3.Size = new Size(87, 61);
             BT_GrapImage3.TabIndex = 1252;
             BT_GrapImage3.Text = "Grap Image";
             BT_GrapImage3.UseVisualStyleBackColor = true;
@@ -333,10 +337,10 @@
             Run_Vision_CAMERA3.IconChar = FontAwesome.Sharp.IconChar.None;
             Run_Vision_CAMERA3.IconColor = Color.Black;
             Run_Vision_CAMERA3.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            Run_Vision_CAMERA3.Location = new Point(1220, 544);
-            Run_Vision_CAMERA3.Margin = new Padding(4, 3, 4, 3);
+            Run_Vision_CAMERA3.Location = new Point(1394, 725);
+            Run_Vision_CAMERA3.Margin = new Padding(5, 4, 5, 4);
             Run_Vision_CAMERA3.Name = "Run_Vision_CAMERA3";
-            Run_Vision_CAMERA3.Size = new Size(76, 46);
+            Run_Vision_CAMERA3.Size = new Size(87, 61);
             Run_Vision_CAMERA3.TabIndex = 1254;
             Run_Vision_CAMERA3.Text = "Run All PRG";
             Run_Vision_CAMERA3.UseVisualStyleBackColor = false;
@@ -348,10 +352,10 @@
             Import_Image2.IconChar = FontAwesome.Sharp.IconChar.None;
             Import_Image2.IconColor = Color.Black;
             Import_Image2.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            Import_Image2.Location = new Point(18, 429);
-            Import_Image2.Margin = new Padding(4, 3, 4, 3);
+            Import_Image2.Location = new Point(21, 572);
+            Import_Image2.Margin = new Padding(5, 4, 5, 4);
             Import_Image2.Name = "Import_Image2";
-            Import_Image2.Size = new Size(76, 46);
+            Import_Image2.Size = new Size(87, 61);
             Import_Image2.TabIndex = 1250;
             Import_Image2.Text = "Import Image";
             Import_Image2.UseVisualStyleBackColor = true;
@@ -364,10 +368,10 @@
             BT_GrapImage2.IconChar = FontAwesome.Sharp.IconChar.None;
             BT_GrapImage2.IconColor = Color.Black;
             BT_GrapImage2.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            BT_GrapImage2.Location = new Point(18, 484);
-            BT_GrapImage2.Margin = new Padding(4, 3, 4, 3);
+            BT_GrapImage2.Location = new Point(21, 645);
+            BT_GrapImage2.Margin = new Padding(5, 4, 5, 4);
             BT_GrapImage2.Name = "BT_GrapImage2";
-            BT_GrapImage2.Size = new Size(76, 46);
+            BT_GrapImage2.Size = new Size(87, 61);
             BT_GrapImage2.TabIndex = 1249;
             BT_GrapImage2.Text = "Grap Image";
             BT_GrapImage2.UseVisualStyleBackColor = true;
@@ -380,10 +384,10 @@
             Run_Vision_CAMERA2.IconChar = FontAwesome.Sharp.IconChar.None;
             Run_Vision_CAMERA2.IconColor = Color.Black;
             Run_Vision_CAMERA2.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            Run_Vision_CAMERA2.Location = new Point(18, 544);
-            Run_Vision_CAMERA2.Margin = new Padding(4, 3, 4, 3);
+            Run_Vision_CAMERA2.Location = new Point(21, 725);
+            Run_Vision_CAMERA2.Margin = new Padding(5, 4, 5, 4);
             Run_Vision_CAMERA2.Name = "Run_Vision_CAMERA2";
-            Run_Vision_CAMERA2.Size = new Size(76, 46);
+            Run_Vision_CAMERA2.Size = new Size(87, 61);
             Run_Vision_CAMERA2.TabIndex = 1251;
             Run_Vision_CAMERA2.Text = "Run All PRG";
             Run_Vision_CAMERA2.UseVisualStyleBackColor = false;
@@ -395,10 +399,10 @@
             Import_Image.IconChar = FontAwesome.Sharp.IconChar.None;
             Import_Image.IconColor = Color.Black;
             Import_Image.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            Import_Image.Location = new Point(18, 21);
-            Import_Image.Margin = new Padding(4, 3, 4, 3);
+            Import_Image.Location = new Point(21, 28);
+            Import_Image.Margin = new Padding(5, 4, 5, 4);
             Import_Image.Name = "Import_Image";
-            Import_Image.Size = new Size(76, 46);
+            Import_Image.Size = new Size(87, 61);
             Import_Image.TabIndex = 1238;
             Import_Image.Text = "Import Image";
             Import_Image.UseVisualStyleBackColor = true;
@@ -409,10 +413,10 @@
             pictureBox2.BackColor = Color.DarkBlue;
             pictureBox2.BorderStyle = BorderStyle.FixedSingle;
             pictureBox2.ContextMenuStrip = MenuStripPic2;
-            pictureBox2.Location = new Point(102, 429);
-            pictureBox2.Margin = new Padding(4, 3, 4, 3);
+            pictureBox2.Location = new Point(117, 572);
+            pictureBox2.Margin = new Padding(5, 4, 5, 4);
             pictureBox2.Name = "pictureBox2";
-            pictureBox2.Size = new Size(556, 402);
+            pictureBox2.Size = new Size(635, 535);
             pictureBox2.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox2.TabIndex = 3;
             pictureBox2.TabStop = false;
@@ -424,19 +428,19 @@
             MenuStripPic2.Items.AddRange(new ToolStripItem[] { Fit_Image2, Clear_Image2 });
             MenuStripPic2.Name = "contextMenuStrip_Home";
             MenuStripPic2.RenderMode = ToolStripRenderMode.Professional;
-            MenuStripPic2.Size = new Size(164, 56);
+            MenuStripPic2.Size = new Size(188, 68);
             // 
             // Fit_Image2
             // 
             Fit_Image2.Name = "Fit_Image2";
-            Fit_Image2.Size = new Size(163, 26);
+            Fit_Image2.Size = new Size(187, 32);
             Fit_Image2.Text = "Fit Image";
             Fit_Image2.Click += Universal_FitImage_Click;
             // 
             // Clear_Image2
             // 
             Clear_Image2.Name = "Clear_Image2";
-            Clear_Image2.Size = new Size(163, 26);
+            Clear_Image2.Size = new Size(187, 32);
             Clear_Image2.Text = "Clear Image";
             Clear_Image2.Click += Universal_Clear_Click;
             // 
@@ -445,10 +449,10 @@
             pictureBox3.BackColor = Color.DarkBlue;
             pictureBox3.BorderStyle = BorderStyle.FixedSingle;
             pictureBox3.ContextMenuStrip = MenuStripPic3;
-            pictureBox3.Location = new Point(666, 430);
-            pictureBox3.Margin = new Padding(4, 3, 4, 3);
+            pictureBox3.Location = new Point(761, 573);
+            pictureBox3.Margin = new Padding(5, 4, 5, 4);
             pictureBox3.Name = "pictureBox3";
-            pictureBox3.Size = new Size(546, 402);
+            pictureBox3.Size = new Size(624, 535);
             pictureBox3.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox3.TabIndex = 1;
             pictureBox3.TabStop = false;
@@ -460,20 +464,20 @@
             MenuStripPic3.Items.AddRange(new ToolStripItem[] { Fit_Image3, Clear_Image3 });
             MenuStripPic3.Name = "contextMenuStrip_Home";
             MenuStripPic3.RenderMode = ToolStripRenderMode.Professional;
-            MenuStripPic3.Size = new Size(164, 56);
+            MenuStripPic3.Size = new Size(188, 68);
             MenuStripPic3.Click += Universal_FitImage_Click;
             // 
             // Fit_Image3
             // 
             Fit_Image3.Name = "Fit_Image3";
-            Fit_Image3.Size = new Size(163, 26);
+            Fit_Image3.Size = new Size(187, 32);
             Fit_Image3.Text = "Fit Image";
             Fit_Image3.Click += Universal_FitImage_Click;
             // 
             // Clear_Image3
             // 
             Clear_Image3.Name = "Clear_Image3";
-            Clear_Image3.Size = new Size(163, 26);
+            Clear_Image3.Size = new Size(187, 32);
             Clear_Image3.Text = "Clear Image";
             Clear_Image3.Click += Universal_Clear_Click;
             // 
@@ -482,10 +486,10 @@
             pictureBox1.BackColor = Color.DarkBlue;
             pictureBox1.BorderStyle = BorderStyle.FixedSingle;
             pictureBox1.ContextMenuStrip = MenuStripPic1;
-            pictureBox1.Location = new Point(102, 21);
-            pictureBox1.Margin = new Padding(4, 3, 4, 3);
+            pictureBox1.Location = new Point(117, 28);
+            pictureBox1.Margin = new Padding(5, 4, 5, 4);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(556, 394);
+            pictureBox1.Size = new Size(635, 525);
             pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
@@ -497,40 +501,40 @@
             MenuStripPic1.Items.AddRange(new ToolStripItem[] { Fit_Image, Clear_Image, selectROIstrip, listROIstrip, showROIstrip });
             MenuStripPic1.Name = "contextMenuStrip_Home";
             MenuStripPic1.RenderMode = ToolStripRenderMode.Professional;
-            MenuStripPic1.Size = new Size(164, 134);
+            MenuStripPic1.Size = new Size(188, 164);
             // 
             // Fit_Image
             // 
             Fit_Image.Name = "Fit_Image";
-            Fit_Image.Size = new Size(163, 26);
+            Fit_Image.Size = new Size(187, 32);
             Fit_Image.Text = "Fit Image";
             Fit_Image.Click += Universal_FitImage_Click;
             // 
             // Clear_Image
             // 
             Clear_Image.Name = "Clear_Image";
-            Clear_Image.Size = new Size(163, 26);
+            Clear_Image.Size = new Size(187, 32);
             Clear_Image.Text = "Clear Image";
             Clear_Image.Click += Universal_Clear_Click;
             // 
             // selectROIstrip
             // 
             selectROIstrip.Name = "selectROIstrip";
-            selectROIstrip.Size = new Size(163, 26);
+            selectROIstrip.Size = new Size(187, 32);
             selectROIstrip.Text = "Select ROI";
             selectROIstrip.Click += btnSelcectROI_Click;
             // 
             // listROIstrip
             // 
             listROIstrip.Name = "listROIstrip";
-            listROIstrip.Size = new Size(163, 26);
+            listROIstrip.Size = new Size(187, 32);
             listROIstrip.Text = "List ROI";
             listROIstrip.Click += listROIstrip_Click;
             // 
             // showROIstrip
             // 
             showROIstrip.Name = "showROIstrip";
-            showROIstrip.Size = new Size(163, 26);
+            showROIstrip.Size = new Size(187, 32);
             showROIstrip.Text = "Show ROI";
             showROIstrip.Click += showROIstrip_Click;
             // 
@@ -541,10 +545,10 @@
             BT_GrapImage1.IconChar = FontAwesome.Sharp.IconChar.None;
             BT_GrapImage1.IconColor = Color.Black;
             BT_GrapImage1.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            BT_GrapImage1.Location = new Point(18, 74);
-            BT_GrapImage1.Margin = new Padding(4, 3, 4, 3);
+            BT_GrapImage1.Location = new Point(21, 99);
+            BT_GrapImage1.Margin = new Padding(5, 4, 5, 4);
             BT_GrapImage1.Name = "BT_GrapImage1";
-            BT_GrapImage1.Size = new Size(76, 46);
+            BT_GrapImage1.Size = new Size(87, 61);
             BT_GrapImage1.TabIndex = 1237;
             BT_GrapImage1.Text = "Grap Image";
             BT_GrapImage1.UseVisualStyleBackColor = true;
@@ -557,10 +561,10 @@
             Run_Vision_CAMERA1.IconChar = FontAwesome.Sharp.IconChar.None;
             Run_Vision_CAMERA1.IconColor = Color.Black;
             Run_Vision_CAMERA1.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            Run_Vision_CAMERA1.Location = new Point(17, 126);
-            Run_Vision_CAMERA1.Margin = new Padding(4, 3, 4, 3);
+            Run_Vision_CAMERA1.Location = new Point(19, 168);
+            Run_Vision_CAMERA1.Margin = new Padding(5, 4, 5, 4);
             Run_Vision_CAMERA1.Name = "Run_Vision_CAMERA1";
-            Run_Vision_CAMERA1.Size = new Size(77, 46);
+            Run_Vision_CAMERA1.Size = new Size(88, 61);
             Run_Vision_CAMERA1.TabIndex = 1239;
             Run_Vision_CAMERA1.Text = "Run All PRG";
             Run_Vision_CAMERA1.UseVisualStyleBackColor = false;
@@ -569,12 +573,10 @@
             // panelContainer
             // 
             panelContainer.Controls.Add(Panel_Settings);
-            panelContainer.Controls.Add(Panel_Home);
             panelContainer.Dock = DockStyle.Fill;
-            panelContainer.Location = new Point(212, 2);
-            panelContainer.Margin = new Padding(3, 2, 3, 2);
+            panelContainer.Location = new Point(242, 3);
             panelContainer.Name = "panelContainer";
-            panelContainer.Size = new Size(1095, 566);
+            panelContainer.Size = new Size(1253, 1132);
             panelContainer.TabIndex = 1;
             // 
             // Panel_Settings
@@ -587,9 +589,9 @@
             Panel_Settings.Dock = DockStyle.Fill;
             Panel_Settings.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             Panel_Settings.Location = new Point(0, 0);
-            Panel_Settings.Margin = new Padding(4, 3, 4, 3);
+            Panel_Settings.Margin = new Padding(5, 4, 5, 4);
             Panel_Settings.Name = "Panel_Settings";
-            Panel_Settings.Size = new Size(1095, 566);
+            Panel_Settings.Size = new Size(1253, 1132);
             Panel_Settings.TabIndex = 1236;
             // 
             // groupBox2
@@ -597,11 +599,11 @@
             groupBox2.Controls.Add(btnLightingOn);
             groupBox2.Controls.Add(btnLightingOff);
             groupBox2.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            groupBox2.Location = new Point(518, 320);
-            groupBox2.Margin = new Padding(4, 3, 4, 3);
+            groupBox2.Location = new Point(592, 427);
+            groupBox2.Margin = new Padding(5, 4, 5, 4);
             groupBox2.Name = "groupBox2";
-            groupBox2.Padding = new Padding(4, 3, 4, 3);
-            groupBox2.Size = new Size(253, 249);
+            groupBox2.Padding = new Padding(5, 4, 5, 4);
+            groupBox2.Size = new Size(289, 332);
             groupBox2.TabIndex = 1245;
             groupBox2.TabStop = false;
             groupBox2.Text = "Models";
@@ -612,10 +614,10 @@
             btnLightingOn.IconChar = FontAwesome.Sharp.IconChar.None;
             btnLightingOn.IconColor = Color.Black;
             btnLightingOn.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            btnLightingOn.Location = new Point(38, 39);
-            btnLightingOn.Margin = new Padding(4, 3, 4, 3);
+            btnLightingOn.Location = new Point(43, 52);
+            btnLightingOn.Margin = new Padding(5, 4, 5, 4);
             btnLightingOn.Name = "btnLightingOn";
-            btnLightingOn.Size = new Size(177, 75);
+            btnLightingOn.Size = new Size(202, 100);
             btnLightingOn.TabIndex = 1241;
             btnLightingOn.Text = "Light On";
             btnLightingOn.UseVisualStyleBackColor = true;
@@ -627,10 +629,10 @@
             btnLightingOff.IconChar = FontAwesome.Sharp.IconChar.None;
             btnLightingOff.IconColor = Color.Black;
             btnLightingOff.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            btnLightingOff.Location = new Point(38, 140);
-            btnLightingOff.Margin = new Padding(4, 3, 4, 3);
+            btnLightingOff.Location = new Point(43, 187);
+            btnLightingOff.Margin = new Padding(5, 4, 5, 4);
             btnLightingOff.Name = "btnLightingOff";
-            btnLightingOff.Size = new Size(177, 72);
+            btnLightingOff.Size = new Size(202, 96);
             btnLightingOff.TabIndex = 1242;
             btnLightingOff.Text = "Light Off";
             btnLightingOff.UseVisualStyleBackColor = true;
@@ -642,21 +644,21 @@
             groupBox1.Controls.Add(btnAddtoArchive);
             groupBox1.Controls.Add(btnExtract);
             groupBox1.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            groupBox1.Location = new Point(518, 51);
-            groupBox1.Margin = new Padding(4, 3, 4, 3);
+            groupBox1.Location = new Point(592, 68);
+            groupBox1.Margin = new Padding(5, 4, 5, 4);
             groupBox1.Name = "groupBox1";
-            groupBox1.Padding = new Padding(4, 3, 4, 3);
-            groupBox1.Size = new Size(253, 244);
+            groupBox1.Padding = new Padding(5, 4, 5, 4);
+            groupBox1.Size = new Size(289, 325);
             groupBox1.TabIndex = 1244;
             groupBox1.TabStop = false;
             groupBox1.Text = "Models";
             // 
             // progressBar1
             // 
-            progressBar1.Location = new Point(38, 196);
-            progressBar1.Margin = new Padding(4, 3, 4, 3);
+            progressBar1.Location = new Point(43, 261);
+            progressBar1.Margin = new Padding(5, 4, 5, 4);
             progressBar1.Name = "progressBar1";
-            progressBar1.Size = new Size(177, 27);
+            progressBar1.Size = new Size(202, 36);
             progressBar1.TabIndex = 1243;
             // 
             // btnAddtoArchive
@@ -665,10 +667,10 @@
             btnAddtoArchive.IconChar = FontAwesome.Sharp.IconChar.None;
             btnAddtoArchive.IconColor = Color.Black;
             btnAddtoArchive.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            btnAddtoArchive.Location = new Point(38, 50);
-            btnAddtoArchive.Margin = new Padding(4, 3, 4, 3);
+            btnAddtoArchive.Location = new Point(43, 67);
+            btnAddtoArchive.Margin = new Padding(5, 4, 5, 4);
             btnAddtoArchive.Name = "btnAddtoArchive";
-            btnAddtoArchive.Size = new Size(177, 51);
+            btnAddtoArchive.Size = new Size(202, 68);
             btnAddtoArchive.TabIndex = 1241;
             btnAddtoArchive.Text = "Nén Models";
             btnAddtoArchive.UseVisualStyleBackColor = true;
@@ -680,10 +682,10 @@
             btnExtract.IconChar = FontAwesome.Sharp.IconChar.None;
             btnExtract.IconColor = Color.Black;
             btnExtract.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            btnExtract.Location = new Point(38, 118);
-            btnExtract.Margin = new Padding(4, 3, 4, 3);
+            btnExtract.Location = new Point(43, 157);
+            btnExtract.Margin = new Padding(5, 4, 5, 4);
             btnExtract.Name = "btnExtract";
-            btnExtract.Size = new Size(177, 51);
+            btnExtract.Size = new Size(202, 68);
             btnExtract.TabIndex = 1242;
             btnExtract.Text = "Giải Nén Models";
             btnExtract.UseVisualStyleBackColor = true;
@@ -693,23 +695,24 @@
             // 
             propertyGridSettings.BackColor = Color.White;
             propertyGridSettings.Font = new Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            propertyGridSettings.Location = new Point(98, 51);
-            propertyGridSettings.Margin = new Padding(4, 3, 4, 3);
+            propertyGridSettings.Location = new Point(112, 68);
+            propertyGridSettings.Margin = new Padding(5, 4, 5, 4);
             propertyGridSettings.Name = "propertyGridSettings";
-            propertyGridSettings.Size = new Size(386, 780);
+            propertyGridSettings.Size = new Size(441, 1040);
             propertyGridSettings.TabIndex = 3;
             propertyGridSettings.PropertyValueChanged += propertyGridSettings_PropertyValueChanged;
             // 
             // Panel_Teaching
             // 
             Panel_Teaching.BackColor = Color.White;
+            Panel_Teaching.Controls.Add(Panel_Home);
             Panel_Teaching.Controls.Add(groupBox3);
             Panel_Teaching.Dock = DockStyle.Fill;
             Panel_Teaching.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             Panel_Teaching.Location = new Point(0, 0);
-            Panel_Teaching.Margin = new Padding(4, 3, 4, 3);
+            Panel_Teaching.Margin = new Padding(5, 4, 5, 4);
             Panel_Teaching.Name = "Panel_Teaching";
-            Panel_Teaching.Size = new Size(1095, 566);
+            Panel_Teaching.Size = new Size(1253, 1132);
             Panel_Teaching.TabIndex = 1235;
             // 
             // groupBox3
@@ -723,9 +726,11 @@
             groupBox3.Controls.Add(label5);
             groupBox3.Controls.Add(btnSave_Parameter);
             groupBox3.Controls.Add(numericExposure_Time);
-            groupBox3.Location = new Point(34, 51);
+            groupBox3.Location = new Point(39, 68);
+            groupBox3.Margin = new Padding(3, 4, 3, 4);
             groupBox3.Name = "groupBox3";
-            groupBox3.Size = new Size(329, 372);
+            groupBox3.Padding = new Padding(3, 4, 3, 4);
+            groupBox3.Size = new Size(376, 496);
             groupBox3.TabIndex = 1245;
             groupBox3.TabStop = false;
             groupBox3.Text = "Camera";
@@ -733,20 +738,22 @@
             // comboBoxCamera
             // 
             comboBoxCamera.FormattingEnabled = true;
-            comboBoxCamera.Location = new Point(141, 62);
+            comboBoxCamera.Location = new Point(161, 83);
+            comboBoxCamera.Margin = new Padding(3, 4, 3, 4);
             comboBoxCamera.Name = "comboBoxCamera";
-            comboBoxCamera.Size = new Size(121, 29);
+            comboBoxCamera.Size = new Size(138, 36);
             comboBoxCamera.TabIndex = 1250;
             comboBoxCamera.SelectedIndexChanged += comboBoxCamera_SelectedIndexChanged;
             // 
             // numericGamma
             // 
             numericGamma.DecimalPlaces = 3;
-            numericGamma.Location = new Point(142, 208);
+            numericGamma.Location = new Point(162, 277);
+            numericGamma.Margin = new Padding(3, 4, 3, 4);
             numericGamma.Maximum = new decimal(new int[] { 4, 0, 0, 0 });
             numericGamma.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numericGamma.Name = "numericGamma";
-            numericGamma.Size = new Size(120, 29);
+            numericGamma.Size = new Size(137, 34);
             numericGamma.TabIndex = 1248;
             numericGamma.Value = new decimal(new int[] { 1, 0, 0, 0 });
             numericGamma.ValueChanged += numericGamma_ValueChanged;
@@ -754,19 +761,20 @@
             // label8
             // 
             label8.AutoSize = true;
-            label8.Location = new Point(17, 212);
+            label8.Location = new Point(19, 283);
             label8.Name = "label8";
-            label8.Size = new Size(65, 21);
+            label8.Size = new Size(80, 28);
             label8.TabIndex = 1247;
             label8.Text = "Gamma";
             // 
             // numericGain
             // 
             numericGain.DecimalPlaces = 3;
-            numericGain.Location = new Point(142, 164);
+            numericGain.Location = new Point(162, 219);
+            numericGain.Margin = new Padding(3, 4, 3, 4);
             numericGain.Maximum = new decimal(new int[] { 20, 0, 0, 0 });
             numericGain.Name = "numericGain";
-            numericGain.Size = new Size(120, 29);
+            numericGain.Size = new Size(137, 34);
             numericGain.TabIndex = 1246;
             numericGain.Value = new decimal(new int[] { 1, 0, 0, 0 });
             numericGain.ValueChanged += numericGain_ValueChanged;
@@ -774,27 +782,27 @@
             // label7
             // 
             label7.AutoSize = true;
-            label7.Location = new Point(17, 168);
+            label7.Location = new Point(19, 224);
             label7.Name = "label7";
-            label7.Size = new Size(42, 21);
+            label7.Size = new Size(52, 28);
             label7.TabIndex = 1245;
             label7.Text = "Gain";
             // 
             // label9
             // 
             label9.AutoSize = true;
-            label9.Location = new Point(14, 64);
+            label9.Location = new Point(16, 85);
             label9.Name = "label9";
-            label9.Size = new Size(72, 21);
+            label9.Size = new Size(90, 28);
             label9.TabIndex = 1244;
             label9.Text = "CAMERA";
             // 
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new Point(14, 123);
+            label5.Location = new Point(16, 164);
             label5.Name = "label5";
-            label5.Size = new Size(111, 21);
+            label5.Size = new Size(138, 28);
             label5.TabIndex = 1244;
             label5.Text = "Exposure Time";
             // 
@@ -805,10 +813,10 @@
             btnSave_Parameter.IconChar = FontAwesome.Sharp.IconChar.None;
             btnSave_Parameter.IconColor = Color.Black;
             btnSave_Parameter.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            btnSave_Parameter.Location = new Point(153, 284);
-            btnSave_Parameter.Margin = new Padding(4, 3, 4, 3);
+            btnSave_Parameter.Location = new Point(175, 379);
+            btnSave_Parameter.Margin = new Padding(5, 4, 5, 4);
             btnSave_Parameter.Name = "btnSave_Parameter";
-            btnSave_Parameter.Size = new Size(131, 66);
+            btnSave_Parameter.Size = new Size(150, 88);
             btnSave_Parameter.TabIndex = 1242;
             btnSave_Parameter.Text = "Save Parameter";
             btnSave_Parameter.UseVisualStyleBackColor = false;
@@ -818,11 +826,12 @@
             // 
             numericExposure_Time.DecimalPlaces = 3;
             numericExposure_Time.Increment = new decimal(new int[] { 500, 0, 0, 0 });
-            numericExposure_Time.Location = new Point(142, 122);
+            numericExposure_Time.Location = new Point(162, 163);
+            numericExposure_Time.Margin = new Padding(3, 4, 3, 4);
             numericExposure_Time.Maximum = new decimal(new int[] { 1000000, 0, 0, 0 });
             numericExposure_Time.Minimum = new decimal(new int[] { 500, 0, 0, 0 });
             numericExposure_Time.Name = "numericExposure_Time";
-            numericExposure_Time.Size = new Size(120, 29);
+            numericExposure_Time.Size = new Size(137, 34);
             numericExposure_Time.TabIndex = 1243;
             numericExposure_Time.Value = new decimal(new int[] { 5000, 0, 0, 0 });
             numericExposure_Time.ValueChanged += numericExposure_Time_ValueChanged;
@@ -834,19 +843,19 @@
             MenuStripPic4.Items.AddRange(new ToolStripItem[] { Fit_Image4, Clear_Image4 });
             MenuStripPic4.Name = "contextMenuStrip_Home";
             MenuStripPic4.RenderMode = ToolStripRenderMode.Professional;
-            MenuStripPic4.Size = new Size(164, 56);
+            MenuStripPic4.Size = new Size(188, 68);
             // 
             // Fit_Image4
             // 
             Fit_Image4.Name = "Fit_Image4";
-            Fit_Image4.Size = new Size(163, 26);
+            Fit_Image4.Size = new Size(187, 32);
             Fit_Image4.Text = "Fit Image";
             Fit_Image4.Click += Universal_FitImage_Click;
             // 
             // Clear_Image4
             // 
             Clear_Image4.Name = "Clear_Image4";
-            Clear_Image4.Size = new Size(163, 26);
+            Clear_Image4.Size = new Size(187, 32);
             Clear_Image4.Text = "Clear Image";
             Clear_Image4.Click += Universal_Clear_Click;
             // 
@@ -861,11 +870,11 @@
             groupbox_Teaching.Controls.Add(BT_Folder_Img);
             groupbox_Teaching.FlatStyle = FlatStyle.Flat;
             groupbox_Teaching.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            groupbox_Teaching.Location = new Point(4, 240);
-            groupbox_Teaching.Margin = new Padding(4, 3, 4, 3);
+            groupbox_Teaching.Location = new Point(5, 401);
+            groupbox_Teaching.Margin = new Padding(5, 4, 5, 4);
             groupbox_Teaching.Name = "groupbox_Teaching";
-            groupbox_Teaching.Padding = new Padding(4, 3, 4, 3);
-            groupbox_Teaching.Size = new Size(355, 408);
+            groupbox_Teaching.Padding = new Padding(5, 4, 5, 4);
+            groupbox_Teaching.Size = new Size(406, 479);
             groupbox_Teaching.TabIndex = 3;
             groupbox_Teaching.TabStop = false;
             groupbox_Teaching.Text = "Teaching Camera";
@@ -876,10 +885,10 @@
             Import_Multi_Image.IconChar = FontAwesome.Sharp.IconChar.None;
             Import_Multi_Image.IconColor = Color.Black;
             Import_Multi_Image.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            Import_Multi_Image.Location = new Point(21, 32);
-            Import_Multi_Image.Margin = new Padding(4, 3, 4, 3);
+            Import_Multi_Image.Location = new Point(24, 35);
+            Import_Multi_Image.Margin = new Padding(5, 4, 5, 4);
             Import_Multi_Image.Name = "Import_Multi_Image";
-            Import_Multi_Image.Size = new Size(168, 51);
+            Import_Multi_Image.Size = new Size(192, 68);
             Import_Multi_Image.TabIndex = 1249;
             Import_Multi_Image.Text = "Import All Image";
             Import_Multi_Image.UseVisualStyleBackColor = true;
@@ -892,11 +901,11 @@
             PerformanceGroup.Controls.Add(label6);
             PerformanceGroup.Controls.Add(Label4);
             PerformanceGroup.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            PerformanceGroup.Location = new Point(21, 90);
-            PerformanceGroup.Margin = new Padding(4, 3, 4, 3);
+            PerformanceGroup.Location = new Point(24, 106);
+            PerformanceGroup.Margin = new Padding(5, 4, 5, 4);
             PerformanceGroup.Name = "PerformanceGroup";
-            PerformanceGroup.Padding = new Padding(4, 3, 4, 3);
-            PerformanceGroup.Size = new Size(308, 104);
+            PerformanceGroup.Padding = new Padding(5, 4, 5, 4);
+            PerformanceGroup.Size = new Size(352, 95);
             PerformanceGroup.TabIndex = 4;
             PerformanceGroup.TabStop = false;
             PerformanceGroup.Text = "Performance Group";
@@ -904,40 +913,40 @@
             // lblMonitorRAM
             // 
             lblMonitorRAM.AutoSize = true;
-            lblMonitorRAM.Location = new Point(121, 64);
-            lblMonitorRAM.Margin = new Padding(4, 0, 4, 0);
+            lblMonitorRAM.Location = new Point(138, 59);
+            lblMonitorRAM.Margin = new Padding(5, 0, 5, 0);
             lblMonitorRAM.Name = "lblMonitorRAM";
-            lblMonitorRAM.Size = new Size(44, 21);
+            lblMonitorRAM.Size = new Size(55, 28);
             lblMonitorRAM.TabIndex = 4;
             lblMonitorRAM.Text = "RAM";
             // 
             // lblMonitorCPU
             // 
             lblMonitorCPU.AutoSize = true;
-            lblMonitorCPU.Location = new Point(121, 28);
-            lblMonitorCPU.Margin = new Padding(4, 0, 4, 0);
+            lblMonitorCPU.Location = new Point(138, 31);
+            lblMonitorCPU.Margin = new Padding(5, 0, 5, 0);
             lblMonitorCPU.Name = "lblMonitorCPU";
-            lblMonitorCPU.Size = new Size(40, 21);
+            lblMonitorCPU.Size = new Size(49, 28);
             lblMonitorCPU.TabIndex = 3;
             lblMonitorCPU.Text = "CPU";
             // 
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new Point(18, 64);
-            label6.Margin = new Padding(4, 0, 4, 0);
+            label6.Location = new Point(21, 59);
+            label6.Margin = new Padding(5, 0, 5, 0);
             label6.Name = "label6";
-            label6.Size = new Size(70, 21);
+            label6.Size = new Size(88, 28);
             label6.TabIndex = 2;
             label6.Text = "RAM =>";
             // 
             // Label4
             // 
             Label4.AutoSize = true;
-            Label4.Location = new Point(18, 28);
-            Label4.Margin = new Padding(4, 0, 4, 0);
+            Label4.Location = new Point(21, 31);
+            Label4.Margin = new Padding(5, 0, 5, 0);
             Label4.Name = "Label4";
-            Label4.Size = new Size(66, 21);
+            Label4.Size = new Size(82, 28);
             Label4.TabIndex = 0;
             Label4.Text = "CPU =>";
             // 
@@ -948,10 +957,10 @@
             btnPreThumb.IconColor = Color.Black;
             btnPreThumb.IconFont = FontAwesome.Sharp.IconFont.Auto;
             btnPreThumb.IconSize = 30;
-            btnPreThumb.Location = new Point(21, 356);
-            btnPreThumb.Margin = new Padding(4, 3, 4, 3);
+            btnPreThumb.Location = new Point(25, 415);
+            btnPreThumb.Margin = new Padding(5, 4, 5, 4);
             btnPreThumb.Name = "btnPreThumb";
-            btnPreThumb.Size = new Size(72, 42);
+            btnPreThumb.Size = new Size(82, 56);
             btnPreThumb.TabIndex = 1245;
             btnPreThumb.UseVisualStyleBackColor = true;
             btnPreThumb.Click += btnPreThumb_Click;
@@ -963,10 +972,10 @@
             btnNextThumb.IconColor = Color.Black;
             btnNextThumb.IconFont = FontAwesome.Sharp.IconFont.Auto;
             btnNextThumb.IconSize = 30;
-            btnNextThumb.Location = new Point(258, 356);
-            btnNextThumb.Margin = new Padding(4, 3, 4, 3);
+            btnNextThumb.Location = new Point(298, 415);
+            btnNextThumb.Margin = new Padding(5, 4, 5, 4);
             btnNextThumb.Name = "btnNextThumb";
-            btnNextThumb.Size = new Size(72, 42);
+            btnNextThumb.Size = new Size(82, 56);
             btnNextThumb.TabIndex = 1244;
             btnNextThumb.UseVisualStyleBackColor = true;
             btnNextThumb.Click += btnNextThumb_Click;
@@ -977,10 +986,10 @@
             btnClearThumbnails.IconChar = FontAwesome.Sharp.IconChar.None;
             btnClearThumbnails.IconColor = Color.Black;
             btnClearThumbnails.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            btnClearThumbnails.Location = new Point(101, 356);
-            btnClearThumbnails.Margin = new Padding(4, 3, 4, 3);
+            btnClearThumbnails.Location = new Point(117, 414);
+            btnClearThumbnails.Margin = new Padding(5, 4, 5, 4);
             btnClearThumbnails.Name = "btnClearThumbnails";
-            btnClearThumbnails.Size = new Size(149, 42);
+            btnClearThumbnails.Size = new Size(170, 56);
             btnClearThumbnails.TabIndex = 1243;
             btnClearThumbnails.Text = "Clear Image";
             btnClearThumbnails.UseVisualStyleBackColor = true;
@@ -990,10 +999,10 @@
             // 
             flowLayoutPanelThumbnails.AutoScroll = true;
             flowLayoutPanelThumbnails.BorderStyle = BorderStyle.FixedSingle;
-            flowLayoutPanelThumbnails.Location = new Point(21, 200);
-            flowLayoutPanelThumbnails.Margin = new Padding(4, 3, 4, 3);
+            flowLayoutPanelThumbnails.Location = new Point(25, 208);
+            flowLayoutPanelThumbnails.Margin = new Padding(5, 4, 5, 4);
             flowLayoutPanelThumbnails.Name = "flowLayoutPanelThumbnails";
-            flowLayoutPanelThumbnails.Size = new Size(308, 149);
+            flowLayoutPanelThumbnails.Size = new Size(354, 198);
             flowLayoutPanelThumbnails.TabIndex = 1242;
             flowLayoutPanelThumbnails.WrapContents = false;
             // 
@@ -1003,10 +1012,10 @@
             BT_Folder_Img.IconChar = FontAwesome.Sharp.IconChar.None;
             BT_Folder_Img.IconColor = Color.Black;
             BT_Folder_Img.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            BT_Folder_Img.Location = new Point(196, 32);
-            BT_Folder_Img.Margin = new Padding(4, 3, 4, 3);
+            BT_Folder_Img.Location = new Point(224, 35);
+            BT_Folder_Img.Margin = new Padding(5, 4, 5, 4);
             BT_Folder_Img.Name = "BT_Folder_Img";
-            BT_Folder_Img.Size = new Size(133, 51);
+            BT_Folder_Img.Size = new Size(152, 68);
             BT_Folder_Img.TabIndex = 1240;
             BT_Folder_Img.Text = "Image Folder";
             BT_Folder_Img.UseVisualStyleBackColor = true;
@@ -1021,10 +1030,10 @@
             btnOCR.IconChar = FontAwesome.Sharp.IconChar.None;
             btnOCR.IconColor = Color.Black;
             btnOCR.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            btnOCR.Location = new Point(163, 55);
-            btnOCR.Margin = new Padding(4, 3, 4, 3);
+            btnOCR.Location = new Point(187, 73);
+            btnOCR.Margin = new Padding(5, 4, 5, 4);
             btnOCR.Name = "btnOCR";
-            btnOCR.Size = new Size(406, 75);
+            btnOCR.Size = new Size(464, 99);
             btnOCR.TabIndex = 1206;
             btnOCR.Text = "OCR";
             btnOCR.UseVisualStyleBackColor = false;
@@ -1038,10 +1047,10 @@
             BT_Time.IconChar = FontAwesome.Sharp.IconChar.None;
             BT_Time.IconColor = Color.Black;
             BT_Time.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            BT_Time.Location = new Point(4, 55);
-            BT_Time.Margin = new Padding(4, 3, 4, 3);
+            BT_Time.Location = new Point(5, 73);
+            BT_Time.Margin = new Padding(5, 4, 5, 4);
             BT_Time.Name = "BT_Time";
-            BT_Time.Size = new Size(151, 75);
+            BT_Time.Size = new Size(172, 99);
             BT_Time.TabIndex = 1171;
             BT_Time.Text = "0 ms";
             BT_Time.UseVisualStyleBackColor = false;
@@ -1054,10 +1063,10 @@
             btnResult.IconChar = FontAwesome.Sharp.IconChar.None;
             btnResult.IconColor = Color.Black;
             btnResult.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            btnResult.Location = new Point(868, 3);
-            btnResult.Margin = new Padding(4, 3, 4, 3);
+            btnResult.Location = new Point(993, 4);
+            btnResult.Margin = new Padding(5, 4, 5, 4);
             btnResult.Name = "btnResult";
-            btnResult.Size = new Size(137, 131);
+            btnResult.Size = new Size(156, 174);
             btnResult.TabIndex = 1;
             btnResult.Text = "NG";
             btnResult.UseVisualStyleBackColor = true;
@@ -1072,10 +1081,10 @@
             BT_cylcetime.IconColor = Color.Black;
             BT_cylcetime.IconFont = FontAwesome.Sharp.IconFont.Auto;
             BT_cylcetime.IconSize = 20;
-            BT_cylcetime.Location = new Point(4, 3);
-            BT_cylcetime.Margin = new Padding(4, 3, 4, 3);
+            BT_cylcetime.Location = new Point(5, 4);
+            BT_cylcetime.Margin = new Padding(5, 4, 5, 4);
             BT_cylcetime.Name = "BT_cylcetime";
-            BT_cylcetime.Size = new Size(151, 46);
+            BT_cylcetime.Size = new Size(172, 61);
             BT_cylcetime.TabIndex = 1172;
             BT_cylcetime.Text = "Vision Time";
             BT_cylcetime.TextAlign = ContentAlignment.MiddleRight;
@@ -1089,11 +1098,11 @@
             richTextLog.Dock = DockStyle.Fill;
             richTextLog.Font = new Font("Consolas", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
             richTextLog.ForeColor = SystemColors.Info;
-            richTextLog.Location = new Point(1017, 8);
-            richTextLog.Margin = new Padding(8, 8, 8, 8);
+            richTextLog.Location = new Point(1163, 11);
+            richTextLog.Margin = new Padding(9, 11, 9, 11);
             richTextLog.Name = "richTextLog";
             richTextLog.ReadOnly = true;
-            richTextLog.Size = new Size(384, 121);
+            richTextLog.Size = new Size(439, 160);
             richTextLog.TabIndex = 0;
             richTextLog.Text = "";
             // 
@@ -1107,10 +1116,10 @@
             btnLabelOCR.IconColor = Color.Black;
             btnLabelOCR.IconFont = FontAwesome.Sharp.IconFont.Auto;
             btnLabelOCR.IconSize = 20;
-            btnLabelOCR.Location = new Point(163, 3);
-            btnLabelOCR.Margin = new Padding(4, 3, 4, 3);
+            btnLabelOCR.Location = new Point(187, 4);
+            btnLabelOCR.Margin = new Padding(5, 4, 5, 4);
             btnLabelOCR.Name = "btnLabelOCR";
-            btnLabelOCR.Size = new Size(406, 46);
+            btnLabelOCR.Size = new Size(464, 61);
             btnLabelOCR.TabIndex = 1201;
             btnLabelOCR.Text = "OCR";
             btnLabelOCR.TextAlign = ContentAlignment.MiddleRight;
@@ -1125,12 +1134,12 @@
             btnRobot.IconColor = Color.DeepSkyBlue;
             btnRobot.IconFont = FontAwesome.Sharp.IconFont.Auto;
             btnRobot.IconSize = 40;
-            btnRobot.Location = new Point(186, 81);
-            btnRobot.Margin = new Padding(4, 3, 4, 3);
+            btnRobot.Location = new Point(209, 93);
+            btnRobot.Margin = new Padding(5, 4, 5, 4);
             btnRobot.Name = "btnRobot";
-            btnRobot.Size = new Size(144, 45);
+            btnRobot.Size = new Size(170, 56);
             btnRobot.TabIndex = 5;
-            btnRobot.Text = "Robot";
+            btnRobot.Text = "ROBOT";
             btnRobot.TextImageRelation = TextImageRelation.ImageBeforeText;
             btnRobot.UseVisualStyleBackColor = true;
             // 
@@ -1142,12 +1151,12 @@
             btnCamera1.IconColor = Color.DeepSkyBlue;
             btnCamera1.IconFont = FontAwesome.Sharp.IconFont.Auto;
             btnCamera1.IconSize = 40;
-            btnCamera1.Location = new Point(21, 30);
-            btnCamera1.Margin = new Padding(4, 3, 4, 3);
+            btnCamera1.Location = new Point(25, 29);
+            btnCamera1.Margin = new Padding(5, 4, 5, 4);
             btnCamera1.Name = "btnCamera1";
-            btnCamera1.Size = new Size(142, 45);
+            btnCamera1.Size = new Size(170, 56);
             btnCamera1.TabIndex = 4;
-            btnCamera1.Text = "Camera1";
+            btnCamera1.Text = "FRONT";
             btnCamera1.TextImageRelation = TextImageRelation.ImageBeforeText;
             btnCamera1.UseVisualStyleBackColor = true;
             btnCamera1.Click += btnCamera1_Click;
@@ -1159,10 +1168,10 @@
             Panel_Header.Dock = DockStyle.Fill;
             Panel_Header.Font = new Font("Segoe UI", 27.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             Panel_Header.ForeColor = SystemColors.Control;
-            Panel_Header.Location = new Point(4, 3);
-            Panel_Header.Margin = new Padding(4, 3, 4, 3);
+            Panel_Header.Location = new Point(5, 4);
+            Panel_Header.Margin = new Padding(5, 4, 5, 4);
             Panel_Header.Name = "Panel_Header";
-            Panel_Header.Size = new Size(1676, 75);
+            Panel_Header.Size = new Size(1915, 100);
             Panel_Header.TabIndex = 2;
             Panel_Header.Paint += Panel_Header_Paint;
             // 
@@ -1170,10 +1179,10 @@
             // 
             label_name_project.AutoSize = true;
             label_name_project.Font = new Font("Segoe UI", 27.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label_name_project.Location = new Point(817, 14);
-            label_name_project.Margin = new Padding(4, 0, 4, 0);
+            label_name_project.Location = new Point(934, 19);
+            label_name_project.Margin = new Padding(5, 0, 5, 0);
             label_name_project.Name = "label_name_project";
-            label_name_project.Size = new Size(518, 50);
+            label_name_project.Size = new Size(656, 62);
             label_name_project.TabIndex = 0;
             label_name_project.Text = "TPU ASSEMBLY INSPECTION";
             label_name_project.Click += Run_All_PictureBox_Click;
@@ -1186,10 +1195,10 @@
             btnLoadModel.IconColor = Color.DeepSkyBlue;
             btnLoadModel.IconFont = FontAwesome.Sharp.IconFont.Auto;
             btnLoadModel.IconSize = 40;
-            btnLoadModel.Location = new Point(21, 132);
-            btnLoadModel.Margin = new Padding(4, 3, 4, 3);
+            btnLoadModel.Location = new Point(24, 157);
+            btnLoadModel.Margin = new Padding(5, 4, 5, 4);
             btnLoadModel.Name = "btnLoadModel";
-            btnLoadModel.Size = new Size(308, 82);
+            btnLoadModel.Size = new Size(355, 56);
             btnLoadModel.TabIndex = 3;
             btnLoadModel.Text = "Load Model";
             btnLoadModel.TextImageRelation = TextImageRelation.ImageBeforeText;
@@ -1204,28 +1213,41 @@
             panel1.Controls.Add(groupbox_Teaching);
             panel1.Controls.Add(btnStart);
             panel1.Dock = DockStyle.Fill;
-            panel1.Location = new Point(1314, 3);
-            panel1.Margin = new Padding(4, 3, 4, 3);
+            panel1.Location = new Point(1503, 4);
+            panel1.Margin = new Padding(5, 4, 5, 4);
             panel1.Name = "panel1";
-            panel1.Size = new Size(360, 564);
+            panel1.Size = new Size(411, 1130);
             panel1.TabIndex = 1235;
             // 
             // groupboxConnection
             // 
+            groupboxConnection.Controls.Add(lbProductName);
             groupboxConnection.Controls.Add(btnCamera2);
+            groupboxConnection.Controls.Add(btnCreateProductModel);
+            groupboxConnection.Controls.Add(btnSaveProductModel);
             groupboxConnection.Controls.Add(btnCamera3);
+            groupboxConnection.Controls.Add(btnLoadProductModel);
             groupboxConnection.Controls.Add(btnLoadModel);
             groupboxConnection.Controls.Add(btnCamera1);
             groupboxConnection.Controls.Add(btnRobot);
             groupboxConnection.Font = new Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            groupboxConnection.Location = new Point(4, 8);
-            groupboxConnection.Margin = new Padding(4, 3, 4, 3);
+            groupboxConnection.Location = new Point(5, 4);
+            groupboxConnection.Margin = new Padding(5, 4, 5, 4);
             groupboxConnection.Name = "groupboxConnection";
-            groupboxConnection.Padding = new Padding(4, 3, 4, 3);
-            groupboxConnection.Size = new Size(355, 226);
+            groupboxConnection.Padding = new Padding(5, 4, 5, 4);
+            groupboxConnection.Size = new Size(406, 397);
             groupboxConnection.TabIndex = 1237;
             groupboxConnection.TabStop = false;
             groupboxConnection.Text = "Camera Connection";
+            // 
+            // lbProductName
+            // 
+            lbProductName.AutoSize = true;
+            lbProductName.Location = new Point(25, 349);
+            lbProductName.Name = "lbProductName";
+            lbProductName.Size = new Size(36, 25);
+            lbProductName.TabIndex = 9;
+            lbProductName.Text = "***";
             // 
             // btnCamera2
             // 
@@ -1235,15 +1257,51 @@
             btnCamera2.IconColor = Color.DeepSkyBlue;
             btnCamera2.IconFont = FontAwesome.Sharp.IconFont.Auto;
             btnCamera2.IconSize = 40;
-            btnCamera2.Location = new Point(187, 30);
-            btnCamera2.Margin = new Padding(4, 3, 4, 3);
+            btnCamera2.Location = new Point(210, 28);
+            btnCamera2.Margin = new Padding(5, 4, 5, 4);
             btnCamera2.Name = "btnCamera2";
-            btnCamera2.Size = new Size(142, 45);
+            btnCamera2.Size = new Size(170, 56);
             btnCamera2.TabIndex = 8;
-            btnCamera2.Text = "Camera2";
+            btnCamera2.Text = "REAR";
             btnCamera2.TextImageRelation = TextImageRelation.ImageBeforeText;
             btnCamera2.UseVisualStyleBackColor = true;
             btnCamera2.Click += btnCamera2_Click;
+            // 
+            // btnCreateProductModel
+            // 
+            btnCreateProductModel.FlatStyle = FlatStyle.Flat;
+            btnCreateProductModel.Font = new Font("Segoe UI", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btnCreateProductModel.IconChar = FontAwesome.Sharp.IconChar.Crosshairs;
+            btnCreateProductModel.IconColor = Color.DeepSkyBlue;
+            btnCreateProductModel.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            btnCreateProductModel.IconSize = 40;
+            btnCreateProductModel.Location = new Point(210, 285);
+            btnCreateProductModel.Margin = new Padding(5, 4, 5, 4);
+            btnCreateProductModel.Name = "btnCreateProductModel";
+            btnCreateProductModel.Size = new Size(170, 56);
+            btnCreateProductModel.TabIndex = 7;
+            btnCreateProductModel.Text = "Create";
+            btnCreateProductModel.TextImageRelation = TextImageRelation.ImageBeforeText;
+            btnCreateProductModel.UseVisualStyleBackColor = true;
+            btnCreateProductModel.Click += btnCreateProductModel_Click;
+            // 
+            // btnSaveProductModel
+            // 
+            btnSaveProductModel.FlatStyle = FlatStyle.Flat;
+            btnSaveProductModel.Font = new Font("Segoe UI", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btnSaveProductModel.IconChar = FontAwesome.Sharp.IconChar.Save;
+            btnSaveProductModel.IconColor = Color.DeepSkyBlue;
+            btnSaveProductModel.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            btnSaveProductModel.IconSize = 40;
+            btnSaveProductModel.Location = new Point(25, 285);
+            btnSaveProductModel.Margin = new Padding(5, 4, 5, 4);
+            btnSaveProductModel.Name = "btnSaveProductModel";
+            btnSaveProductModel.Size = new Size(170, 56);
+            btnSaveProductModel.TabIndex = 7;
+            btnSaveProductModel.Text = "Save";
+            btnSaveProductModel.TextImageRelation = TextImageRelation.ImageBeforeText;
+            btnSaveProductModel.UseVisualStyleBackColor = true;
+            btnSaveProductModel.Click += btnCamera3_Click;
             // 
             // btnCamera3
             // 
@@ -1253,15 +1311,33 @@
             btnCamera3.IconColor = Color.DeepSkyBlue;
             btnCamera3.IconFont = FontAwesome.Sharp.IconFont.Auto;
             btnCamera3.IconSize = 40;
-            btnCamera3.Location = new Point(21, 81);
-            btnCamera3.Margin = new Padding(4, 3, 4, 3);
+            btnCamera3.Location = new Point(25, 93);
+            btnCamera3.Margin = new Padding(5, 4, 5, 4);
             btnCamera3.Name = "btnCamera3";
-            btnCamera3.Size = new Size(142, 45);
+            btnCamera3.Size = new Size(170, 56);
             btnCamera3.TabIndex = 7;
-            btnCamera3.Text = "Camera3";
+            btnCamera3.Text = "LEFT";
             btnCamera3.TextImageRelation = TextImageRelation.ImageBeforeText;
             btnCamera3.UseVisualStyleBackColor = true;
             btnCamera3.Click += btnCamera3_Click;
+            // 
+            // btnLoadProductModel
+            // 
+            btnLoadProductModel.FlatStyle = FlatStyle.Flat;
+            btnLoadProductModel.Font = new Font("Segoe UI", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btnLoadProductModel.IconChar = FontAwesome.Sharp.IconChar.Download;
+            btnLoadProductModel.IconColor = Color.DeepSkyBlue;
+            btnLoadProductModel.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            btnLoadProductModel.IconSize = 40;
+            btnLoadProductModel.Location = new Point(25, 221);
+            btnLoadProductModel.Margin = new Padding(5, 4, 5, 4);
+            btnLoadProductModel.Name = "btnLoadProductModel";
+            btnLoadProductModel.Size = new Size(355, 56);
+            btnLoadProductModel.TabIndex = 3;
+            btnLoadProductModel.Text = "Load Product Model";
+            btnLoadProductModel.TextImageRelation = TextImageRelation.ImageBeforeText;
+            btnLoadProductModel.UseVisualStyleBackColor = true;
+            btnLoadProductModel.Click += btnLoadModel_Click;
             // 
             // btnStop
             // 
@@ -1271,10 +1347,10 @@
             btnStop.IconChar = FontAwesome.Sharp.IconChar.None;
             btnStop.IconColor = Color.Black;
             btnStop.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            btnStop.Location = new Point(4, 747);
-            btnStop.Margin = new Padding(4, 3, 4, 3);
+            btnStop.Location = new Point(5, 996);
+            btnStop.Margin = new Padding(5, 4, 5, 4);
             btnStop.Name = "btnStop";
-            btnStop.Size = new Size(355, 86);
+            btnStop.Size = new Size(406, 100);
             btnStop.TabIndex = 1176;
             btnStop.Text = "STOP";
             btnStop.UseVisualStyleBackColor = true;
@@ -1288,10 +1364,10 @@
             btnStart.IconChar = FontAwesome.Sharp.IconChar.None;
             btnStart.IconColor = Color.Black;
             btnStart.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            btnStart.Location = new Point(4, 654);
-            btnStart.Margin = new Padding(4, 3, 4, 3);
+            btnStart.Location = new Point(5, 888);
+            btnStart.Margin = new Padding(5, 4, 5, 4);
             btnStart.Name = "btnStart";
-            btnStart.Size = new Size(355, 87);
+            btnStart.Size = new Size(406, 100);
             btnStart.TabIndex = 1175;
             btnStart.Text = "START";
             btnStart.UseVisualStyleBackColor = true;
@@ -1306,10 +1382,10 @@
             BT_Exit.IconColor = Color.Red;
             BT_Exit.IconFont = FontAwesome.Sharp.IconFont.Auto;
             BT_Exit.IconSize = 35;
-            BT_Exit.Location = new Point(1550, 3);
-            BT_Exit.Margin = new Padding(4, 3, 4, 3);
+            BT_Exit.Location = new Point(1773, 4);
+            BT_Exit.Margin = new Padding(5, 4, 5, 4);
             BT_Exit.Name = "BT_Exit";
-            BT_Exit.Size = new Size(124, 131);
+            BT_Exit.Size = new Size(141, 174);
             BT_Exit.TabIndex = 1236;
             BT_Exit.Text = "Exit";
             BT_Exit.TextImageRelation = TextImageRelation.ImageBeforeText;
@@ -1325,10 +1401,10 @@
             BT_Hide.IconColor = Color.DeepSkyBlue;
             BT_Hide.IconFont = FontAwesome.Sharp.IconFont.Auto;
             BT_Hide.IconSize = 35;
-            BT_Hide.Location = new Point(1413, 3);
-            BT_Hide.Margin = new Padding(4, 3, 4, 3);
+            BT_Hide.Location = new Point(1616, 4);
+            BT_Hide.Margin = new Padding(5, 4, 5, 4);
             BT_Hide.Name = "BT_Hide";
-            BT_Hide.Size = new Size(129, 131);
+            BT_Hide.Size = new Size(147, 174);
             BT_Hide.TabIndex = 1235;
             BT_Hide.Text = "Hide";
             BT_Hide.TextImageRelation = TextImageRelation.ImageBeforeText;
@@ -1340,10 +1416,10 @@
             label2.AutoSize = true;
             label2.Font = new Font("Microsoft Sans Serif", 9.75F, FontStyle.Bold);
             label2.ForeColor = Color.Red;
-            label2.Location = new Point(10, 58);
-            label2.Margin = new Padding(4, 0, 4, 0);
+            label2.Location = new Point(11, 77);
+            label2.Margin = new Padding(5, 0, 5, 0);
             label2.Name = "label2";
-            label2.Size = new Size(29, 16);
+            label2.Size = new Size(36, 20);
             label2.TabIndex = 1238;
             label2.Text = "NG";
             // 
@@ -1352,10 +1428,10 @@
             label3.AutoSize = true;
             label3.Font = new Font("Microsoft Sans Serif", 9.75F, FontStyle.Bold);
             label3.ForeColor = Color.Green;
-            label3.Location = new Point(10, 37);
-            label3.Margin = new Padding(4, 0, 4, 0);
+            label3.Location = new Point(11, 49);
+            label3.Margin = new Padding(5, 0, 5, 0);
             label3.Name = "label3";
-            label3.Size = new Size(27, 16);
+            label3.Size = new Size(35, 20);
             label3.TabIndex = 1239;
             label3.Text = "OK";
             // 
@@ -1364,10 +1440,10 @@
             labelTotal.AutoSize = true;
             labelTotal.Font = new Font("Microsoft Sans Serif", 9.75F, FontStyle.Bold);
             labelTotal.ForeColor = Color.Goldenrod;
-            labelTotal.Location = new Point(111, 8);
-            labelTotal.Margin = new Padding(4, 0, 4, 0);
+            labelTotal.Location = new Point(127, 11);
+            labelTotal.Margin = new Padding(5, 0, 5, 0);
             labelTotal.Name = "labelTotal";
-            labelTotal.Size = new Size(15, 16);
+            labelTotal.Size = new Size(19, 20);
             labelTotal.TabIndex = 1240;
             labelTotal.Text = "0";
             // 
@@ -1376,10 +1452,10 @@
             LabelOK.AutoSize = true;
             LabelOK.Font = new Font("Microsoft Sans Serif", 9.75F, FontStyle.Bold);
             LabelOK.ForeColor = Color.Green;
-            LabelOK.Location = new Point(111, 37);
-            LabelOK.Margin = new Padding(4, 0, 4, 0);
+            LabelOK.Location = new Point(127, 49);
+            LabelOK.Margin = new Padding(5, 0, 5, 0);
             LabelOK.Name = "LabelOK";
-            LabelOK.Size = new Size(15, 16);
+            LabelOK.Size = new Size(19, 20);
             LabelOK.TabIndex = 1241;
             LabelOK.Text = "0";
             // 
@@ -1388,10 +1464,10 @@
             LabelNG.AutoSize = true;
             LabelNG.Font = new Font("Microsoft Sans Serif", 9.75F, FontStyle.Bold);
             LabelNG.ForeColor = Color.Red;
-            LabelNG.Location = new Point(111, 58);
-            LabelNG.Margin = new Padding(4, 0, 4, 0);
+            LabelNG.Location = new Point(127, 77);
+            LabelNG.Margin = new Padding(5, 0, 5, 0);
             LabelNG.Name = "LabelNG";
-            LabelNG.Size = new Size(15, 16);
+            LabelNG.Size = new Size(19, 20);
             LabelNG.TabIndex = 1242;
             LabelNG.Text = "0";
             // 
@@ -1400,10 +1476,10 @@
             label1.AutoSize = true;
             label1.Font = new Font("Microsoft Sans Serif", 9.75F, FontStyle.Bold);
             label1.ForeColor = Color.Goldenrod;
-            label1.Location = new Point(8, 8);
-            label1.Margin = new Padding(4, 0, 4, 0);
+            label1.Location = new Point(9, 11);
+            label1.Margin = new Padding(5, 0, 5, 0);
             label1.Name = "label1";
-            label1.Size = new Size(43, 16);
+            label1.Size = new Size(51, 20);
             label1.TabIndex = 1237;
             label1.Text = "Total";
             // 
@@ -1416,10 +1492,10 @@
             btnClearCounter.IconColor = Color.Black;
             btnClearCounter.IconFont = FontAwesome.Sharp.IconFont.Auto;
             btnClearCounter.IconSize = 20;
-            btnClearCounter.Location = new Point(7, 81);
-            btnClearCounter.Margin = new Padding(4, 3, 4, 3);
+            btnClearCounter.Location = new Point(8, 108);
+            btnClearCounter.Margin = new Padding(5, 4, 5, 4);
             btnClearCounter.Name = "btnClearCounter";
-            btnClearCounter.Size = new Size(188, 45);
+            btnClearCounter.Size = new Size(215, 60);
             btnClearCounter.TabIndex = 1246;
             btnClearCounter.Text = "Clear Counter";
             btnClearCounter.TextAlign = ContentAlignment.MiddleRight;
@@ -1430,48 +1506,46 @@
             // tableLayoutPanel1
             // 
             tableLayoutPanel1.ColumnCount = 1;
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 18F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 21F));
             tableLayoutPanel1.Controls.Add(Panel_Header, 0, 0);
             tableLayoutPanel1.Controls.Add(tableLayoutPanel2, 0, 1);
             tableLayoutPanel1.Controls.Add(tableLayoutPanel3, 0, 2);
             tableLayoutPanel1.Dock = DockStyle.Fill;
             tableLayoutPanel1.Location = new Point(0, 0);
-            tableLayoutPanel1.Margin = new Padding(3, 2, 3, 2);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 3;
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 81F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 108F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 141F));
-            tableLayoutPanel1.Size = new Size(1684, 796);
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 188F));
+            tableLayoutPanel1.Size = new Size(1925, 1440);
             tableLayoutPanel1.TabIndex = 1247;
             // 
             // tableLayoutPanel2
             // 
             tableLayoutPanel2.ColumnCount = 3;
-            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 209F));
+            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 239F));
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 368F));
+            tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 421F));
             tableLayoutPanel2.Controls.Add(panelContainer, 1, 0);
             tableLayoutPanel2.Controls.Add(panel1, 2, 0);
             tableLayoutPanel2.Controls.Add(Panel_Menu, 0, 0);
             tableLayoutPanel2.Dock = DockStyle.Fill;
-            tableLayoutPanel2.Location = new Point(3, 83);
-            tableLayoutPanel2.Margin = new Padding(3, 2, 3, 2);
+            tableLayoutPanel2.Location = new Point(3, 111);
             tableLayoutPanel2.Name = "tableLayoutPanel2";
             tableLayoutPanel2.RowCount = 1;
             tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel2.Size = new Size(1678, 570);
+            tableLayoutPanel2.Size = new Size(1919, 1138);
             tableLayoutPanel2.TabIndex = 3;
             // 
             // tableLayoutPanel3
             // 
             tableLayoutPanel3.ColumnCount = 6;
-            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 285F));
-            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 579F));
-            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 145F));
+            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 326F));
+            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 662F));
+            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 166F));
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 137F));
-            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 132F));
+            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 157F));
+            tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 151F));
             tableLayoutPanel3.Controls.Add(panel2, 0, 0);
             tableLayoutPanel3.Controls.Add(tableLayoutPanel4, 1, 0);
             tableLayoutPanel3.Controls.Add(btnResult, 2, 0);
@@ -1479,12 +1553,11 @@
             tableLayoutPanel3.Controls.Add(BT_Hide, 4, 0);
             tableLayoutPanel3.Controls.Add(BT_Exit, 5, 0);
             tableLayoutPanel3.Dock = DockStyle.Fill;
-            tableLayoutPanel3.Location = new Point(3, 657);
-            tableLayoutPanel3.Margin = new Padding(3, 2, 3, 2);
+            tableLayoutPanel3.Location = new Point(3, 1255);
             tableLayoutPanel3.Name = "tableLayoutPanel3";
             tableLayoutPanel3.RowCount = 1;
             tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel3.Size = new Size(1678, 137);
+            tableLayoutPanel3.Size = new Size(1919, 182);
             tableLayoutPanel3.TabIndex = 4;
             // 
             // panel2
@@ -1499,10 +1572,9 @@
             panel2.Controls.Add(percentOK);
             panel2.Controls.Add(label1);
             panel2.Dock = DockStyle.Fill;
-            panel2.Location = new Point(3, 2);
-            panel2.Margin = new Padding(3, 2, 3, 2);
+            panel2.Location = new Point(3, 3);
             panel2.Name = "panel2";
-            panel2.Size = new Size(279, 133);
+            panel2.Size = new Size(320, 176);
             panel2.TabIndex = 0;
             // 
             // tableLayoutPanel4
@@ -1515,23 +1587,22 @@
             tableLayoutPanel4.Controls.Add(BT_Time, 0, 1);
             tableLayoutPanel4.Controls.Add(btnOCR, 1, 1);
             tableLayoutPanel4.Dock = DockStyle.Fill;
-            tableLayoutPanel4.Location = new Point(288, 2);
-            tableLayoutPanel4.Margin = new Padding(3, 2, 3, 2);
+            tableLayoutPanel4.Location = new Point(329, 3);
             tableLayoutPanel4.Name = "tableLayoutPanel4";
             tableLayoutPanel4.RowCount = 2;
             tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 39.2136574F));
             tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Percent, 60.78634F));
-            tableLayoutPanel4.Size = new Size(573, 133);
+            tableLayoutPanel4.Size = new Size(656, 176);
             tableLayoutPanel4.TabIndex = 1;
             // 
             // MAINFORM
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1684, 796);
+            ClientSize = new Size(1925, 1440);
             Controls.Add(tableLayoutPanel1);
             Icon = (Icon)resources.GetObject("$this.Icon");
-            Margin = new Padding(4, 3, 4, 3);
+            Margin = new Padding(5, 4, 5, 4);
             Name = "MAINFORM";
             Text = "TPU Inspection";
             Load += MAINFORM_Load;
@@ -1562,6 +1633,7 @@
             Panel_Header.PerformLayout();
             panel1.ResumeLayout(false);
             groupboxConnection.ResumeLayout(false);
+            groupboxConnection.PerformLayout();
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel2.ResumeLayout(false);
             tableLayoutPanel3.ResumeLayout(false);
@@ -1571,8 +1643,9 @@
             ResumeLayout(false);
 
             Panel_Home.Parent = panelContainer;
-            Panel_Settings.Parent = panelContainer;
             Panel_Teaching.Parent = panelContainer;
+            Panel_Settings.Parent = panelContainer;
+
             Panel_Home.BringToFront();
         }
 
@@ -1677,6 +1750,10 @@
         private TableLayoutPanel tableLayoutPanel3;
         private Panel panel2;
         private TableLayoutPanel tableLayoutPanel4;
+        public FontAwesome.Sharp.IconButton btnLoadProductModel;
+        private FontAwesome.Sharp.IconButton btnCreateProductModel;
+        private FontAwesome.Sharp.IconButton btnSaveProductModel;
+        private Label lbProductName;
     }
 }
 

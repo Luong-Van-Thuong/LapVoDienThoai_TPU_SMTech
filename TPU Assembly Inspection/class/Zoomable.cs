@@ -326,7 +326,7 @@ namespace TPU_Assembly.Class
             return prompt.ShowDialog() == DialogResult.OK ? textBox.Text : "";
         }
 
-        private void SaveOcrZones()
+        public void SaveOcrZones()
         {
             try
             {

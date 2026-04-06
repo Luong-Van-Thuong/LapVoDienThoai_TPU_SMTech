@@ -147,9 +147,9 @@ namespace TPU_Assembly.Class
             }
 
 
-            public string CAM1 = "CAMERA1";
-            public string CAM2 = "CAMERA2";
-            public string CAM3 = "CAMERA3";
+            public string CAM1 = "FRONT";
+            public string CAM2 = "REAR";
+            public string CAM3 = "LEFT";
 
             public List<AoiParam> AoiParams = [];
 

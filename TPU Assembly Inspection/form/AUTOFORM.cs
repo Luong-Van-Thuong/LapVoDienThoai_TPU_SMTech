@@ -1,5 +1,7 @@
 ﻿using Lighting_ALT;         
+using Newtonsoft.Json;
 using PaddleOCRSharp;
+using System.Configuration;
 using System.Diagnostics;
 using System.Drawing.Drawing2D;
 using System.Globalization;
@@ -10,6 +12,7 @@ using System.Text.RegularExpressions;
 using TPU_Assembly.Class;
 using TPU_Assembly.JobSelection;
 using TPU_Assembly_Inspection;
+using TPU_Assembly_Inspection.form;
 using TPU_Assembly_Inspection.Properties;
 
 namespace TPU_Assembly_Inspection_Paddle
@@ -31,6 +34,7 @@ namespace TPU_Assembly_Inspection_Paddle
         public static string IPAddress;
 
         public bool isLiveOn = false;
+        public static string ProductModelName;
 
         public System.Windows.Forms.Timer liveTimer;
 
@@ -97,22 +101,22 @@ namespace TPU_Assembly_Inspection_Paddle
             _cameraDict = new Dictionary<string, CameraConfig>
             {
                 {
-                    "CAMERA1", new CameraConfig {
-                        Name = "CAMERA1",
+                    "FRONT", new CameraConfig {
+                        Name = "FRONT",
                         CameraInterface = BaslerCam.CAMERA1,
                         TargetPictureBox = pictureBox1
                     }
                 },
                 {
-                    "CAMERA2", new CameraConfig {
-                        Name = "CAMERA2",
+                    "REAR", new CameraConfig {
+                        Name = "REAR",
                         CameraInterface = BaslerCam.CAMERA2,
                         TargetPictureBox = pictureBox2
                     }
                 },
                 {
-                    "CAMERA3", new CameraConfig {
-                        Name = "CAMERA3",
+                    "LEFT", new CameraConfig {
+                        Name = "LEFT",
                         CameraInterface = BaslerCam.CAMERA3,
                         TargetPictureBox = pictureBox3
                     }
@@ -120,6 +124,7 @@ namespace TPU_Assembly_Inspection_Paddle
             };
 
             LoadSystemSettings();
+            LoadProductModel();
 
             zoomable = new Zoomable(this);
 
@@ -152,10 +157,13 @@ namespace TPU_Assembly_Inspection_Paddle
 
             numericGain.Minimum = 0;
             numericGain.Maximum = 99999999;
-            
+
             numericExposure_Time.Minimum = 0;
             numericExposure_Time.Maximum = 99999999;
 
+            Panel_Home.Parent = panelContainer;
+            Panel_Teaching.Parent = panelContainer;
+            Panel_Settings.Parent = panelContainer;
 
             this.FormBorderStyle = FormBorderStyle.None;
             this.WindowState = FormWindowState.Maximized;
@@ -289,9 +297,9 @@ namespace TPU_Assembly_Inspection_Paddle
                     return;
                 }
 
-                var taskCam1 = ProcessCameraAndAIAsync("CAMERA1");
-                var taskCam2 = ProcessCameraAndAIAsync("CAMERA2");
-                var taskCam3 = ProcessCameraAndAIAsync("CAMERA3");
+                var taskCam1 = ProcessCameraAndAIAsync("FRONT");
+                var taskCam2 = ProcessCameraAndAIAsync("REAR");
+                var taskCam3 = ProcessCameraAndAIAsync("LEFT");
 
                 await Task.WhenAll(taskCam1, taskCam2, taskCam3);
 
@@ -408,20 +416,20 @@ namespace TPU_Assembly_Inspection_Paddle
                 }
                 try
                 {
-                    Bitmap grabbedImg = CameraBasler.GrabImage(camName);                   
+                    Bitmap grabbedImg = CameraBasler.GrabImage(camName);
                     if (grabbedImg == null)
                     {
                         result.Status = "GRAB_ERROR";
                         return result;
                     }
 
-                    if (camName == "CAMERA1")
+                    if (camName == "FRONT")
                     {
                         grabbedImg.RotateFlip(RotateFlipType.Rotate270FlipNone);
                     }
                     result.RawImage = grabbedImg;
 
-                    if (camName == "CAMERA1")
+                    if (camName == "FRONT")
                     {
                         result.OcrText = GetResultFromZone(grabbedImg, "OCR");
                     }
@@ -514,7 +522,7 @@ namespace TPU_Assembly_Inspection_Paddle
                 {
                     if (zoneName.ToUpper().Contains("OCR") || zoneName.ToUpper().Contains("TEXT"))
                     {
-                        if(_ocrEngine == null)
+                        if (_ocrEngine == null)
                         {
                             MessageBox.Show("Inference Engine chưa được khởi tạo!");
                             return "";
@@ -1071,6 +1079,51 @@ namespace TPU_Assembly_Inspection_Paddle
             propertyGridSettings.SelectedObject = new VisionSettingsWrapper();
         }
 
+        private void LoadProductModel()
+        {
+            if (string.IsNullOrEmpty(ProductModelName))
+            {
+                return;
+            }
+
+            string productModelPath = Path.Combine(Application.StartupPath, "ProductModels", ProductModelName);
+            if (!File.Exists(productModelPath))
+            {
+                return;
+            }
+
+            try
+            {
+                string json = File.ReadAllText(productModelPath);
+                ProductModel productModel = JsonConvert.DeserializeObject<ProductModel>(json);
+
+                if (productModel != null)
+                {
+                    _inspectionZones = productModel.InspectionZones;
+                    foreach(CameraTeaching cameraTeaching in productModel.CameraTeachings)
+                    {
+                        try
+                        {
+                            CameraBasler.SetExposureTime(cameraTeaching.CameraName, cameraTeaching.ExposureTime);
+                            CameraBasler.SetGain(cameraTeaching.CameraName, cameraTeaching.Gain);
+                            CameraBasler.SetGamma(cameraTeaching.CameraName, cameraTeaching.Gamma);
+
+                            lbProductName.Text = productModel.ProductName;
+                        }
+                        catch (Exception ex)
+                        {
+                            MSystem.InsertAndSaveLogs("set parameter camera: " + ex.ToString(), Color.Red);
+                            lbProductName.Text = "Load Product Model Fail";
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi Load Product Model: " + ex.Message);
+            }
+        }
+
         private void propertyGridSettings_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
             try
@@ -1099,17 +1152,17 @@ namespace TPU_Assembly_Inspection_Paddle
 
             Color statusColor = isConnected ? Color.Lime : Color.Red;
 
-            if (camName == "CAMERA1") btnCamera1.BackColor = statusColor;
-            else if (camName == "CAMERA2") btnCamera2.BackColor = statusColor;
-            else if (camName == "CAMERA3") btnCamera3.BackColor = statusColor;
+            if (camName == "FRONT") btnCamera1.BackColor = statusColor;
+            else if (camName == "REAR") btnCamera2.BackColor = statusColor;
+            else if (camName == "LEFT") btnCamera3.BackColor = statusColor;
 
         }
 
         private void UpdateStatusCamera()
         {
-            btnCamera1.BackColor = (CameraBasler.CheckConnectCam("CAMERA1")) ? Color.Lime : Color.Red;
-            btnCamera2.BackColor = (CameraBasler.CheckConnectCam("CAMERA2")) ? Color.Lime : Color.Red;
-            btnCamera3.BackColor = (CameraBasler.CheckConnectCam("CAMERA3")) ? Color.Lime : Color.Red;
+            btnCamera1.BackColor = (CameraBasler.CheckConnectCam("FRONT")) ? Color.Lime : Color.Red;
+            btnCamera2.BackColor = (CameraBasler.CheckConnectCam("REAR")) ? Color.Lime : Color.Red;
+            btnCamera3.BackColor = (CameraBasler.CheckConnectCam("LEFT")) ? Color.Lime : Color.Red;
             foreach (var cam in MAINFORM._cameraDict.Values)
             {
                 if (cam.CameraInterface is BaslerCam baslerCam)
@@ -1118,33 +1171,33 @@ namespace TPU_Assembly_Inspection_Paddle
                 }
             }
 
-            if (CameraBasler.CheckConnectCam("CAMERA1"))
+            if (CameraBasler.CheckConnectCam("FRONT"))
             {
-                comboBoxCamera.Items.Add("CAMERA1");
+                comboBoxCamera.Items.Add("FRONT");
             }
-            if (CameraBasler.CheckConnectCam("CAMERA2"))
+            if (CameraBasler.CheckConnectCam("REAR"))
             {
-                comboBoxCamera.Items.Add("CAMERA2");
+                comboBoxCamera.Items.Add("REAR");
             }
-            if (CameraBasler.CheckConnectCam("CAMERA3"))
+            if (CameraBasler.CheckConnectCam("LEFT"))
             {
-                comboBoxCamera.Items.Add("CAMERA3");
+                comboBoxCamera.Items.Add("LEFT");
             }
         }
 
         private void btnCamera1_Click(object sender, EventArgs e)
         {
-            if (!CameraBasler.CheckConnectCam("CAMERA1")) CameraBasler.ReOpenCamera("CAMERA1");
+            if (!CameraBasler.CheckConnectCam("FRONT")) CameraBasler.ReOpenCamera("FRONT");
         }
 
         private void btnCamera2_Click(object sender, EventArgs e)
         {
-            if (!CameraBasler.CheckConnectCam("CAMERA2")) CameraBasler.ReOpenCamera("CAMERA2");
+            if (!CameraBasler.CheckConnectCam("REAR")) CameraBasler.ReOpenCamera("REAR");
         }
 
         private void btnCamera3_Click(object sender, EventArgs e)
         {
-            if (!CameraBasler.CheckConnectCam("CAMERA3")) CameraBasler.ReOpenCamera("CAMERA3");
+            if (!CameraBasler.CheckConnectCam("LEFT")) CameraBasler.ReOpenCamera("LEFT");
         }
 
         #endregion
@@ -1157,9 +1210,9 @@ namespace TPU_Assembly_Inspection_Paddle
                 if (sender is not Button btn) return;
                 string cameraName = btn.Name switch
                 {
-                    "BT_GrapImage1" => "CAMERA1",
-                    "BT_GrapImage2" => "CAMERA2",
-                    "BT_GrapImage3" => "CAMERA3",
+                    "BT_GrapImage1" => "FRONT",
+                    "BT_GrapImage2" => "REAR",
+                    "BT_GrapImage3" => "LEFT",
                     _ => ""
                 };
 
@@ -1181,7 +1234,7 @@ namespace TPU_Assembly_Inspection_Paddle
 
                 if (newImage == null) return;
 
-                if(cameraName == "CAMERA1") newImage.RotateFlip(RotateFlipType.Rotate270FlipNone);
+                if (cameraName == "FRONT") newImage.RotateFlip(RotateFlipType.Rotate270FlipNone);
 
                 UpdateCameraImage(cameraName, newImage);
 
@@ -1242,9 +1295,9 @@ namespace TPU_Assembly_Inspection_Paddle
                     {
                         Bitmap originalBmp = LoadBitmapWithoutLocking(ofd.FileName);
 
-                        UpdateCameraImage("CAMERA1", new Bitmap(originalBmp));
-                        UpdateCameraImage("CAMERA2", new Bitmap(originalBmp));
-                        UpdateCameraImage("CAMERA3", new Bitmap(originalBmp));
+                        UpdateCameraImage("FRONT", new Bitmap(originalBmp));
+                        UpdateCameraImage("REAR", new Bitmap(originalBmp));
+                        UpdateCameraImage("LEFT", new Bitmap(originalBmp));
 
                         originalBmp.Dispose();
 
@@ -1293,9 +1346,9 @@ namespace TPU_Assembly_Inspection_Paddle
 
             switch (btn.Name)
             {
-                case "Import_Image": targetPB = pictureBox1; camName = "CAMERA1"; break;
-                case "Import_Image2": targetPB = pictureBox2; camName = "CAMERA2"; break;
-                case "Import_Image3": targetPB = pictureBox3; camName = "CAMERA3"; break;
+                case "Import_Image": targetPB = pictureBox1; camName = "FRONT"; break;
+                case "Import_Image2": targetPB = pictureBox2; camName = "REAR"; break;
+                case "Import_Image3": targetPB = pictureBox3; camName = "LEFT"; break;
             }
 
             using (OpenFileDialog ofd = new OpenFileDialog())
@@ -1635,9 +1688,9 @@ namespace TPU_Assembly_Inspection_Paddle
         {
             return camName switch
             {
-                "CAMERA1" => pictureBox1,
-                "CAMERA2" => pictureBox2,
-                "CAMERA3" => pictureBox3,
+                "FRONT" => pictureBox1,
+                "REAR" => pictureBox2,
+                "LEFT" => pictureBox3,
                 _ => null,
             };
         }
@@ -2078,6 +2131,91 @@ namespace TPU_Assembly_Inspection_Paddle
         {
 
         }
+
+        private async void btnCreateProductModel_Click(object sender, EventArgs e)
+        {
+            if (IsRunning)
+            {
+                MessageBox.Show("Please STOP Before Change Models");
+                return;
+            }
+
+            ButtonIsEnableLoadJob(false);
+
+            try
+            {
+                CreateProductModelForm createProductModelForm = new CreateProductModelForm();
+                createProductModelForm.StartPosition = FormStartPosition.CenterScreen;
+                if (createProductModelForm.ShowDialog() == DialogResult.OK)
+                {
+                    string modelName = createProductModelForm.productModelName;
+                    string productModelFolder = Path.Combine(Application.StartupPath, "ProductModels");
+                    if (!Directory.Exists(productModelFolder))
+                    {
+                        Directory.CreateDirectory(productModelFolder);
+                    }
+
+                    string productModelPath = Path.Combine(productModelFolder, createProductModelForm.productModelName + ".json");
+                    ProductModel newProductModel = new ProductModel();
+                    newProductModel.Path = productModelPath;
+                    newProductModel.ProductName = createProductModelForm.productModelName;
+                    newProductModel.InspectionZones = new List<InspectionZones>();
+                    newProductModel.CameraTeachings = new List<CameraTeaching>();
+                    foreach (string cameraName in _cameraDict.Keys)
+                    {
+                        CameraTeaching cameraTeaching = new CameraTeaching();
+                        cameraTeaching.CameraName = cameraName;
+                        try
+                        {
+                            cameraTeaching.ExposureTime = CameraBasler.GetExposureTime(cameraName);
+                            cameraTeaching.Gain = CameraBasler.GetGain(cameraName);
+                            cameraTeaching.Gamma = CameraBasler.GetGamma(cameraName);
+                        }
+                        catch (Exception ex)
+                        {
+                            MSystem.InsertAndSaveLogs("Lỗi khi lấy parameter camera: " + ex.ToString(), Color.Red);
+                            cameraTeaching.ExposureTime = 5000;
+                            cameraTeaching.Gain = 0;
+                            cameraTeaching.Gamma = 0;
+                        }
+
+                        newProductModel.CameraTeachings.Add(cameraTeaching);
+                    }                    
+
+                    _inspectionZones = newProductModel.InspectionZones;
+
+                    ProductModelName = Path.GetFileName(productModelPath);
+                    lbProductName.Text = newProductModel.ProductName;
+
+                    string json = JsonConvert.SerializeObject(newProductModel, Formatting.Indented);
+                    File.WriteAllText(newProductModel.Path, json);
+
+                    zoomable.SaveOcrZones();
+                    ConfigurationSystem.SaveSystemSetting();
+
+                    LoadProductModel();
+                }
+                else
+                {
+                    // 👉 User bấm Cancel hoặc đóng form
+                }
+
+                
+            }
+            catch (Exception ex)
+            {
+                btnLoadProductModel.BackColor = Color.Red;
+                MSystem.InsertAndSaveLogs($"Load Product Models Fail: {ex}", Color.Red);
+            }
+            finally
+            {
+                if (inferenceEngine != null)
+                {
+                    btnStart_Click(null, null);
+                }
+                ButtonIsEnableLoadJob(true);
+            }
+        }
     }
 
     #region Inspection Zones Class
@@ -2116,4 +2254,22 @@ namespace TPU_Assembly_Inspection_Paddle
     }
     #endregion
 
+    #region Product Model
+    public class CameraTeaching
+    {
+        public string CameraName { get; set; }
+        public double ExposureTime { get; set; }
+        public double Gain { get; set; }
+        public double Gamma { get; set; }
+    }
+
+    public class ProductModel
+    {
+        public string ProductName { get; set; }
+        public string Path { get; set; }
+        public List<CameraTeaching> CameraTeachings { get; set; }
+        public List<InspectionZones> InspectionZones { get; set; }
+    }
+
+    #endregion
 }
