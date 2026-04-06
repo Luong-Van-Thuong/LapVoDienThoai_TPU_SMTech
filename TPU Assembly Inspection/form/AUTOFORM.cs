@@ -34,7 +34,7 @@ namespace TPU_Assembly_Inspection_Paddle
         public static string IPAddress;
 
         public bool isLiveOn = false;
-        public static string ProductModelName;
+        public static string ProductModelFileName;
 
         public System.Windows.Forms.Timer liveTimer;
 
@@ -1081,12 +1081,12 @@ namespace TPU_Assembly_Inspection_Paddle
 
         private void LoadProductModel()
         {
-            if (string.IsNullOrEmpty(ProductModelName))
+            if (string.IsNullOrEmpty(ProductModelFileName))
             {
                 return;
             }
 
-            string productModelPath = Path.Combine(Application.StartupPath, "ProductModels", ProductModelName);
+            string productModelPath = Path.Combine(Application.StartupPath, "ProductModels", ProductModelFileName);
             if (!File.Exists(productModelPath))
             {
                 return;
@@ -1099,8 +1099,10 @@ namespace TPU_Assembly_Inspection_Paddle
 
                 if (productModel != null)
                 {
+                    ProductModelFileName = Path.GetFileName(productModelPath);
                     _inspectionZones = productModel.InspectionZones;
-                    foreach(CameraTeaching cameraTeaching in productModel.CameraTeachings)
+
+                    foreach (CameraTeaching cameraTeaching in productModel.CameraTeachings)
                     {
                         try
                         {
@@ -1112,7 +1114,7 @@ namespace TPU_Assembly_Inspection_Paddle
                         }
                         catch (Exception ex)
                         {
-                            MSystem.InsertAndSaveLogs("set parameter camera: " + ex.ToString(), Color.Red);
+                            MSystem.InsertAndSaveLogs("(Load Product Model) set parameter camera: " + ex.ToString(), Color.Red);
                             lbProductName.Text = "Load Product Model Fail";
                         }
                     }
@@ -2180,11 +2182,11 @@ namespace TPU_Assembly_Inspection_Paddle
                         }
 
                         newProductModel.CameraTeachings.Add(cameraTeaching);
-                    }                    
+                    }
 
                     _inspectionZones = newProductModel.InspectionZones;
 
-                    ProductModelName = Path.GetFileName(productModelPath);
+                    ProductModelFileName = Path.GetFileName(productModelPath);
                     lbProductName.Text = newProductModel.ProductName;
 
                     string json = JsonConvert.SerializeObject(newProductModel, Formatting.Indented);
@@ -2200,7 +2202,7 @@ namespace TPU_Assembly_Inspection_Paddle
                     // 👉 User bấm Cancel hoặc đóng form
                 }
 
-                
+
             }
             catch (Exception ex)
             {
@@ -2214,6 +2216,98 @@ namespace TPU_Assembly_Inspection_Paddle
                     btnStart_Click(null, null);
                 }
                 ButtonIsEnableLoadJob(true);
+            }
+        }
+
+        private void btnSaveProductModel_Click(object sender, EventArgs e)
+        {
+            if (IsRunning)
+            {
+                MessageBox.Show("Please STOP Before Change Models");
+                return;
+            }
+
+            ButtonIsEnableLoadJob(false);
+
+            try
+            {
+                if (string.IsNullOrEmpty(ProductModelFileName))
+                {
+                    MessageBox.Show("Chưa chọn product model.");
+                    return;
+                }
+
+                string modelName = ProductModelFileName;
+                string productModelFolder = Path.Combine(Application.StartupPath, "ProductModels");
+                if (!Directory.Exists(productModelFolder))
+                {
+                    Directory.CreateDirectory(productModelFolder);
+                }
+
+                string productModelPath = Path.Combine(productModelFolder, ProductModelFileName);
+                if (!File.Exists(productModelPath))
+                {
+                    MessageBox.Show("Không tồn tại file.");
+                    return;
+                }
+
+                ProductModel newProductModel = new ProductModel();
+                newProductModel.Path = productModelPath;
+                newProductModel.ProductName = Path.GetFileNameWithoutExtension(ProductModelFileName);
+                newProductModel.InspectionZones = _inspectionZones;
+                newProductModel.CameraTeachings = new List<CameraTeaching>();
+                foreach (string cameraName in _cameraDict.Keys)
+                {
+                    CameraTeaching cameraTeaching = new CameraTeaching();
+                    cameraTeaching.CameraName = cameraName;
+                    try
+                    {
+                        cameraTeaching.ExposureTime = CameraBasler.GetExposureTime(cameraName);
+                        cameraTeaching.Gain = CameraBasler.GetGain(cameraName);
+                        cameraTeaching.Gamma = CameraBasler.GetGamma(cameraName);
+                    }
+                    catch (Exception ex)
+                    {
+                        MSystem.InsertAndSaveLogs("Lỗi khi lấy parameter camera: " + ex.ToString(), Color.Red);
+                        cameraTeaching.ExposureTime = 5000;
+                        cameraTeaching.Gain = 0;
+                        cameraTeaching.Gamma = 0;
+                    }
+
+                    newProductModel.CameraTeachings.Add(cameraTeaching);
+                }
+
+                string json = JsonConvert.SerializeObject(newProductModel, Formatting.Indented);
+                File.WriteAllText(newProductModel.Path, json);
+
+                MessageBox.Show("Lưu Thành Công.", "Save", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            catch (Exception ex)
+            {
+                btnSaveProductModel.BackColor = Color.Red;
+                MSystem.InsertAndSaveLogs($"Save Product Models Fail: {ex}", Color.Red);
+            }
+            finally
+            {
+                ButtonIsEnableLoadJob(true);
+            }
+        }
+
+        private void btnLoadProductModel_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Title = "Chọn file";
+                openFileDialog.Filter = "Json files (*.json)|*.json";
+                openFileDialog.InitialDirectory = Path.Combine(Application.StartupPath, "ProductModels");
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string filePath = openFileDialog.FileName;
+                    ProductModelFileName = Path.GetFileName(filePath);
+                    LoadProductModel();                    
+                }
             }
         }
     }

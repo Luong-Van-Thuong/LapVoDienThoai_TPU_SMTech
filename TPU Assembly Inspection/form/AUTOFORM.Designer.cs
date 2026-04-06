@@ -572,6 +572,7 @@
             // 
             // panelContainer
             // 
+            panelContainer.Controls.Add(Panel_Home);
             panelContainer.Controls.Add(Panel_Settings);
             panelContainer.Dock = DockStyle.Fill;
             panelContainer.Location = new Point(242, 3);
@@ -705,7 +706,6 @@
             // Panel_Teaching
             // 
             Panel_Teaching.BackColor = Color.White;
-            Panel_Teaching.Controls.Add(Panel_Home);
             Panel_Teaching.Controls.Add(groupBox3);
             Panel_Teaching.Dock = DockStyle.Fill;
             Panel_Teaching.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
@@ -1301,7 +1301,7 @@
             btnSaveProductModel.Text = "Save";
             btnSaveProductModel.TextImageRelation = TextImageRelation.ImageBeforeText;
             btnSaveProductModel.UseVisualStyleBackColor = true;
-            btnSaveProductModel.Click += btnCamera3_Click;
+            btnSaveProductModel.Click += btnSaveProductModel_Click;
             // 
             // btnCamera3
             // 
@@ -1337,7 +1337,7 @@
             btnLoadProductModel.Text = "Load Product Model";
             btnLoadProductModel.TextImageRelation = TextImageRelation.ImageBeforeText;
             btnLoadProductModel.UseVisualStyleBackColor = true;
-            btnLoadProductModel.Click += btnLoadModel_Click;
+            btnLoadProductModel.Click += btnLoadProductModel_Click;
             // 
             // btnStop
             // 
@@ -1641,12 +1641,6 @@
             panel2.PerformLayout();
             tableLayoutPanel4.ResumeLayout(false);
             ResumeLayout(false);
-
-            Panel_Home.Parent = panelContainer;
-            Panel_Teaching.Parent = panelContainer;
-            Panel_Settings.Parent = panelContainer;
-
-            Panel_Home.BringToFront();
         }
 
         #endregion

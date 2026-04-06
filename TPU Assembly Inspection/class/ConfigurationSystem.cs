@@ -17,7 +17,7 @@ namespace TPU_Assembly.Class
                 SaveSetting("IPAddress", MAINFORM.IPAddress.ToString());
                 SaveSetting("Port", MAINFORM.Port.ToString());
                 SaveSetting("AutoLoadModel", MAINFORM.AutoLoadModel.ToString());
-                SaveSetting("ProductModelName", MAINFORM.ProductModelName);
+                SaveSetting("ProductModelFileName", MAINFORM.ProductModelFileName);
             }
             catch (Exception ex)
             {
@@ -71,7 +71,7 @@ namespace TPU_Assembly.Class
                 MAINFORM.IPAddress = appSettings["IPAddress"] ?? "127.0.0.1";
                 MAINFORM.Port = int.Parse(appSettings["Port"] ?? "9900");
                 MAINFORM.AutoLoadModel = bool.Parse(appSettings["AutoLoadModel"] ?? "false");
-                MAINFORM.ProductModelName = appSettings["ProductModelName"];
+                MAINFORM.ProductModelFileName = appSettings["ProductModelFileName"];
             }
             catch { }
         }
