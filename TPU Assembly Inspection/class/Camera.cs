@@ -114,6 +114,7 @@ namespace TPU_Assembly.Class
                 if (MAINFORM._cameraDict.TryGetValue(indexCamera, out var config))
                 {
                     config.CameraInterface.SetExposureTime(exposuretime);
+
                     return true;
                 }
                 return false;

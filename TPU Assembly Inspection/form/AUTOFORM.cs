@@ -73,7 +73,7 @@ namespace TPU_Assembly_Inspection_Paddle
 
         private TCP_Server _tcpServer;
 
-        private readonly Font font = new("Arial", 150, FontStyle.Bold);
+        private readonly Font font = new("Arial", 60, FontStyle.Bold);
         private readonly Pen penBox = new(Color.Lime, 15);
         private readonly SolidBrush brushText = new(Color.White);
         private readonly SolidBrush brushBg = new(Color.Lime);
@@ -2134,6 +2134,7 @@ namespace TPU_Assembly_Inspection_Paddle
 
         }
 
+        #region 15. Product Model
         private async void btnCreateProductModel_Click(object sender, EventArgs e)
         {
             if (IsRunning)
@@ -2310,6 +2311,8 @@ namespace TPU_Assembly_Inspection_Paddle
                 }
             }
         }
+
+        #endregion
     }
 
     #region Inspection Zones Class

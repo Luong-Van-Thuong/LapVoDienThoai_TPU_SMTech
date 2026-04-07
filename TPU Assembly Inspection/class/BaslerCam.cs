@@ -152,21 +152,39 @@ namespace TPU_Assembly.Class
             public string CAM3 = "LEFT";
 
             public List<AoiParam> AoiParams = [];
-
-
         }
 
 
-        #region Set /Get Camera Parameters
+        #region SET /GET Camera Parameters
+        //public override bool SetExposureTime(double exposuretime)
+        //{
+        //    try
+        //    {
+        //        if (camera == null || !camera.IsOpen) return false;
+
+        //        if (camera.Parameters[PLCamera.ExposureTimeRaw].IsWritable)
+        //        {
+        //            camera.Parameters[PLCamera.ExposureTimeRaw].SetValue((long)exposuretime);
+        //            return true;
+        //        }
+        //        else
+        //        {
+        //            MSystem.InsertAndSaveLogs($"Exposure time parameter is not writable for camera: {cameraName}", Color.Red);
+        //            return false;
+        //        }
+        //    }
+        //    catch (Exception) { return false; }
+        //}
+
         public override bool SetExposureTime(double exposuretime)
         {
             try
             {
                 if (camera == null || !camera.IsOpen) return false;
 
-                if (camera.Parameters[PLCamera.ExposureTimeRaw].IsWritable)
+                if (camera.Parameters[PLCamera.ExposureTimeAbs].IsWritable)
                 {
-                    camera.Parameters[PLCamera.ExposureTimeRaw].SetValue((long)exposuretime);
+                    camera.Parameters[PLCamera.ExposureTimeAbs].SetValue((long)exposuretime);
                     return true;
                 }
                 else
@@ -177,7 +195,6 @@ namespace TPU_Assembly.Class
             }
             catch (Exception) { return false; }
         }
-
 
         public override double GetGain()
         {
@@ -496,5 +513,6 @@ namespace TPU_Assembly.Class
             }
         }
 
+        
     }
 }
