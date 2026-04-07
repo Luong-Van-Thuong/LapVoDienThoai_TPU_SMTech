@@ -73,7 +73,7 @@ namespace TPU_Assembly_Inspection_Paddle
 
         private TCP_Server _tcpServer;
 
-        private readonly Font font = new("Arial", 60, FontStyle.Bold);
+        private readonly Font font = new("Arial", 80, FontStyle.Bold);
         private readonly Pen penBox = new(Color.Lime, 15);
         private readonly SolidBrush brushText = new(Color.White);
         private readonly SolidBrush brushBg = new(Color.Lime);
@@ -87,8 +87,6 @@ namespace TPU_Assembly_Inspection_Paddle
         public int OKCount = 0;
         public int NGCount = 0;
 
-
-        private static readonly object _lock = new object();
 
         public MAINFORM()
         {
