@@ -73,7 +73,7 @@ namespace TPU_Assembly_Inspection_Paddle
 
         private TCP_Server _tcpServer;
 
-        private readonly Font font = new("Arial", 60, FontStyle.Bold);
+        private readonly Font font = new("Arial", 68, FontStyle.Bold);
         private readonly Pen penBox = new(Color.Lime, 15);
         private readonly SolidBrush brushText = new(Color.White);
         private readonly SolidBrush brushBg = new(Color.Lime);
@@ -1953,6 +1953,12 @@ namespace TPU_Assembly_Inspection_Paddle
         private async void Run_Vision_CAMERA3_Click(object sender, EventArgs e)
         {
             if (pictureBox3.Image == null) return;
+
+            if (inferenceEngine == null)
+            {
+                MessageBox.Show("Chưa Load Model.");
+                return;
+            }
 
             Bitmap workingImage = new(pictureBox3.Image);
 
