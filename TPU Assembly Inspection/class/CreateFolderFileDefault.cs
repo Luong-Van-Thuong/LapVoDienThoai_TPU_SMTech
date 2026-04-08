@@ -49,9 +49,7 @@ namespace TPU_Assembly.Class
             //{
             //    image.Save(fullPath, System.Drawing.Imaging.ImageFormat.Bmp);
             //}
-        }
-
-        
+        }       
 
     }
 }
