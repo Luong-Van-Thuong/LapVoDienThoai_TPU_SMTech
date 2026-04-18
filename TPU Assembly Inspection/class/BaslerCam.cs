@@ -68,7 +68,7 @@ namespace TPU_Assembly.Class
 
                         camera.Open();
                         isOpened = true;
-
+                        break;
                     }
                 }
             }
@@ -119,8 +119,7 @@ namespace TPU_Assembly.Class
                         camera.Open();
 
                         isOpened = true;
-
-
+                        break;
                     }
                     MSystem.InsertAndSaveLogs($"ReOpened camera: {cameraName}", Color.Red);
                     return true;

@@ -176,7 +176,7 @@
             Panel_Menu.Location = new Point(5, 4);
             Panel_Menu.Margin = new Padding(5, 4, 5, 4);
             Panel_Menu.Name = "Panel_Menu";
-            Panel_Menu.Size = new Size(229, 1130);
+            Panel_Menu.Size = new Size(229, 1113);
             Panel_Menu.TabIndex = 0;
             // 
             // btnHome
@@ -284,7 +284,7 @@
             Panel_Home.Location = new Point(0, 0);
             Panel_Home.Margin = new Padding(5, 4, 5, 4);
             Panel_Home.Name = "Panel_Home";
-            Panel_Home.Size = new Size(1253, 1132);
+            Panel_Home.Size = new Size(1509, 1115);
             Panel_Home.TabIndex = 1;
             // 
             // pictureBox4
@@ -577,7 +577,7 @@
             panelContainer.Dock = DockStyle.Fill;
             panelContainer.Location = new Point(242, 3);
             panelContainer.Name = "panelContainer";
-            panelContainer.Size = new Size(1253, 1132);
+            panelContainer.Size = new Size(1509, 1115);
             panelContainer.TabIndex = 1;
             // 
             // Panel_Settings
@@ -592,7 +592,7 @@
             Panel_Settings.Location = new Point(0, 0);
             Panel_Settings.Margin = new Padding(5, 4, 5, 4);
             Panel_Settings.Name = "Panel_Settings";
-            Panel_Settings.Size = new Size(1253, 1132);
+            Panel_Settings.Size = new Size(1509, 1115);
             Panel_Settings.TabIndex = 1236;
             // 
             // groupBox2
@@ -712,7 +712,7 @@
             Panel_Teaching.Location = new Point(0, 0);
             Panel_Teaching.Margin = new Padding(5, 4, 5, 4);
             Panel_Teaching.Name = "Panel_Teaching";
-            Panel_Teaching.Size = new Size(1253, 1132);
+            Panel_Teaching.Size = new Size(1509, 1115);
             Panel_Teaching.TabIndex = 1235;
             // 
             // groupBox3
@@ -1102,7 +1102,7 @@
             richTextLog.Margin = new Padding(9, 11, 9, 11);
             richTextLog.Name = "richTextLog";
             richTextLog.ReadOnly = true;
-            richTextLog.Size = new Size(439, 160);
+            richTextLog.Size = new Size(695, 160);
             richTextLog.TabIndex = 0;
             richTextLog.Text = "";
             // 
@@ -1171,7 +1171,7 @@
             Panel_Header.Location = new Point(5, 4);
             Panel_Header.Margin = new Padding(5, 4, 5, 4);
             Panel_Header.Name = "Panel_Header";
-            Panel_Header.Size = new Size(1915, 100);
+            Panel_Header.Size = new Size(2171, 100);
             Panel_Header.TabIndex = 2;
             Panel_Header.Paint += Panel_Header_Paint;
             // 
@@ -1213,10 +1213,10 @@
             panel1.Controls.Add(groupbox_Teaching);
             panel1.Controls.Add(btnStart);
             panel1.Dock = DockStyle.Fill;
-            panel1.Location = new Point(1503, 4);
+            panel1.Location = new Point(1759, 4);
             panel1.Margin = new Padding(5, 4, 5, 4);
             panel1.Name = "panel1";
-            panel1.Size = new Size(411, 1130);
+            panel1.Size = new Size(411, 1113);
             panel1.TabIndex = 1235;
             // 
             // groupboxConnection
@@ -1382,7 +1382,7 @@
             BT_Exit.IconColor = Color.Red;
             BT_Exit.IconFont = FontAwesome.Sharp.IconFont.Auto;
             BT_Exit.IconSize = 35;
-            BT_Exit.Location = new Point(1773, 4);
+            BT_Exit.Location = new Point(2029, 4);
             BT_Exit.Margin = new Padding(5, 4, 5, 4);
             BT_Exit.Name = "BT_Exit";
             BT_Exit.Size = new Size(141, 174);
@@ -1401,7 +1401,7 @@
             BT_Hide.IconColor = Color.DeepSkyBlue;
             BT_Hide.IconFont = FontAwesome.Sharp.IconFont.Auto;
             BT_Hide.IconSize = 35;
-            BT_Hide.Location = new Point(1616, 4);
+            BT_Hide.Location = new Point(1872, 4);
             BT_Hide.Margin = new Padding(5, 4, 5, 4);
             BT_Hide.Name = "BT_Hide";
             BT_Hide.Size = new Size(147, 174);
@@ -1517,7 +1517,7 @@
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 108F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 188F));
-            tableLayoutPanel1.Size = new Size(1925, 1440);
+            tableLayoutPanel1.Size = new Size(2181, 1423);
             tableLayoutPanel1.TabIndex = 1247;
             // 
             // tableLayoutPanel2
@@ -1534,7 +1534,7 @@
             tableLayoutPanel2.Name = "tableLayoutPanel2";
             tableLayoutPanel2.RowCount = 1;
             tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel2.Size = new Size(1919, 1138);
+            tableLayoutPanel2.Size = new Size(2175, 1121);
             tableLayoutPanel2.TabIndex = 3;
             // 
             // tableLayoutPanel3
@@ -1553,11 +1553,11 @@
             tableLayoutPanel3.Controls.Add(BT_Hide, 4, 0);
             tableLayoutPanel3.Controls.Add(BT_Exit, 5, 0);
             tableLayoutPanel3.Dock = DockStyle.Fill;
-            tableLayoutPanel3.Location = new Point(3, 1255);
+            tableLayoutPanel3.Location = new Point(3, 1238);
             tableLayoutPanel3.Name = "tableLayoutPanel3";
             tableLayoutPanel3.RowCount = 1;
             tableLayoutPanel3.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel3.Size = new Size(1919, 182);
+            tableLayoutPanel3.Size = new Size(2175, 182);
             tableLayoutPanel3.TabIndex = 4;
             // 
             // panel2
@@ -1599,7 +1599,7 @@
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1925, 1440);
+            ClientSize = new Size(2181, 1423);
             Controls.Add(tableLayoutPanel1);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(5, 4, 5, 4);
