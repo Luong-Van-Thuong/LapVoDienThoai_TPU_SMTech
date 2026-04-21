@@ -14,7 +14,7 @@ using TPU_Assembly.JobSelection;
 using TPU_Assembly_Inspection;
 using TPU_Assembly_Inspection.form;
 using TPU_Assembly_Inspection.Properties;
-  
+using System.Threading.Channels;
 namespace TPU_Assembly_Inspection_Paddle
 {
     public partial class MAINFORM : Form
@@ -90,6 +90,8 @@ namespace TPU_Assembly_Inspection_Paddle
 
         public int LeftObjectNumber;
 
+        private volatile bool _isModelLoadedByTcp = false;
+        private readonly SemaphoreSlim _runGate = new(1, 1);
         public MAINFORM()
         {
             InitializeComponent();
@@ -213,6 +215,20 @@ namespace TPU_Assembly_Inspection_Paddle
             }
         }
 
+        private static IEnumerable<string> ParseTcpRequests(string raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw)) yield break;
+            string normalized = raw.Replace("\x02", "").Replace("\x03", "\n");
+            string[] parts = normalized.Split(['\r', '\n', ';', '|'], StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var p in parts)
+            {
+                var s = p.Trim();
+                if (!string.IsNullOrEmpty(s)) yield return s;
+            }
+        }
+
+        
         private void OnClientConnected(string clientIP)
         {
             if (InvokeRequired)
@@ -227,7 +243,7 @@ namespace TPU_Assembly_Inspection_Paddle
         private void OnClientDisconnected()
         {
             if (InvokeRequired)
-            {
+            { 
                 Invoke(new Action(OnClientDisconnected));
                 return;
             }
@@ -236,82 +252,129 @@ namespace TPU_Assembly_Inspection_Paddle
         }
         private static Random _rand = new();
 
-        private void OnDataReceived(string cmd)
+        private async void OnDataReceived(string cmd)
         {
+            //if (this.InvokeRequired)
+            //{
+            //    this.BeginInvoke(new Action(() => OnDataReceived(cmd)));
+            //    return;
+            //}
+
+            //MSystem.InsertAndSaveLogs(cmd, Color.Blue);
+            //if (string.IsNullOrEmpty(cmd)) return;
+
+            //string data = cmd.Trim();
+
+            ////// xử lý data nhận được
+            //if (data.Contains("TRIGGER"))
+            //{
+            //    if (!myLighting.MutilChannelON(myLighting.Brightness))
+            //    {
+            //        MSystem.InsertAndSaveLogs("ERROR ON LIGHT", Color.Red);
+            //        _tcpServer.Send("GRAB_ERROR");
+            //        return;
+            //    }
+            //    Thread.Sleep(50);
+            //    await Run_Once();
+            //}
+
+
             if (this.InvokeRequired)
             {
                 this.BeginInvoke(new Action(() => OnDataReceived(cmd)));
                 return;
             }
 
+            if (string.IsNullOrWhiteSpace(cmd)) return;
             MSystem.InsertAndSaveLogs(cmd, Color.Blue);
-            if (string.IsNullOrEmpty(cmd)) return;
 
-            string data = cmd.Trim();
+            // Hỗ trợ cả frame literal [0x20]...[0x30] và frame \x02...\x03
+            string normalized = cmd
+                .Replace("[0x20]", "")
+                .Replace("[0x30]", "")
+                .Trim();
 
-            //// xử lý data nhận được
-            if (data.Contains("TRIGGER"))
+            foreach (string request in ParseTcpRequests(normalized))
             {
-                if (!myLighting.MutilChannelON(myLighting.Brightness))
+                // LOAD model: A26_black
+                if (request.StartsWith("A26_", StringComparison.OrdinalIgnoreCase))
                 {
-                    MSystem.InsertAndSaveLogs("ERROR ON LIGHT", Color.Red);
-                    _tcpServer.Send("GRAB_ERROR");
-                    return;
+                    bool ok = TryHandleLoadModelRequest(request);
+                    if (!ok)
+                    {
+                        _tcpServer.Send($"LOAD_FAIL_SETTING_CAMERA:{request}");
+                    }
+                    continue;
                 }
-                Thread.Sleep(50);
-                Run_Once();
+
+                // TRIGGER
+                if (request.Equals("TRIGGER", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (!_isModelLoadedByTcp)
+                    {
+                        _tcpServer.Send("LOAD_REQUIRED");
+                        continue;
+                    }
+
+                    if (!await _runGate.WaitAsync(0))
+                    {
+                        _tcpServer.Send("BUSY");
+                        continue;
+                    }
+
+                    try
+                    {
+                        if (!myLighting.MutilChannelON(myLighting.Brightness))
+                        {
+                            MSystem.InsertAndSaveLogs("ERROR ON LIGHT", Color.Red);
+                            _tcpServer.Send("GRAB_ERROR");
+                            continue;
+                        }
+
+                        await Task.Delay(50);
+                        await Run_Once();
+                    }
+                    finally
+                    {
+                        _isModelLoadedByTcp = true;
+                        _runGate.Release();
+                    }
+
+                    continue;
+                }
+
+                _tcpServer.Send("UNKNOWN_CMD");
+
             }
-
-            //if (data.Contains("TRIGGER"))
-            //{
-            //    int r = _rand.Next(0, 6);
-
-            //    string response = r switch
-            //    {
-            //        0 => "OK:A37GF12#6HT",
-            //        1 => "NG_OCR:A26GF12#6HT",
-            //        2 => "NG_TPU:A37GF12#6HT",
-            //        3 => "NG_ALL:A26GF12#6HT",
-            //        4 => "GRAB_ERROR",
-            //        5 => "UNKNOWN_ERROR",
-            //        _ => "UNKNOWN_ERROR"
-            //    };
-
-            //    _tcpServer.Send(response);
-            //}
         }
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (keyData == Keys.Enter)
-
-
             {
-                if (!IsRunning)
+                _ = Task.Run(async () =>
                 {
-                    MSystem.InsertAndSaveLogs("Chưa START chương trình!", Color.Orange);
-                    return true;
-                }
+                    if (!await _runGate.WaitAsync(0)) return;
+                    try
+                    {
+                        if (!IsRunning || inferenceEngine == null) return;
+                        if (!myLighting.MutilChannelON(myLighting.Brightness)) return;
 
-                if (inferenceEngine == null)
-                {
-                    MSystem.InsertAndSaveLogs("Inference Engine chưa được khởi tạo!", Color.Red);
-                    return true;
-                }
+                        await Task.Delay(50);
+                        await Run_Once();
+                    }
+                    finally
+                    {
+                        _runGate.Release();
+                    }
+                });
 
-                if (!myLighting.MutilChannelON(myLighting.Brightness))
-                {
-                    MSystem.InsertAndSaveLogs("ERROR ON LIGHT", Color.Red);
-                    return true;
-                }
-                Thread.Sleep(50);
-                Run_Once();
-                return true; // true = đã xử lý, không cho các control khác nhận phím này
+                return true;
             }
 
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
-        private async void Run_Once()
+        private async Task Run_Once()
         {
             string OcrText = "";
             CameraProcessResult resFront = null;
@@ -482,6 +545,20 @@ namespace TPU_Assembly_Inspection_Paddle
                 }
                 return result;
             });
+        }
+
+        private bool TryHandleLoadModelRequest(string request)
+        {
+            string modelPath = Path.Combine(Application.StartupPath, "ProductModels", $"{request}.json");
+            if(!File.Exists(modelPath))
+                return false;
+
+            ProductModelFileName = Path.GetFileName(modelPath);
+            LoadProductModel();
+
+            _tcpServer.Send($"LOAD_OK:{request}");
+            MSystem.InsertAndSaveLogs($"[TCP] Loaded product model: {ProductModelFileName}", Color.Green);
+            return true;
         }
 
         private void UpdatePictureBoxWithClone(PictureBox pb, Bitmap newImage)
@@ -2435,7 +2512,6 @@ namespace TPU_Assembly_Inspection_Paddle
 
         #endregion
 
-        #region Them ham nhan dien anh
         #region Add new functions
 
         /// <summary>
@@ -2494,58 +2570,10 @@ namespace TPU_Assembly_Inspection_Paddle
                 return "";
             }
         }
-
-        /// <summary>
-        /// Thử 4 kiểu preprocessing, trả về kết quả có điểm cao nhất theo pattern A26/A37
-        /// </summary>
-        private string OcrTryBestPreprocess_Old(Bitmap roi)
-        {
-            // Ngưỡng score đủ tốt - nếu đạt thì dừng sớm, không cần thử tiếp
-            const int GOOD_ENOUGH_SCORE = 60;
-
-            var candidates = new (string Label, Func<Bitmap> Factory)[]
-            {
-                ("Original",        () => OcrCloneBitmap(roi)),
-                ("ContrastStretch", () => OcrPreprocessContrast(roi)),
-                ("Sharpen",         () => OcrPreprocessSharpen(roi)),
-                ("Invert",          () => OcrPreprocessInvert(roi)),
-            };
-
-            string bestResult = "";
-            int bestScore = -1;
-
-            foreach (var (label, factory) in candidates)
-            {
-                Bitmap bmp = null;
-                try
-                {
-                    bmp = factory();
-                    var ocrResult = _ocrEngine.DetectText(bmp);
-                    string raw = ocrResult?.Text?.Trim() ?? "";
-                    string cleaned = OcrNormalizeText(raw);
-                    int score = OcrScoreText(cleaned);
-
-                    MSystem.InsertAndSaveLogs($"  [{label}]: \"{cleaned}\" score={score}", Color.Gray);
-
-                    if (score > bestScore)
-                    {
-                        bestScore = score;
-                        bestResult = cleaned;
-                    }
-
-                    // Early exit: đủ tốt thì không cần thử tiếp
-                    if (bestScore >= GOOD_ENOUGH_SCORE) break;
-                }
-                catch { }
-                finally { bmp?.Dispose(); }
-            }
-
-            return bestResult;
-        }
-
+        
         private string OcrTryBestPreprocess(Bitmap roi)
         {
-            const int GOOD_ENOUGH_SCORE = 50;
+            //const int GOOD_ENOUGH_SCORE = 50;
             // Resize về chiều cao tối đa 120px — PaddleOCR đủ nhận dạng, nhanh hơn ~40-60%
             const int TARGET_HEIGHT = 120;
 
@@ -2678,60 +2706,6 @@ namespace TPU_Assembly_Inspection_Paddle
             return b;
         }
 
-        /// <summary>Contrast stretch + S-curve, bỏ 2% outlier hai đầu histogram</summary>
-        private Bitmap OcrPreprocessContrast(Bitmap source)
-        {
-            var result = new Bitmap(source.Width, source.Height,
-                System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-            var srcData = source.LockBits(new Rectangle(0, 0, source.Width, source.Height),
-                System.Drawing.Imaging.ImageLockMode.ReadOnly,
-                System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-            int stride = Math.Abs(srcData.Stride);
-            int bytes = stride * source.Height;
-            byte[] buf = new byte[bytes];
-            System.Runtime.InteropServices.Marshal.Copy(srcData.Scan0, buf, 0, bytes);
-            source.UnlockBits(srcData);
-
-            // Histogram để tìm lo/hi bỏ 2% outlier
-            int[] hist = new int[256];
-            for (int i = 0; i < buf.Length; i += 4)
-            {
-                int g = (int)(buf[i] * 0.114 + buf[i + 1] * 0.587 + buf[i + 2] * 0.299);
-                hist[Math.Clamp(g, 0, 255)]++;
-            }
-
-            int cutoff = (int)(source.Width * source.Height * 0.02);
-            int lo = 0, hi = 255, acc = 0;
-            for (int v = 0; v < 256; v++) { acc += hist[v]; if (acc >= cutoff) { lo = v; break; } }
-            acc = 0;
-            for (int v = 255; v >= 0; v--) { acc += hist[v]; if (acc >= cutoff) { hi = v; break; } }
-            float range = Math.Max(hi - lo, 1);
-
-            byte[] output = new byte[bytes];
-            for (int i = 0; i < buf.Length; i += 4)
-            {
-                int gray = (int)(buf[i] * 0.114 + buf[i + 1] * 0.587 + buf[i + 2] * 0.299);
-                float norm = Math.Clamp((gray - lo) / range, 0f, 1f);
-
-                // S-curve
-                float enhanced = norm < 0.5f
-                    ? 2f * norm * norm
-                    : 1f - MathF.Pow(-2f * norm + 2f, 2f) / 2f;
-
-                byte val = (byte)(enhanced * 255f);
-                output[i] = output[i + 1] = output[i + 2] = val;
-                output[i + 3] = 255;
-            }
-
-            var dstData = result.LockBits(new Rectangle(0, 0, result.Width, result.Height),
-                System.Drawing.Imaging.ImageLockMode.WriteOnly,
-                System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            System.Runtime.InteropServices.Marshal.Copy(output, 0, dstData.Scan0, bytes);
-            result.UnlockBits(dstData);
-            return result;
-        }
 
         /// <summary>Optimized Contrast: Unsafe Pointers + LUT (Look-up Table)</summary>
         private unsafe Bitmap OcrPreprocessContrastOptimized(Bitmap source)
@@ -2797,86 +2771,6 @@ namespace TPU_Assembly_Inspection_Paddle
             return result;
         }
 
-        /// <summary>Sharpen kernel 3x3 làm nét cạnh chữ</summary>
-        private Bitmap OcrPreprocessSharpen(Bitmap source)
-        {
-            int w = source.Width, h = source.Height;
-            float[,] kernel = { { 0, -1, 0 }, { -1, 5, -1 }, { 0, -1, 0 } };
-
-            var result = new Bitmap(w, h, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-            var srcD = source.LockBits(new Rectangle(0, 0, w, h),
-                System.Drawing.Imaging.ImageLockMode.ReadOnly,
-                System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            var dstD = result.LockBits(new Rectangle(0, 0, w, h),
-                System.Drawing.Imaging.ImageLockMode.WriteOnly,
-                System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-            int stride = Math.Abs(srcD.Stride);
-            byte[] src = new byte[stride * h];
-            byte[] dst = new byte[stride * h];
-            System.Runtime.InteropServices.Marshal.Copy(srcD.Scan0, src, 0, src.Length);
-
-            for (int y = 1; y < h - 1; y++)
-            {
-                for (int x = 1; x < w - 1; x++)
-                {
-                    float r = 0, gr = 0, b = 0;
-                    for (int ky = -1; ky <= 1; ky++)
-                        for (int kx = -1; kx <= 1; kx++)
-                        {
-                            int idx = (y + ky) * stride + (x + kx) * 4;
-                            float k = kernel[ky + 1, kx + 1];
-                            b += src[idx] * k;
-                            gr += src[idx + 1] * k;
-                            r += src[idx + 2] * k;
-                        }
-                    int di = y * stride + x * 4;
-                    dst[di] = (byte)Math.Clamp((int)b, 0, 255);
-                    dst[di + 1] = (byte)Math.Clamp((int)gr, 0, 255);
-                    dst[di + 2] = (byte)Math.Clamp((int)r, 0, 255);
-                    dst[di + 3] = 255;
-                }
-            }
-
-            System.Runtime.InteropServices.Marshal.Copy(dst, 0, dstD.Scan0, dst.Length);
-            source.UnlockBits(srcD);
-            result.UnlockBits(dstD);
-            return result;
-        }
-
-        /// <summary>Invert màu - dùng khi chữ sáng hơn nền</summary>
-        private Bitmap OcrPreprocessInvert(Bitmap source)
-        {
-            var result = new Bitmap(source.Width, source.Height,
-                System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-            var srcD = source.LockBits(new Rectangle(0, 0, source.Width, source.Height),
-                System.Drawing.Imaging.ImageLockMode.ReadOnly,
-                System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            var dstD = result.LockBits(new Rectangle(0, 0, result.Width, result.Height),
-                System.Drawing.Imaging.ImageLockMode.WriteOnly,
-                System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-            int bytes = Math.Abs(srcD.Stride) * source.Height;
-            byte[] buf = new byte[bytes];
-            System.Runtime.InteropServices.Marshal.Copy(srcD.Scan0, buf, 0, bytes);
-            source.UnlockBits(srcD);
-
-            for (int i = 0; i < buf.Length; i += 4)
-            {
-                buf[i] = (byte)(255 - buf[i]);
-                buf[i + 1] = (byte)(255 - buf[i + 1]);
-                buf[i + 2] = (byte)(255 - buf[i + 2]);
-                buf[i + 3] = 255;
-            }
-
-            System.Runtime.InteropServices.Marshal.Copy(buf, 0, dstD.Scan0, bytes);
-            result.UnlockBits(dstD);
-            return result;
-        }
-
-        #endregion
         #endregion
 
     }

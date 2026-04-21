@@ -45,6 +45,15 @@ namespace TPU_Assembly.Class
 
         public void Stop()
         {
+
+            //try { stream?.Close(); } catch { }
+            //try { client?.Close(); } catch { }
+            //try { server?.Stop(); } catch { }
+
+            //stream = null;
+            //client = null;
+            //server = null;
+
             isRunning = false;
             server?.Stop();
             server = null;
