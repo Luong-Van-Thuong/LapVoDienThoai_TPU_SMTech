@@ -48,13 +48,24 @@ namespace TPU_Assembly.Class
             {
                 //image.Save(fullPath, System.Drawing.Imaging.ImageFormat.Bmp);
                 image.Save(fullPath, _jpegCodec, _jpegParams);
-            }
+            }    
+        }
 
-            //lock (image)
-            //{
-            //    image.Save(fullPath, System.Drawing.Imaging.ImageFormat.Bmp);
-            //}
-        }       
+        private static ImageCodecInfo GetEncoder(ImageFormat format)
+        {
+            foreach (var codec in ImageCodecInfo.GetImageEncoders())
+            {
+                if (codec.FormatID == format.Guid) return codec;
+            }
+            return null;
+        }
+
+        private static EncoderParameters CreateJpegParams(long quality)
+        {
+            var param = new EncoderParameters(1);
+            param.Param[0] = new EncoderParameter(Encoder.Quality, quality);
+            return param;
+        }
 
     }
 }

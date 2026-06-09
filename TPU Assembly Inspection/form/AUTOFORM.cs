@@ -86,7 +86,7 @@ namespace TPU_Assembly_Inspection_Paddle
         public int TotalCount = 0;
         public int OKCount = 0;
         public int NGCount = 0;
-
+        public int LeftObjectNumber = 0;
 
         public MAINFORM()
         {
