@@ -31,6 +31,9 @@
             label1 = new Label();
             tbProductModelName = new TextBox();
             btnOK = new Button();
+            label2 = new Label();
+            nupObjectNumber = new NumericUpDown();
+            ((System.ComponentModel.ISupportInitialize)nupObjectNumber).BeginInit();
             SuspendLayout();
             // 
             // label1
@@ -48,13 +51,13 @@
             tbProductModelName.Font = new Font("Segoe UI", 19.8000011F, FontStyle.Regular, GraphicsUnit.Point, 0);
             tbProductModelName.Location = new Point(127, 36);
             tbProductModelName.Name = "tbProductModelName";
-            tbProductModelName.Size = new Size(630, 51);
+            tbProductModelName.Size = new Size(379, 51);
             tbProductModelName.TabIndex = 1;
             tbProductModelName.TextAlign = HorizontalAlignment.Center;
             // 
             // btnOK
             // 
-            btnOK.Location = new Point(636, 100);
+            btnOK.Location = new Point(753, 100);
             btnOK.Name = "btnOK";
             btnOK.Size = new Size(121, 61);
             btnOK.TabIndex = 2;
@@ -62,16 +65,37 @@
             btnOK.UseVisualStyleBackColor = true;
             btnOK.Click += btnOK_Click;
             // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Font = new Font("Segoe UI", 19.8000011F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label2.Location = new Point(525, 39);
+            label2.Name = "label2";
+            label2.Size = new Size(252, 46);
+            label2.TabIndex = 0;
+            label2.Text = "Object Number";
+            // 
+            // nupObjectNumber
+            // 
+            nupObjectNumber.Font = new Font("Segoe UI", 19.8000011F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            nupObjectNumber.Location = new Point(793, 34);
+            nupObjectNumber.Name = "nupObjectNumber";
+            nupObjectNumber.Size = new Size(81, 51);
+            nupObjectNumber.TabIndex = 3;
+            // 
             // CreateProductModelForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 173);
+            ClientSize = new Size(897, 173);
+            Controls.Add(nupObjectNumber);
             Controls.Add(btnOK);
             Controls.Add(tbProductModelName);
+            Controls.Add(label2);
             Controls.Add(label1);
             Name = "CreateProductModelForm";
             Text = "Create Product Model";
+            ((System.ComponentModel.ISupportInitialize)nupObjectNumber).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -81,5 +105,7 @@
         private Label label1;
         private TextBox tbProductModelName;
         private Button btnOK;
+        private Label label2;
+        private NumericUpDown nupObjectNumber;
     }
 }

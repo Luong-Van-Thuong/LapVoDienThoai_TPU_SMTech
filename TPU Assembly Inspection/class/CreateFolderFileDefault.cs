@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 
 namespace TPU_Assembly.Class
@@ -10,6 +11,9 @@ namespace TPU_Assembly.Class
         public static string Today => DateTime.Now.ToString("ddMMyyyy");
         public static string BasePath = @"C:\FA\TPU_Assembly_Inspection_Paddle\Images";
         private static readonly object _lock = new object();
+        // Tạo encoder JPEG 1 lần duy nhất, tái sử dụng
+        private static readonly ImageCodecInfo _jpegCodec = GetEncoder(ImageFormat.Jpeg);
+        private static readonly EncoderParameters _jpegParams = CreateJpegParams(90L); // quality 90%
 
         public static void CreateSaveFolders()
         {
@@ -30,19 +34,20 @@ namespace TPU_Assembly.Class
                 Directory.CreateDirectory(NG);
 
         }
-        public static void SaveOriginalBitmap(Bitmap image)
+        public static void SaveOriginalBitmap(Bitmap image, string indexCamera)
         {
             string saveFolder = Path.Combine(BasePath, Today, "Origin");
 
             if (!Directory.Exists(saveFolder))
                 Directory.CreateDirectory(saveFolder);
 
-            string filename = DateTime.Now.ToString("HHmmssfff") + ".bmp";
+            string filename = indexCamera + "_" + DateTime.Now.ToString("HHmmssfff") + ".bmp";
             string fullPath = Path.Combine(saveFolder, filename);
 
             lock (_lock)
             {
-                image.Save(fullPath, System.Drawing.Imaging.ImageFormat.Bmp);
+                //image.Save(fullPath, System.Drawing.Imaging.ImageFormat.Bmp);
+                image.Save(fullPath, _jpegCodec, _jpegParams);
             }
 
             //lock (image)

@@ -71,7 +71,7 @@ namespace TPU_Assembly.Class
                 MAINFORM.IPAddress = appSettings["IPAddress"] ?? "127.0.0.1";
                 MAINFORM.Port = int.Parse(appSettings["Port"] ?? "9900");
                 MAINFORM.AutoLoadModel = bool.Parse(appSettings["AutoLoadModel"] ?? "false");
-                MAINFORM.ProductModelFileName = appSettings["ProductModelFileName"];
+                MAINFORM.ProductModelFileName = appSettings["ProductModelFileName"] ?? "Black.json";
             }
             catch { }
         }

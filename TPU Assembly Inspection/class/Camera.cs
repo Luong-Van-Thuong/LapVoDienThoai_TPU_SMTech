@@ -49,7 +49,7 @@ namespace TPU_Assembly.Class
                         {
                             try
                             {
-                                CreateFolderFileDefault.SaveOriginalBitmap(clone);
+                                CreateFolderFileDefault.SaveOriginalBitmap(clone, indexCamera);
                             }
                             catch (Exception ex)
                             {
