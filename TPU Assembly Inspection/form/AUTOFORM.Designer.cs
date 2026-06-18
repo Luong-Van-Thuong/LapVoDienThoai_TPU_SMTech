@@ -71,9 +71,10 @@
             progressBar1 = new ProgressBar();
             btnAddtoArchive = new FontAwesome.Sharp.IconButton();
             btnExtract = new FontAwesome.Sharp.IconButton();
-            propertyGridSettings = new PropertyGrid();
             Panel_Teaching = new Panel();
             groupBox3 = new GroupBox();
+            numericLeftObjectNumber = new NumericUpDown();
+            label10 = new Label();
             comboBoxCamera = new ComboBox();
             numericGamma = new NumericUpDown();
             label8 = new Label();
@@ -83,6 +84,7 @@
             label5 = new Label();
             btnSave_Parameter = new FontAwesome.Sharp.IconButton();
             numericExposure_Time = new NumericUpDown();
+            propertyGridSettings = new PropertyGrid();
             MenuStripPic4 = new ContextMenuStrip(components);
             Fit_Image4 = new ToolStripMenuItem();
             Clear_Image4 = new ToolStripMenuItem();
@@ -148,6 +150,7 @@
             groupBox1.SuspendLayout();
             Panel_Teaching.SuspendLayout();
             groupBox3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)numericLeftObjectNumber).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericGamma).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericGain).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericExposure_Time).BeginInit();
@@ -585,8 +588,8 @@
             Panel_Settings.BackColor = Color.White;
             Panel_Settings.Controls.Add(groupBox2);
             Panel_Settings.Controls.Add(groupBox1);
-            Panel_Settings.Controls.Add(propertyGridSettings);
             Panel_Settings.Controls.Add(Panel_Teaching);
+            Panel_Settings.Controls.Add(propertyGridSettings);
             Panel_Settings.Dock = DockStyle.Fill;
             Panel_Settings.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             Panel_Settings.Location = new Point(0, 0);
@@ -692,17 +695,6 @@
             btnExtract.UseVisualStyleBackColor = true;
             btnExtract.Click += btnExtract_Click;
             // 
-            // propertyGridSettings
-            // 
-            propertyGridSettings.BackColor = Color.White;
-            propertyGridSettings.Font = new Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            propertyGridSettings.Location = new Point(112, 68);
-            propertyGridSettings.Margin = new Padding(5, 4, 5, 4);
-            propertyGridSettings.Name = "propertyGridSettings";
-            propertyGridSettings.Size = new Size(441, 1040);
-            propertyGridSettings.TabIndex = 3;
-            propertyGridSettings.PropertyValueChanged += propertyGridSettings_PropertyValueChanged;
-            // 
             // Panel_Teaching
             // 
             Panel_Teaching.BackColor = Color.White;
@@ -717,6 +709,8 @@
             // 
             // groupBox3
             // 
+            groupBox3.Controls.Add(numericLeftObjectNumber);
+            groupBox3.Controls.Add(label10);
             groupBox3.Controls.Add(comboBoxCamera);
             groupBox3.Controls.Add(numericGamma);
             groupBox3.Controls.Add(label8);
@@ -726,14 +720,36 @@
             groupBox3.Controls.Add(label5);
             groupBox3.Controls.Add(btnSave_Parameter);
             groupBox3.Controls.Add(numericExposure_Time);
-            groupBox3.Location = new Point(39, 68);
+            groupBox3.Location = new Point(39, 88);
             groupBox3.Margin = new Padding(3, 4, 3, 4);
             groupBox3.Name = "groupBox3";
             groupBox3.Padding = new Padding(3, 4, 3, 4);
-            groupBox3.Size = new Size(376, 496);
+            groupBox3.Size = new Size(386, 565);
             groupBox3.TabIndex = 1245;
             groupBox3.TabStop = false;
             groupBox3.Text = "Camera";
+            groupBox3.Enter += groupBox3_Enter;
+            // 
+            // numericLeftObjectNumber
+            // 
+            numericLeftObjectNumber.DecimalPlaces = 3;
+            numericLeftObjectNumber.Location = new Point(216, 345);
+            numericLeftObjectNumber.Margin = new Padding(3, 4, 3, 4);
+            numericLeftObjectNumber.Maximum = new decimal(new int[] { 20, 0, 0, 0 });
+            numericLeftObjectNumber.Name = "numericLeftObjectNumber";
+            numericLeftObjectNumber.Size = new Size(137, 34);
+            numericLeftObjectNumber.TabIndex = 1252;
+            numericLeftObjectNumber.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            numericLeftObjectNumber.ValueChanged += numericLeftObjectNumber_ValueChanged;
+            // 
+            // label10
+            // 
+            label10.AutoSize = true;
+            label10.Location = new Point(26, 351);
+            label10.Name = "label10";
+            label10.Size = new Size(174, 28);
+            label10.TabIndex = 1251;
+            label10.Text = "LeftObjectNumber";
             // 
             // comboBoxCamera
             // 
@@ -813,7 +829,7 @@
             btnSave_Parameter.IconChar = FontAwesome.Sharp.IconChar.None;
             btnSave_Parameter.IconColor = Color.Black;
             btnSave_Parameter.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            btnSave_Parameter.Location = new Point(175, 379);
+            btnSave_Parameter.Location = new Point(162, 417);
             btnSave_Parameter.Margin = new Padding(5, 4, 5, 4);
             btnSave_Parameter.Name = "btnSave_Parameter";
             btnSave_Parameter.Size = new Size(150, 88);
@@ -835,6 +851,17 @@
             numericExposure_Time.TabIndex = 1243;
             numericExposure_Time.Value = new decimal(new int[] { 5000, 0, 0, 0 });
             numericExposure_Time.ValueChanged += numericExposure_Time_ValueChanged;
+            // 
+            // propertyGridSettings
+            // 
+            propertyGridSettings.BackColor = Color.White;
+            propertyGridSettings.Font = new Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            propertyGridSettings.Location = new Point(0, 0);
+            propertyGridSettings.Margin = new Padding(5, 4, 5, 4);
+            propertyGridSettings.Name = "propertyGridSettings";
+            propertyGridSettings.Size = new Size(441, 705);
+            propertyGridSettings.TabIndex = 3;
+            propertyGridSettings.PropertyValueChanged += propertyGridSettings_PropertyValueChanged;
             // 
             // MenuStripPic4
             // 
@@ -1622,6 +1649,7 @@
             Panel_Teaching.ResumeLayout(false);
             groupBox3.ResumeLayout(false);
             groupBox3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)numericLeftObjectNumber).EndInit();
             ((System.ComponentModel.ISupportInitialize)numericGamma).EndInit();
             ((System.ComponentModel.ISupportInitialize)numericGain).EndInit();
             ((System.ComponentModel.ISupportInitialize)numericExposure_Time).EndInit();
@@ -1748,6 +1776,8 @@
         private FontAwesome.Sharp.IconButton btnCreateProductModel;
         private FontAwesome.Sharp.IconButton btnSaveProductModel;
         private Label lbProductName;
+        private NumericUpDown numericLeftObjectNumber;
+        private Label label10;
     }
 }
 
