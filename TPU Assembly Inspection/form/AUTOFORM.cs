@@ -21,7 +21,7 @@ namespace TPU_Assembly_Inspection_Paddle
     {
         public volatile bool IsRunning = false;
 
-        private YoloInferenceEngine inferenceEngine;
+        private YoloInferenceEngine inferenceEngine;            
 
         public static bool SaveImageOrigin, SaveImageOK, SaveImageNG;
 
@@ -90,7 +90,7 @@ namespace TPU_Assembly_Inspection_Paddle
 
         public int LeftObjectNumber;
 
-        private volatile bool _isModelLoadedByTcp = false;
+        //private volatile bool _isModelLoadedByTcp = false;
         private readonly SemaphoreSlim _runGate = new(1, 1);
         public MAINFORM()
         {
@@ -163,6 +163,9 @@ namespace TPU_Assembly_Inspection_Paddle
             numericExposure_Time.Minimum = 0;
             numericExposure_Time.Maximum = 99999999;
 
+            numericLeftObjectNumber.Minimum = 1;
+            numericLeftObjectNumber.Maximum = 999;
+
             Panel_Home.Parent = panelContainer;
             Panel_Teaching.Parent = panelContainer;
             Panel_Settings.Parent = panelContainer;
@@ -228,7 +231,7 @@ namespace TPU_Assembly_Inspection_Paddle
             }
         }
 
-        
+
         private void OnClientConnected(string clientIP)
         {
             if (InvokeRequired)
@@ -243,7 +246,7 @@ namespace TPU_Assembly_Inspection_Paddle
         private void OnClientDisconnected()
         {
             if (InvokeRequired)
-            { 
+            {
                 Invoke(new Action(OnClientDisconnected));
                 return;
             }
@@ -297,12 +300,21 @@ namespace TPU_Assembly_Inspection_Paddle
             foreach (string request in ParseTcpRequests(normalized))
             {
                 // LOAD model: A26_black
-                if (request.StartsWith("A26_", StringComparison.OrdinalIgnoreCase))
+                if (request.StartsWith("MODEL", StringComparison.OrdinalIgnoreCase) || request.Contains("A26", StringComparison.OrdinalIgnoreCase))
                 {
-                    bool ok = TryHandleLoadModelRequest(request);
+                    string nameFileSetting = request.Replace("MODEL,", "", StringComparison.OrdinalIgnoreCase).Trim();
+                    // Tôi cần bỏ từ MODEL khi nhận được từ request mong muốn nhận được là chỉ có A26_BLACK còn lại bỏ hết đi
+
+                    bool ok = TryHandleLoadModelRequest(nameFileSetting);
                     if (!ok)
                     {
                         _tcpServer.Send($"LOAD_FAIL_SETTING_CAMERA:{request}");
+                        MSystem.InsertAndSaveLogs($"Failed to load product model: {nameFileSetting}", Color.Red);
+                    }
+                    else 
+                    {
+                        _tcpServer.Send($"LOAD_OK:{request}");
+                        MSystem.InsertAndSaveLogs($"[TCP] Loaded product model: {ProductModelFileName}", Color.Green);
                     }
                     continue;
                 }
@@ -310,11 +322,11 @@ namespace TPU_Assembly_Inspection_Paddle
                 // TRIGGER
                 if (request.Equals("TRIGGER", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (!_isModelLoadedByTcp)
-                    {
-                        _tcpServer.Send("LOAD_REQUIRED");
-                        continue;
-                    }
+                    //if (!_isModelLoadedByTcp && inferenceEngine == null)
+                    //{
+                    //    _tcpServer.Send("LOAD_REQUIRED");
+                    //    continue;
+                    //}
 
                     if (!await _runGate.WaitAsync(0))
                     {
@@ -336,7 +348,7 @@ namespace TPU_Assembly_Inspection_Paddle
                     }
                     finally
                     {
-                        _isModelLoadedByTcp = true;
+                        //_isModelLoadedByTcp = true;
                         _runGate.Release();
                     }
 
@@ -403,7 +415,7 @@ namespace TPU_Assembly_Inspection_Paddle
                 if (resFront.Status != "OK" || resRear.Status != "OK" || resLeft.Status != "OK")
                 {
                     string errorToSend = new[] { resFront.Status, resRear.Status, resLeft.Status }.FirstOrDefault(r => r != "OK");
-                    _tcpServer.Send(errorToSend ?? "GRAB_ERROR");
+                    _tcpServer.Send(errorToSend ?? "TẮT CHƯƠNG TRÌNH ĐI BẬT LẠI");
                     MSystem.InsertAndSaveLogs("CAMERA PROCESSING FAILED", Color.Red);
 
                     this.Invoke(new Action(() =>
@@ -414,10 +426,23 @@ namespace TPU_Assembly_Inspection_Paddle
                     return;
                 }
 
+                float minConfidence = 0.5f; // ngưỡng tối thiểu 70%
+                int valDetection = 0;
+                valDetection = resLeft.Detections.Count;
+                // ClassName == "1" tương đương với lables = A26_L2_OK
+                var validDetections = resLeft.Detections
+                    .Where(d => d.ClassName == "1" && d.Confidence <= minConfidence)
+                    .ToList();
+                if (validDetections != null && validDetections.Count > 0)
+                    valDetection = valDetection - 1;
+
                 bool isCamRear = resRear.Detections.Count >= 3;
-                bool isCamLeft = resLeft.Detections.Count >= LeftObjectNumber;
-               // bool isOCROK = !string.IsNullOrEmpty(resFront.OcrText);
-                bool isOCROK = true;
+                bool isCamLeft = valDetection >= LeftObjectNumber;
+                bool isOCROK = !string.IsNullOrEmpty(resFront.OcrText);
+
+                //Sau này chạy chương trình thì commnet lại
+
+                //bool isOCROK = true;
 
                 OcrText = resFront.OcrText;
 
@@ -431,12 +456,15 @@ namespace TPU_Assembly_Inspection_Paddle
                 Color backColor = isAllOK ? Color.Lime : Color.Red;
                 Color foreColor = isAllOK ? Color.Black : Color.White;
 
-                float tongDienTichLoi = resRear.Detections.Where(d => d.ClassName == "2").Sum(d => d.Area);
+               // float tongDienTichLoi = resRear.Detections.Where(d => d.ClassName == "2").Sum(d => d.Area);
 
                 if (isAllOK) _tcpServer.Send("OK:" + OcrText);
                 else if (!isOCROK && errorCams.Count >= 2) _tcpServer.Send("NG_ALL:" + OcrText);
-                //else if (!isOCROK && errorCams.Count < 2) _tcpServer.Send("NG_OCR:" + OcrText);
-                else if ((isOCROK && errorCams.Count > 0) || tongDienTichLoi < 200000) _tcpServer.Send("NG_TPU:" + OcrText);
+                else if (!isOCROK && errorCams.Count < 2) _tcpServer.Send("NG_OCR:" + OcrText);
+                else if (errorCams.Count >= 2) _tcpServer.Send("NG_TPU:");
+                else if (errorCams.Count == 1)
+                    _tcpServer.Send("NG_CAMERA:" + errorCams[0]);
+                //else if ((isOCROK && errorCams.Count > 0) || tongDienTichLoi < 200000) _tcpServer.Send("NG_TPU:" + OcrText);
 
 
                 stopWatch_Run.Stop();
@@ -494,6 +522,8 @@ namespace TPU_Assembly_Inspection_Paddle
                 resRear?.RawImage?.Dispose();
                 resLeft?.RawImage?.Dispose();
 
+                GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
 
@@ -521,7 +551,7 @@ namespace TPU_Assembly_Inspection_Paddle
 
                     if (camName == "FRONT")
                     {
-                       //grabbedImg.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                        //grabbedImg.RotateFlip(RotateFlipType.Rotate90FlipNone);
                         //grabbedImg.RotateFlip(RotateFlipType.RotateNoneFlipXY);
                     }
                     result.RawImage = grabbedImg;
@@ -550,14 +580,12 @@ namespace TPU_Assembly_Inspection_Paddle
         private bool TryHandleLoadModelRequest(string request)
         {
             string modelPath = Path.Combine(Application.StartupPath, "ProductModels", $"{request}.json");
-            if(!File.Exists(modelPath))
+            if (!File.Exists(modelPath))
                 return false;
 
             ProductModelFileName = Path.GetFileName(modelPath);
             LoadProductModel();
-
-            _tcpServer.Send($"LOAD_OK:{request}");
-            MSystem.InsertAndSaveLogs($"[TCP] Loaded product model: {ProductModelFileName}", Color.Green);
+            //_isModelLoadedByTcp = true;
             return true;
         }
 
@@ -565,9 +593,15 @@ namespace TPU_Assembly_Inspection_Paddle
         {
             if (pb == null || newImage == null) return;
 
+            // ✅ Dispose Tag trước
+            if (pb.Tag is Bitmap oldTag)
+            {
+                pb.Tag = null;
+                oldTag.Dispose();
+            }
+
             Image oldImg = pb.Image;
             pb.Image = (Bitmap)newImage.Clone();
-
             oldImg?.Dispose();
 
             zoomable.FitImageToPictureBox(pb);
@@ -577,12 +611,21 @@ namespace TPU_Assembly_Inspection_Paddle
         {
             if (detections == null) return;
             Bitmap newDrawnImage = DrawBoundingBoxes(source, detections);
+
+            // ✅ Dispose Tag
+            if (pb.Tag is Bitmap oldTag)
+            {
+                pb.Tag = null;
+                oldTag.Dispose();
+            }
+
             Image oldImage = pb.Image;
             pb.Image = newDrawnImage;
-            if (oldImage != null && oldImage != pb.Tag)
-            {
-                oldImage.Dispose();
-            }
+            oldImage?.Dispose();
+            //if (oldImage != null && oldImage != pb.Tag)
+            //{
+            //    oldImage.Dispose();
+            //}
             zoomable.FitImageToPictureBox(pb);
         }
         public Bitmap DrawBoundingBoxes(Bitmap originalImage, List<YoloInferenceEngine.Detection> detections)
@@ -958,7 +1001,7 @@ namespace TPU_Assembly_Inspection_Paddle
                                             OCRParameter ocrParam = new()
                                             {
                                                 det_db_thresh = 0.2f,        // ← giảm từ 0.5 xuống 0.2
-                                                det_db_box_thresh = 0.3f,    // ← giảm từ 0.5 xuống 0.3
+                                                det_db_box_thresh = 0.25f,    // ← giảm từ 0.5 xuống 0.3
                                                 use_angle_cls = false,
                                                 det_db_unclip_ratio = 2.0f   // ← mở rộng vùng detect text
                                             };
@@ -1132,6 +1175,12 @@ namespace TPU_Assembly_Inspection_Paddle
                     ProductModelFileName = Path.GetFileName(productModelPath);
                     _inspectionZones = productModel.InspectionZones;
                     LeftObjectNumber = productModel.LeftObjectNumber;
+                    numericLeftObjectNumber.Value = LeftObjectNumber;
+                    if (numericLeftObjectNumber != null)
+                    {
+                        numericLeftObjectNumber.Value = Math.Max(numericLeftObjectNumber.Minimum,
+                            Math.Min(numericLeftObjectNumber.Maximum, (decimal)productModel.LeftObjectNumber));
+                    }
 
                     foreach (CameraTeaching cameraTeaching in productModel.CameraTeachings)
                     {
@@ -1266,7 +1315,7 @@ namespace TPU_Assembly_Inspection_Paddle
 
                 if (newImage == null) return;
 
-               // if (cameraName == "FRONT") newImage.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                // if (cameraName == "FRONT") newImage.RotateFlip(RotateFlipType.Rotate90FlipNone);
 
                 UpdateCameraImage(cameraName, newImage);
             }
@@ -1278,7 +1327,7 @@ namespace TPU_Assembly_Inspection_Paddle
                 }
             }
         }
-       
+
         private string ShowSelectionDialog()
         {
             Form prompt = new()
@@ -1803,8 +1852,17 @@ namespace TPU_Assembly_Inspection_Paddle
                 UpdatePictureBoxSafe(pictureBox2, bm2, det2);
                 UpdatePictureBoxSafe(pictureBox3, bm3, det3);
 
+                float minConfidence = 0.5f;
+                int valDetection = 0;
+                valDetection = det3.Count;
+                var validDetections = det3
+                    .Where(d => d.ClassName == "2" && d.Confidence <= minConfidence)
+                    .ToList();
+                if (validDetections != null && validDetections.Count > 0)
+                    valDetection = valDetection - 1;
+
                 bool isCamRear = det2.Count >= 3;
-                bool isCamLeft = det3.Count >= 4;
+                bool isCamLeft = det3.Count >= LeftObjectNumber;
                 bool isOCROK = !string.IsNullOrEmpty(ocrResult);
 
                 List<string> errorCams = [];
@@ -2018,8 +2076,19 @@ namespace TPU_Assembly_Inspection_Paddle
                 oldImage?.Dispose();
 
                 workingImage.Dispose();
+                var minConfidence = 0.5f; // ngưỡng tối thiểu 70%
+                int valDetection = 0;
+                valDetection = resultData.Detections.Count;
+                // Trong gán label thì phải để ý cách gán cũ ClassName == "1" tương đương với A26_L2_OK
+                var validDetections = resultData.Detections
+                    .Where(d => d.ClassName == "1" && d.Confidence <= minConfidence)
+                    .ToList();
+                if (validDetections != null && validDetections.Count > 0)
+                    valDetection = valDetection - 1;
 
-                string status = (resultData.Detections.Count >= LeftObjectNumber) ? "OK" : "NG";
+                string status = (valDetection >= LeftObjectNumber) ? "OK" : "NG";
+
+                //string status = (resultData.Detections.Count >= LeftObjectNumber) ? "OK" : "NG";
 
                 SaveResultToDisk((Bitmap)pictureBox3.Image, baseName, status);
 
@@ -2292,6 +2361,7 @@ namespace TPU_Assembly_Inspection_Paddle
                 newProductModel.ProductName = Path.GetFileNameWithoutExtension(ProductModelFileName);
                 newProductModel.InspectionZones = _inspectionZones;
                 newProductModel.CameraTeachings = new List<CameraTeaching>();
+                newProductModel.LeftObjectNumber = (int)numericLeftObjectNumber.Value;
                 foreach (string cameraName in _cameraDict.Keys)
                 {
                     CameraTeaching cameraTeaching = new CameraTeaching();
@@ -2407,7 +2477,7 @@ namespace TPU_Assembly_Inspection_Paddle
                 return "";
             }
         }
-        
+
         private string OcrTryBestPreprocess(Bitmap roi)
         {
             //const int GOOD_ENOUGH_SCORE = 50;
@@ -2610,6 +2680,24 @@ namespace TPU_Assembly_Inspection_Paddle
 
         #endregion
 
+        private void numericLeftObjectNumber_ValueChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                LeftObjectNumber = (int)numericLeftObjectNumber.Value;
+                MSystem.InsertAndSaveLogs($"Left Object Number thay đổi: {LeftObjectNumber}", Color.Blue);
+            }
+            catch (Exception ex)
+            {
+                MSystem.InsertAndSaveLogs($"Left Object Number thay đổi failed: {ex.Message}", Color.Red);
+            }
+
+        }
+
+        private void groupBox3_Enter(object sender, EventArgs e)
+        {
+
+        }
     }
 
     #region Inspection Zones Class
